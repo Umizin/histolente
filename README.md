@@ -1,4 +1,6 @@
-# Workstation de Patologia Digital — TCC
+# HistoLente
+
+*Estudo explicável de padrões histológicos do câncer colorretal* — ferramenta desenvolvida no TCC
 
 **Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência Artificial: Uma Ferramenta de Apoio à Patologia Digital**
 

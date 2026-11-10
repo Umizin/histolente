@@ -3,7 +3,7 @@
 ## 1. Estrutura Analítica do Projeto (EAP)
 
 ```
-TCC — Workstation de Patologia Digital
+TCC — HistoLente
 ├── 1 Gerenciamento do projeto
 │   ├── 1.1 Metodologia e planejamento
 │   ├── 1.2 Gestão de riscos

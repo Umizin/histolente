@@ -341,7 +341,7 @@ Estimativas em *story points* (sequência de Fibonacci), com sprints de duas sem
 
 ### 5.1 Diagrama de casos de uso
 
-**Figura 1 — Diagrama de casos de uso da Workstation de Patologia Digital**
+**Figura 1 — Diagrama de casos de uso da ferramenta HistoLente**
 
 Código-fonte PlantUML: `docs/engenharia-requisitos/casos-de-uso.puml`
 

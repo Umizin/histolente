@@ -1,7 +1,7 @@
 # Gestão de Configuração
 
 ## 1. Repositório
-- **Git**, com repositório remoto no **GitHub**: `[[URL do repositório]]`.
+- **Git**, com repositório remoto no **GitHub**: https://github.com/Umizin/histolente.
 - Branch principal: `main`. Ela é sempre estável e cada sprint concluída recebe uma *tag* (`sprint-00`, `sprint-01`…).
 - O repositório contém código, documentação, monografia e ferramentas. **Não** contém modelos treinados (`.pt`), o dataset, segredos (`.env`) nem respostas de participantes (ver `.gitignore`).
 

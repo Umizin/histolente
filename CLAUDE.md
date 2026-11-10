@@ -13,6 +13,7 @@
 | Autor | Paulo Victor Silva Gonçalves |
 | Curso / IES | Engenharia de Software — Universidade de Vassouras (UVS), Campus Maricá |
 | Ano | 2026 |
+| Nome da ferramenta | **HistoLente** — estudo explicável de padrões histológicos do câncer colorretal (repositório: https://github.com/Umizin/histolente) |
 | Título | Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência Artificial: Uma Ferramenta de Apoio à Patologia Digital |
 | Metodologia | Design Science Research (DSR) + Scrum (sprints de 2 semanas) |
 | Dataset | NCT-CRC-HE-100K (Kather et al., 2018) — 100.000 patches H&E 224×224 px, 86 lâminas, 9 classes |

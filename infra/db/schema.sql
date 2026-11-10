@@ -1,4 +1,4 @@
--- Modelo físico — Workstation de Patologia Digital
+-- Modelo físico — HistoLente
 -- PostgreSQL 16. Acesso exclusivo do Backend de Orquestração (o serviço de inferência NÃO acessa este banco — RNF06).
 -- Dicionário de dados: docs/projeto/03-modelagem-de-dados.md
 

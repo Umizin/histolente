@@ -115,9 +115,9 @@ O *Product Backlog* inicial reúne 22 histórias de usuário e 6 itens habilitad
 
 ## 3.6 Modelagem de casos de uso
 
-A Figura 1 apresenta o diagrama de casos de uso da UML, com quatro atores e quinze casos de uso. O Professor é modelado como especialização do Estudante, herdando seus casos de uso e acrescentando o envio de lotes para aulas práticas. O Serviço de Inferência aparece como ator secundário de sistema, refletindo seu isolamento arquitetural (RNF06). Os casos de uso de envio (UC02, UC03 e UC04) incluem a classificação (UC05), que por sua vez inclui a geração do mapa Grad-CAM (UC06). Funcionalidades opcionais, como a exploração do mapa, o modo quiz, a comparação de classes e a exportação do histórico, são modeladas como extensões.
+A ferramenta desenvolvida neste trabalho foi denominada **HistoLente**. O nome remete à ideia de uma lente de estudo, que auxilia a observação da lâmina sem substituir o olhar do especialista. A Figura 1 apresenta o diagrama de casos de uso da UML, com quatro atores e quinze casos de uso. O Professor é modelado como especialização do Estudante, herdando seus casos de uso e acrescentando o envio de lotes para aulas práticas. O Serviço de Inferência aparece como ator secundário de sistema, refletindo seu isolamento arquitetural (RNF06). Os casos de uso de envio (UC02, UC03 e UC04) incluem a classificação (UC05), que por sua vez inclui a geração do mapa Grad-CAM (UC06). Funcionalidades opcionais, como a exploração do mapa, o modo quiz, a comparação de classes e a exportação do histórico, são modeladas como extensões.
 
-**Figura 1 — Diagrama de casos de uso da Workstation de Patologia Digital**
+**Figura 1 — Diagrama de casos de uso da ferramenta HistoLente**
 
 ![Diagrama de casos de uso](../engenharia-requisitos/casos-de-uso.svg){.paisagem}
 

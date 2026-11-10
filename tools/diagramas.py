@@ -65,7 +65,7 @@ def casos_de_uso() -> str:
          '<path d="M0,0 L12,6 L0,12 Z" fill="#fff" stroke="#333" stroke-width="1.2"/></marker></defs>',
          f'<rect width="{w}" height="{h}" fill="#fff"/>',
          '<rect x="215" y="12" width="840" height="885" fill="none" stroke="#333" stroke-width="1.4" rx="4"/>',
-         '<text x="1043" y="34" text-anchor="end" font-size="17" font-weight="bold">Workstation de Patologia Digital</text>']
+         '<text x="1043" y="34" text-anchor="end" font-size="17" font-weight="bold">HistoLente</text>']
     for a, u in assoc:
         ux, uy, _ = ucs[u]
         x, y, _ = actors[a]

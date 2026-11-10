@@ -1,5 +1,5 @@
 @startuml casos-de-uso
-' Diagrama de Casos de Uso — Workstation de Patologia Digital (TCC UVS 2026)
+' Diagrama de Casos de Uso — HistoLente (TCC UVS 2026)
 ' Renderizar: extensão "PlantUML" do VS Code (Alt+D) ou java -jar plantuml.jar casos-de-uso.puml
 left to right direction
 skinparam packageStyle rectangle
@@ -17,7 +17,7 @@ actor "Serviço de Inferência\n(Worker de IA)" as WK <<sistema>>
 
 PROF -|> EST
 
-rectangle "Workstation de Patologia Digital" {
+rectangle "HistoLente" {
   usecase "UC01 Autenticar-se" as UC01
   usecase "UC02 Enviar patch\npara análise" as UC02
   usecase "UC03 Analisar amostra\nda galeria" as UC03
