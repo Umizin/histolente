@@ -1,0 +1,66 @@
+@startuml casos-de-uso
+' Diagrama de Casos de Uso — Workstation de Patologia Digital (TCC UVS 2026)
+' Renderizar: extensão "PlantUML" do VS Code (Alt+D) ou java -jar plantuml.jar casos-de-uso.puml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #F4FBFA
+  BorderColor #0F766E
+}
+skinparam actorBorderColor #0F766E
+
+actor "Estudante de\nMedicina" as EST
+actor "Professor de\nPatologia" as PROF
+actor "Administrador" as ADM
+actor "Serviço de Inferência\n(Worker de IA)" as WK <<sistema>>
+
+PROF -|> EST
+
+rectangle "Workstation de Patologia Digital" {
+  usecase "UC01 Autenticar-se" as UC01
+  usecase "UC02 Enviar patch\npara análise" as UC02
+  usecase "UC03 Analisar amostra\nda galeria" as UC03
+  usecase "UC04 Enviar lote\nde patches" as UC04
+  usecase "UC05 Classificar patch" as UC05
+  usecase "UC06 Gerar mapa\nGrad-CAM" as UC06
+  usecase "UC07 Visualizar resultado\nda classificação" as UC07
+  usecase "UC08 Explorar mapa Grad-CAM\n(opacidade, lado a lado, zoom)" as UC08
+  usecase "UC09 Praticar em\nmodo quiz" as UC09
+  usecase "UC10 Consultar histórico\nde análises" as UC10
+  usecase "UC11 Exportar histórico\n(CSV)" as UC11
+  usecase "UC12 Gerenciar versão\nativa do modelo" as UC12
+  usecase "UC13 Gerenciar usuários" as UC13
+  usecase "UC14 Comparar classes\nconfundíveis" as UC14
+  usecase "UC15 Acompanhar\nprogresso" as UC15
+}
+
+EST --> UC01
+EST --> UC02
+EST --> UC03
+EST --> UC07
+EST --> UC10
+EST --> UC15
+UC14 ..> UC03 : <<extend>>
+PROF --> UC04
+ADM --> UC01
+ADM --> UC12
+ADM --> UC13
+
+UC02 ..> UC05 : <<include>>
+UC03 ..> UC05 : <<include>>
+UC04 ..> UC05 : <<include>>
+UC05 ..> UC06 : <<include>>
+UC05 -- WK
+UC06 -- WK
+
+UC08 ..> UC07 : <<extend>>
+UC09 ..> UC03 : <<extend>>
+UC11 ..> UC10 : <<extend>>
+
+note right of UC07
+  RF07 — Todas as telas exibem o aviso:
+  ferramenta educacional / apoio à triagem,
+  não substitui laudo (Res. CFM nº 2.454/2026).
+end note
+@enduml
