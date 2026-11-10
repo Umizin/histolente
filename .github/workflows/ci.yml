@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  banco:
+    name: Schema do banco
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aplica infra/db/schema.sql
+        run: psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f infra/db/schema.sql
+        env:
+          PGPASSWORD: ci
+
+  ferramentas:
+    name: Ferramentas de documentação
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compila scripts
+        run: python -m py_compile tools/*.py
+      - name: Gera diagramas
+        run: python -I tools/diagramas.py
