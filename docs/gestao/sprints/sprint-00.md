@@ -21,10 +21,10 @@
 | 1 | Repositório Git, `.gitignore`, README, estratégia de branches e padrão de commits | 1.3 | Iniciado em 10/11 |
 | 2 | Repositório remoto no GitHub e GitHub Projects com o backlog | 1.3 | A fazer (depende da conta do autor) |
 | 3 | Metodologia, EAP, roadmap e matriz de riscos | 1.1, 1.2 | Iniciado em 10/11 |
-| 4 | Diagrama de classes e diagramas de sequência dos fluxos principais | 4.2 | A fazer |
-| 5 | MER, modelo lógico, modelo físico (SQL) e dicionário de dados | 4.3 | A fazer |
-| 6 | Guia de estilo, critérios WCAG e protótipo navegável | 4.4 | A fazer |
-| 7 | Seção de segurança e LGPD | 4.5 | A fazer |
+| 4 | Diagrama de classes e diagramas de sequência dos fluxos principais | 4.2 | Concluído em 10/11 (`docs/projeto/02-…`) |
+| 5 | MER, modelo lógico, modelo físico (SQL) e dicionário de dados | 4.3 | Concluído em 10/11 (`docs/projeto/03-…`, `infra/db/schema.sql`) |
+| 6 | Guia de estilo, critérios WCAG e protótipo navegável | 4.4 | Guia e protótipo concluídos em 10/11; validação com usuários pendente |
+| 7 | Seção de segurança e LGPD | 4.5 | Concluído em 10/11 (`docs/projeto/05-…`) |
 | 8 | Consolidar as respostas da elicitação (Seção 1.4) e revisar o MoSCoW | 3.1 | Aguardando respostas |
 | 9 | Confirmar com o orientador: CEP, política de uso de IA, prazos | 2.4 | A fazer |
 
