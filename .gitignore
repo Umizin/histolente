@@ -1,0 +1,40 @@
+# Segredos e ambiente
+.env
+.env.*
+!.env.example
+
+# Dependências e builds
+node_modules/
+.next/
+dist/
+build/
+coverage/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Modelos e dados (grandes / licenciados — fora do Git)
+*.pt
+*.pth
+*.onnx
+data/
+datasets/
+ml/models/*
+!ml/models/.gitkeep
+
+# Dados de participantes da pesquisa (LGPD — nunca versionar)
+docs/pesquisa/respostas/
+docs/pesquisa/*.csv
+!docs/pesquisa/exemplo_*.csv
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
