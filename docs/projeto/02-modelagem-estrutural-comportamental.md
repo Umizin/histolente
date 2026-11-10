@@ -1,0 +1,358 @@
+# 2. Modelagem Estrutural e Comportamental
+
+> Os diagramas estão em Mermaid. Eles são renderizados automaticamente no GitHub e no VS Code (extensão *Markdown Preview Mermaid Support*).
+
+## 2.1 Diagrama de classes — Backend de orquestração (domínio, aplicação e portas)
+
+```mermaid
+classDiagram
+    direction LR
+
+    class Perfil {
+        <<enumeration>>
+        ESTUDANTE
+        PROFESSOR
+        ADMINISTRADOR
+    }
+    class ClasseTecidual {
+        <<enumeration>>
+        ADI
+        BACK
+        DEB
+        LYM
+        MUC
+        MUS
+        NORM
+        STR
+        TUM
+    }
+    class StatusAnalise {
+        <<enumeration>>
+        NA_FILA
+        PROCESSANDO
+        CONCLUIDA
+        FALHOU
+    }
+
+    class Usuario {
+        +UUID id
+        +Email email
+        +String nome
+        +Perfil perfil
+        +String hashSenha
+        +podeVerAnalise(a: Analise) bool
+    }
+    class Imagem {
+        +UUID id
+        +Sha256 hash
+        +String mimeType
+        +int largura
+        +int altura
+        +int tamanhoBytes
+        +String chaveArmazenamento
+        +ClasseTecidual? classeVerdadeira
+        +validar() void
+        +foraDoPadrao() bool
+    }
+    class VersaoModelo {
+        +UUID id
+        +String nome
+        +String versao
+        +Sha256 hashArquivo
+        +bool ativa
+    }
+    class Analise {
+        +UUID id
+        +StatusAnalise status
+        +bool cacheHit
+        +Duracao tempoWorker
+        +Duracao tempoTotal
+        +String? erro
+        +concluir(r: ResultadoInferencia) void
+        +falhar(motivo: String) void
+        +reenviar() Analise
+    }
+    class ResultadoInferencia {
+        +ClasseTecidual classeSugerida
+        +Map~ClasseTecidual,float~ probabilidades
+        +MapaGradCam mapa
+        +bool baixaConfianca()
+        +ranking() List~ClasseTecidual~
+    }
+    class MapaGradCam {
+        +String chaveArmazenamento
+        +String camadaAlvo
+        +ClasseTecidual classeAlvo
+    }
+    class Lote {
+        +UUID id
+        +String rotulo
+        +adicionar(a: Analise) void
+    }
+    class TentativaQuiz {
+        +UUID id
+        +ClasseTecidual resposta
+        +bool acertou()
+    }
+    class Consentimento {
+        +String documento
+        +String versao
+        +DateTime aceitoEm
+    }
+
+    Usuario "1" --> "*" Analise : solicita
+    Usuario "1" --> "*" Lote : cria
+    Usuario "1" --> "*" Consentimento : registra
+    Usuario "1" --> "*" TentativaQuiz : realiza
+    Imagem "1" --> "*" Analise : analisada em
+    VersaoModelo "1" --> "*" Analise : produz
+    Lote "0..1" o-- "*" Analise : agrupa
+    Analise "1" *-- "0..1" ResultadoInferencia
+    ResultadoInferencia "1" *-- "1" MapaGradCam
+    TentativaQuiz "*" --> "1" Imagem : sobre
+    Usuario --> Perfil
+    Analise --> StatusAnalise
+
+    class SubmeterAnalise {
+        <<caso de uso>>
+        +executar(cmd) RespostaSubmissao
+    }
+    class ProcessarResultado {
+        <<caso de uso>>
+        +executar(evento) void
+    }
+    class ConsultarHistorico {
+        <<caso de uso>>
+        +executar(filtro) Pagina~Analise~
+    }
+    class ResponderQuiz {
+        <<caso de uso>>
+        +executar(cmd) FeedbackQuiz
+    }
+
+    class AnaliseRepository {
+        <<interface>>
+        +salvar(a: Analise) void
+        +buscar(id: UUID) Analise
+        +listar(filtro) Pagina~Analise~
+    }
+    class CacheResultados {
+        <<interface>>
+        +obter(hash, versao) ResultadoInferencia?
+        +gravar(hash, versao, r) void
+    }
+    class PublicadorJobs {
+        <<interface>>
+        +publicar(job: JobInferencia) void
+    }
+    class NotificadorEventos {
+        <<interface>>
+        +notificar(analiseId, evento) void
+    }
+    class ArmazenamentoImagens {
+        <<interface>>
+        +guardar(bytes) String
+    }
+
+    SubmeterAnalise ..> AnaliseRepository
+    SubmeterAnalise ..> CacheResultados
+    SubmeterAnalise ..> PublicadorJobs
+    SubmeterAnalise ..> ArmazenamentoImagens
+    ProcessarResultado ..> AnaliseRepository
+    ProcessarResultado ..> CacheResultados
+    ProcessarResultado ..> NotificadorEventos
+    ConsultarHistorico ..> AnaliseRepository
+
+    class PrismaAnaliseRepository
+    class RedisCacheResultados
+    class RabbitMqPublicadorJobs
+    class RedisPubSubNotificador
+    class DiscoArmazenamentoImagens
+    PrismaAnaliseRepository ..|> AnaliseRepository
+    RedisCacheResultados ..|> CacheResultados
+    RabbitMqPublicadorJobs ..|> PublicadorJobs
+    RedisPubSubNotificador ..|> NotificadorEventos
+    DiscoArmazenamentoImagens ..|> ArmazenamentoImagens
+```
+
+**Padrões de projeto aplicados:**
+
+| Padrão | Onde | Para quê |
+|---|---|---|
+| Ports & Adapters (Hexagonal) | Portas `*Repository`, `CacheResultados`, `PublicadorJobs`; adaptadores Prisma, Redis, RabbitMQ | Isolar o domínio da infraestrutura |
+| Repository | `AnaliseRepository` | Abstrair a persistência |
+| Command / Use Case | `SubmeterAnalise`, `ProcessarResultado`… | Uma operação de negócio por classe (responsabilidade única) |
+| Value Object | `Sha256`, `Email`, `Duracao` | Validar na criação e evitar dados inválidos no domínio |
+| Observer / Pub-Sub | `NotificadorEventos` → SSE | Notificar o navegador quando o resultado chega |
+| Strategy | Backbone da CNN e colormap do Grad-CAM (serviço de inferência) | Trocar a arquitetura do modelo ou a paleta sem alterar o fluxo |
+| Idempotent Consumer | `ProcessarResultado` (ignora `job_id` repetido) | Mensagens duplicadas não geram efeitos duplicados |
+
+## 2.2 Diagrama de classes — Serviço de inferência
+
+```mermaid
+classDiagram
+    direction LR
+    class ConsumidorJobs {
+        +iniciar() void
+        -aoReceber(msg) void
+    }
+    class ProcessarJob {
+        <<caso de uso>>
+        +executar(job: JobInferencia) ResultadoJob
+    }
+    class PreProcessador {
+        +preparar(bytes) Tensor
+    }
+    class Classificador {
+        <<interface>>
+        +prever(t: Tensor) Probabilidades
+    }
+    class ExplicadorGradCam {
+        +gerar(t: Tensor, classe) MapaCalor
+    }
+    class ModeloPyTorch {
+        +versao String
+        +hashArquivo String
+        +carregar(caminho) void
+        +aquecer() void
+    }
+    class PublicadorResultados {
+        <<interface>>
+        +publicar(r: ResultadoJob) void
+    }
+    class RabbitMqPublicadorResultados
+    ConsumidorJobs --> ProcessarJob
+    ProcessarJob --> PreProcessador
+    ProcessarJob --> Classificador
+    ProcessarJob --> ExplicadorGradCam
+    ProcessarJob --> PublicadorResultados
+    ModeloPyTorch ..|> Classificador
+    ExplicadorGradCam --> ModeloPyTorch
+    RabbitMqPublicadorResultados ..|> PublicadorResultados
+```
+
+## 2.3 Diagramas de sequência dos fluxos principais
+
+### SQ1 — Enviar *patch* (sem resultado em cache) — UC02, RF01–RF05, RNF01
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Estudante
+    participant FE as Frontend (Next.js)
+    participant BE as Orquestração (API/SSE)
+    participant RD as Redis
+    participant PG as PostgreSQL
+    participant MQ as RabbitMQ
+    participant WK as Serviço de inferência
+    U->>FE: arrasta o patch
+    FE->>FE: exibe skeleton (otimista)
+    FE->>BE: POST /api/analyses (multipart)
+    BE->>BE: valida tipo, tamanho, dimensões (RN01) e calcula SHA-256
+    BE->>RD: GET cache:sha256:{hash}:{versão}
+    RD-->>BE: (vazio)
+    BE->>PG: INSERT analyses (NA_FILA)
+    BE->>MQ: publish inference.request
+    BE-->>FE: 202 {analysisId, streamUrl}
+    FE->>BE: GET /api/analyses/{id}/stream (SSE)
+    BE->>PG: SELECT status (recupera estado)
+    BE->>RD: SUBSCRIBE job:{id}
+    MQ->>WK: entrega job
+    WK->>WK: pré-processa → classifica → Grad-CAM
+    WK->>MQ: publish inference.completed
+    MQ->>BE: entrega resultado
+    BE->>PG: UPDATE analyses (CONCLUIDA, probabilidades, mapa, versão, tempos)
+    BE->>RD: SET cache + PUBLISH job:{id}
+    RD-->>BE: mensagem
+    BE-->>FE: event: completed
+    FE-->>U: barras de confiança + Grad-CAM interativo
+```
+
+### SQ2 — Enviar *patch* já analisado (resultado em cache) — RN05
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Estudante
+    participant FE as Frontend
+    participant BE as Orquestração
+    participant RD as Redis
+    participant PG as PostgreSQL
+    U->>FE: envia imagem repetida
+    FE->>BE: POST /api/analyses
+    BE->>RD: GET cache:sha256:{hash}:{versão}
+    RD-->>BE: resultado
+    BE->>PG: INSERT analyses (CONCLUIDA, cache_hit = true)
+    BE-->>FE: 200 {analysisId, resultado}
+    FE-->>U: resultado imediato (< 150 ms)
+```
+
+### SQ3 — Falha no processamento e reenvio — RF14, RNF05
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Estudante
+    participant FE as Frontend
+    participant BE as Orquestração
+    participant MQ as RabbitMQ
+    participant WK as Serviço de inferência
+    MQ->>WK: entrega job
+    WK--xMQ: erro (nack)
+    loop até 3 tentativas com espera crescente
+        MQ->>WK: reentrega
+        WK--xMQ: erro
+    end
+    MQ->>MQ: encaminha para inference.dlq
+    MQ->>BE: evento de falha (status FAILED)
+    BE->>BE: Analise.falhar(motivo)
+    BE-->>FE: event: failed
+    FE-->>U: "Não foi possível analisar. Tentar novamente?"
+    U->>FE: clica em reenviar
+    FE->>BE: POST /api/analyses/{id}/retry
+    BE->>MQ: publish inference.request (novo job_id)
+```
+
+### SQ4 — Consultar e reabrir análise do histórico — UC10, RF06, RN06
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Estudante
+    participant FE as Frontend
+    participant BE as Orquestração
+    participant PG as PostgreSQL
+    U->>FE: abre Histórico e filtra por classe
+    FE->>BE: GET /api/analyses?class=TUM&cursor=...
+    BE->>PG: SELECT ... WHERE user_id = :usuario (RN06)
+    PG-->>BE: página de análises
+    BE-->>FE: lista paginada
+    U->>FE: seleciona uma análise
+    FE->>BE: GET /api/analyses/{id}
+    BE->>BE: Usuario.podeVerAnalise()
+    alt pertence ao usuário
+        BE-->>FE: análise com resultado e versão do modelo
+        FE-->>U: mesma visualização da análise original
+    else pertence a outro usuário
+        BE-->>FE: 404 (não revela existência)
+    end
+```
+
+### SQ5 — Praticar no modo quiz — UC09, RF09, RF16, RN07
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Estudante
+    participant FE as Frontend
+    participant BE as Orquestração
+    participant PG as PostgreSQL
+    U->>FE: ativa modo quiz e escolhe amostra
+    FE->>BE: GET /api/samples/{id}?quiz=true
+    BE-->>FE: imagem SEM classe verdadeira (RN07)
+    U->>FE: responde "STR"
+    FE->>BE: POST /api/quiz/attempts {amostra, resposta}
+    BE->>PG: INSERT quiz_attempts
+    BE-->>FE: {correta: MUS, acertou: false, critériosDiferenciais}
+    FE-->>U: erro explicado (MUS × STR) + sugestão do modelo
+```
