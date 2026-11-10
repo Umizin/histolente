@@ -1,0 +1,54 @@
+# Gestão de Configuração
+
+## 1. Repositório
+- **Git**, com repositório remoto no **GitHub**: `[[URL do repositório]]`.
+- Branch principal: `main`. Ela é sempre estável e cada sprint concluída recebe uma *tag* (`sprint-00`, `sprint-01`…).
+- O repositório contém código, documentação, monografia e ferramentas. **Não** contém modelos treinados (`.pt`), o dataset, segredos (`.env`) nem respostas de participantes (ver `.gitignore`).
+
+## 2. Estratégia de branches: GitHub Flow (variação leve do trunk-based)
+
+| Branch | Uso | Exemplo |
+|---|---|---|
+| `main` | Código integrado e estável; protegida (só recebe merge via *pull request* com CI verde) | — |
+| `feat/<id>-<descricao>` | Nova funcionalidade ligada a uma história ou habilitador | `feat/HU07-gradcam-opacidade` |
+| `fix/<descricao>` | Correção de defeito | `fix/sse-reconexao` |
+| `docs/<descricao>` | Documentação e monografia | `docs/cap4-arquitetura` |
+| `chore/<descricao>` | Infraestrutura, dependências, CI | `chore/ci-pipeline` |
+
+**Por que GitHub Flow e não GitFlow:**
+- O GitFlow mantém branches longas (`develop`, `release/*`, `hotfix/*`) pensadas para equipes com várias versões em paralelo.
+- Com um desenvolvedor e entrega contínua, essa estrutura só adiciona *merges* sem benefício.
+- Branches curtas a partir da `main`, integradas por *pull request*, mantêm o histórico rastreável e são o padrão do trunk-based.
+
+## 3. Padrão de commits: Conventional Commits
+
+```
+<tipo>(<escopo>): <descrição no imperativo>
+
+[corpo opcional: o quê e por quê]
+
+refs HU07, RF04
+```
+
+- **Tipos:** `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `perf`.
+- **Escopos:** `web`, `api`, `inference`, `ml`, `infra`, `monografia`, `requisitos`, `gestao`, `pesquisa`.
+- **Exemplos:**
+  - `feat(web): adiciona slider de opacidade do Grad-CAM`
+  - `fix(inference): normaliza mapa constante sem divisão por zero`
+  - `docs(monografia): reescreve Seção 4.3 com fluxo SSE`
+
+Toda referência a requisito usa o ID do documento de requisitos (RF, RNF, HU, UC). Isso liga o histórico do Git à matriz de rastreabilidade.
+
+## 4. Pull requests e code review
+- Todo trabalho entra na `main` por *pull request*, mesmo com um único desenvolvedor.
+- **Modelo de PR:** o que muda; requisitos atendidos (RF/HU); como testar; checklist da Definição de Pronto.
+- **Revisão em duas camadas:**
+  1. **Automática:** CI com lint, verificação de tipos, testes e build.
+  2. **Humana:** autorrevisão do diff com o checklist. Quando possível, uma revisão assistida (revisor automatizado ou colega) registrada como comentário no PR.
+- O orientador pode ser marcado como revisor nos PRs de marcos (fim de sprint).
+- **Merge:** *squash and merge*, com a mensagem no padrão Conventional Commits.
+
+## 5. Quadro de tarefas: GitHub Projects
+- **Colunas:** `Backlog` → `Sprint atual` → `Em andamento` (limite: 2) → `Em revisão (PR)` → `Pronto`.
+- **Campos:** Sprint, Pontos, Prioridade (MoSCoW), Épico, Requisito.
+- Cada história do backlog vira uma *issue*, com os critérios de aceite como checklist. O PR fecha a issue (`Closes #N`).
