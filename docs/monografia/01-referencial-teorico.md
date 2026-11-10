@@ -1,0 +1,39 @@
+# 1 Referencial Teórico
+
+## 1.1 Engenharia de Software e rigor metodológico
+
+No mundo moderno, a computação deixou de atuar apenas como ferramenta de automação de tarefas repetitivas para se tornar um agente ativo na interpretação de dados complexos e na tomada de decisão em domínios antes restritos à expertise humana, entre eles a medicina. Construir esse tipo de sistema, no entanto, exige mais do que domínio técnico isolado sobre um modelo computacional: segundo Sommerville (2019), a Engenharia de Software fornece uma base sólida de processos, métodos e ferramentas necessários para que um software evolua de forma controlada, sustentável e alinhada às necessidades reais de seus usuários, distinguindo um produto de software de um experimento técnico isolado. Pressman e Maxim (2016) reforçam essa perspectiva ao destacarem que a qualidade de um artefato de software está diretamente relacionada à disciplina do processo que o originou: levantamento de requisitos, definição de arquitetura e validação sistemática, elementos que estruturam a condução deste trabalho.
+
+## 1.2 Inteligência Artificial e Aprendizado de Máquina
+
+É dentro dessa matriz de engenharia que se insere a aplicação prática da Inteligência Artificial (IA). De acordo com Mitchell (1997), um sistema é dito capaz de aprender quando seu desempenho em uma tarefa melhora a partir da experiência, sem que suas regras de decisão sejam explicitamente programadas, definição que fundamenta o campo do Aprendizado de Máquina (*Machine Learning*) até hoje. Dentro desse campo, Goodfellow, Bengio e Courville (2016) descrevem o Aprendizado Profundo (*deep learning*) como uma abordagem baseada em redes neurais artificiais organizadas em múltiplas camadas, nas quais cada camada aprende a representar os dados em um nível crescente de abstração, das características mais simples, como bordas e texturas, até conceitos mais complexos, como formas e padrões estruturais.
+
+Segundo LeCun, Bengio e Hinton (2015), foi justamente essa capacidade de aprender representações hierárquicas diretamente dos dados, sem a necessidade de extração manual de características, que impulsionou avanços expressivos do *deep learning* em reconhecimento de padrões visuais, com impacto direto em domínios como reconhecimento de fala, detecção de objetos e, posteriormente, diagnóstico assistido por imagem.
+
+## 1.3 A escassez de patologistas no Brasil
+
+Conforme dados da pesquisa Demografia Médica no Brasil 2025, realizada pelo Ministério da Saúde em parceria com a Faculdade de Medicina da Universidade de São Paulo (FMUSP) e a Associação Médica Brasileira (AMB), o país conta com um contingente de apenas 4.424 médicos patologistas. Essa realidade equivale a uma média nacional de 2,08 especialistas para cada 100 mil habitantes, um indicador severamente abaixo da razão de 5 a 6 profissionais recomendada pela Organização Mundial da Saúde (OMS) para garantir a segurança diagnóstica da população (SOCIEDADE BRASILEIRA DE PATOLOGIA, 2025).
+
+A despeito de a média nacional já ser deficitária, o cenário é agravado por uma distribuição geográfica profundamente desigual entre as regiões brasileiras. Enquanto o estado de São Paulo concentra isoladamente 1.468 patologistas, a região Norte inteira dispõe de apenas 177 profissionais para cobrir toda a sua extensão territorial (SOCIEDADE BRASILEIRA DE PATOLOGIA, 2025). O ecossistema assistencial nortista revela cenários ainda mais críticos quando analisado por Unidade da Federação: o Pará lidera a região com 65 médicos, seguido pelo Amazonas com 34, Rondônia e Tocantins com 24 profissionais cada, Roraima com 11, Acre com 10 e, no extremo da escassez, o Amapá, que conta com apenas 9 patologistas em todo o seu território (SOCIEDADE BRASILEIRA DE PATOLOGIA, 2025).
+
+Segundo Gerônimo Jr., presidente da Sociedade Brasileira de Patologia (SBP), esse vazio assistencial e a escassez generalizada de especialistas comprometem diretamente o diagnóstico precoce e o desenho de linhas terapêuticas eficazes, sobretudo na área oncológica (SOCIEDADE BRASILEIRA DE PATOLOGIA, 2025). Sem a presença capilarizada do patologista, os gargalos no processamento de biópsias retardam o início do tratamento, impactando negativamente o prognóstico dos pacientes que dependem do sistema de saúde nessas regiões periféricas.
+
+## 1.4 Patologia digital e patologia computacional
+
+Diante desse cenário, iniciativas de patologia digital têm buscado ampliar a capacidade diagnóstica por meio da digitalização de lâminas histológicas e da aplicação de ferramentas computacionais de apoio à análise. Niazi, Parwani e Gurcan (2019) descrevem que a combinação entre a imagem de lâmina completa (*whole-slide imaging*), redes de dados mais rápidas e armazenamento mais barato tornou viável, nos últimos anos, integrar algoritmos de inteligência artificial ao fluxo de trabalho do patologista, ampliando as possibilidades de diagnóstico assistido por imagem para além da radiologia. Contudo, esse avanço não se distribui de forma uniforme: Zehra et al. (2023) apontam que, em países de baixa e média renda, a maioria dos laboratórios não dispõe de recursos como scanners de lâmina completa ou microscópios digitais, o que limita severamente a adoção dessas ferramentas mesmo quando tecnicamente viáveis, restringindo o benefício da inteligência artificial em patologia majoritariamente a centros com maior capacidade financeira. É justamente essa desigualdade de acesso que fundamenta a proposta deste trabalho: buscar uma alternativa tecnicamente viável para contextos de recursos mais limitados, realidade de boa parte dos laboratórios brasileiros.
+
+## 1.5 Redes neurais convolucionais aplicadas a imagens médicas
+
+Litjens et al. (2017) conduziram um levantamento abrangente de mais de 300 trabalhos aplicando *deep learning* a tarefas como classificação, detecção e segmentação, demonstrando que as redes neurais convolucionais (CNNs) se tornaram a metodologia dominante para essas tarefas, com aplicações consolidadas também no campo específico da patologia digital.
+
+## 1.6 Explicabilidade em modelos de IA aplicados à saúde
+
+Para endereçar a natureza pouco interpretável dos modelos de *deep learning*, Selvaraju et al. (2017) propuseram o Grad-CAM (*Gradient-weighted Class Activation Mapping*), técnica capaz de gerar mapas de calor que destacam as regiões de uma imagem mais relevantes para a decisão de uma rede neural convolucional, sem exigir alterações em sua arquitetura original. No plano regulatório brasileiro, essa preocupação também se reflete na Resolução CFM nº 2.454/2026, publicada pelo Conselho Federal de Medicina, que reafirma que a decisão clínica permanece sempre humana e que sistemas de inteligência artificial devem atuar exclusivamente como ferramenta de apoio (CONSELHO FEDERAL DE MEDICINA, 2026).
+
+## 1.7 Datasets públicos para patologia computacional
+
+Kather et al. (2018) disponibilizaram publicamente o *dataset* NCT-CRC-HE-100K, composto por 100 mil *patches* de imagem histológica de 224 × 224 pixels, extraídos de 86 lâminas de câncer colorretal coradas por Hematoxilina-Eosina (H&E), organizados em nove classes de tecido. Em trabalho posterior, Kather et al. (2019) demonstraram, em estudo multicêntrico retrospectivo publicado na PLOS Medicine, que uma rede neural convolucional é capaz de avaliar o microambiente tumoral humano e prever prognóstico diretamente a partir de imagens histopatológicas.
+
+## 1.8 Lacunas identificadas
+
+A partir do referencial apresentado, observam-se três lacunas centrais que fundamentam a proposta deste trabalho: a concentração de soluções de IA para patologia digital em contextos de alto orçamento; a escassez de ferramentas voltadas ao apoio pedagógico no ensino de reconhecimento de padrões histológicos; e a necessidade de soluções que incorporem explicabilidade de forma acessível a usuários não especialistas.
