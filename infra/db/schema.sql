@@ -1,0 +1,119 @@
+-- Modelo físico — Workstation de Patologia Digital
+-- PostgreSQL 16. Acesso exclusivo do Backend de Orquestração (o serviço de inferência NÃO acessa este banco — RNF06).
+-- Dicionário de dados: docs/projeto/03-modelagem-de-dados.md
+
+BEGIN;
+
+CREATE EXTENSION IF NOT EXISTS citext;
+
+-- Tipos enumerados ---------------------------------------------------------
+CREATE TYPE tissue_class     AS ENUM ('ADI','BACK','DEB','LYM','MUC','MUS','NORM','STR','TUM');
+CREATE TYPE user_role        AS ENUM ('STUDENT','PROFESSOR','ADMIN');
+CREATE TYPE analysis_status  AS ENUM ('QUEUED','PROCESSING','DONE','FAILED');
+CREATE TYPE image_source     AS ENUM ('UPLOAD','SAMPLE_GALLERY');
+CREATE TYPE consent_document AS ENUM ('TERMS','TCLE');
+
+-- Usuários -----------------------------------------------------------------
+CREATE TABLE users (
+    id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email         citext      NOT NULL UNIQUE,
+    name          text        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 120),
+    role          user_role   NOT NULL DEFAULT 'STUDENT',
+    password_hash text        NOT NULL,
+    created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- Versões do modelo --------------------------------------------------------
+CREATE TABLE model_versions (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        text        NOT NULL,
+    version     text        NOT NULL UNIQUE,
+    file_sha256 char(64)    NOT NULL CHECK (file_sha256 ~ '^[0-9a-f]{64}$'),
+    backbone    text        NOT NULL,
+    metrics     jsonb,
+    trained_at  timestamptz,
+    active      boolean     NOT NULL DEFAULT false
+);
+-- no máximo uma versão ativa (RF12)
+CREATE UNIQUE INDEX model_versions_one_active ON model_versions (active) WHERE active;
+
+-- Imagens ------------------------------------------------------------------
+CREATE TABLE images (
+    id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    sha256             char(64)     NOT NULL UNIQUE CHECK (sha256 ~ '^[0-9a-f]{64}$'),
+    mime_type          text         NOT NULL CHECK (mime_type IN ('image/png','image/jpeg')),
+    width              integer      NOT NULL CHECK (width > 0),
+    height             integer      NOT NULL CHECK (height > 0),
+    size_bytes         integer      NOT NULL CHECK (size_bytes BETWEEN 1 AND 5242880),
+    storage_key        text         NOT NULL,
+    source             image_source NOT NULL DEFAULT 'UPLOAD',
+    ground_truth_class tissue_class,
+    created_at         timestamptz  NOT NULL DEFAULT now(),
+    CONSTRAINT gallery_has_ground_truth
+        CHECK ((source = 'SAMPLE_GALLERY') = (ground_truth_class IS NOT NULL))
+);
+
+-- Lotes --------------------------------------------------------------------
+CREATE TABLE batches (
+    id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    uuid        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    label      text        NOT NULL CHECK (char_length(label) BETWEEN 1 AND 120),
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Análises -----------------------------------------------------------------
+CREATE TABLE analyses (
+    id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id             uuid            NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    image_id            uuid            NOT NULL REFERENCES images(id),
+    model_version_id    uuid            NOT NULL REFERENCES model_versions(id),
+    batch_id            uuid            REFERENCES batches(id) ON DELETE SET NULL,
+    job_id              uuid            NOT NULL UNIQUE,          -- idempotência do consumidor
+    status              analysis_status NOT NULL DEFAULT 'QUEUED',
+    predicted_class     tissue_class,
+    probabilities       jsonb,
+    heatmap_storage_key text,
+    cache_hit           boolean         NOT NULL DEFAULT false,
+    out_of_distribution boolean         NOT NULL DEFAULT false,
+    worker_ms           integer CHECK (worker_ms >= 0),
+    e2e_ms              integer CHECK (e2e_ms >= 0),
+    error               text,
+    created_at          timestamptz     NOT NULL DEFAULT now(),
+    completed_at        timestamptz,
+    CONSTRAINT done_has_result CHECK (
+        status <> 'DONE'
+        OR (predicted_class IS NOT NULL AND probabilities IS NOT NULL AND completed_at IS NOT NULL)
+    ),
+    CONSTRAINT probabilities_nine_classes CHECK (
+        probabilities IS NULL
+        OR (probabilities ?& ARRAY['ADI','BACK','DEB','LYM','MUC','MUS','NORM','STR','TUM'])
+    ),
+    CONSTRAINT failed_has_error CHECK (status <> 'FAILED' OR error IS NOT NULL)
+);
+CREATE INDEX analyses_user_created ON analyses (user_id, created_at DESC);   -- histórico (RF06)
+CREATE INDEX analyses_user_class   ON analyses (user_id, predicted_class);  -- filtro por classe
+CREATE INDEX analyses_batch        ON analyses (batch_id) WHERE batch_id IS NOT NULL;
+CREATE INDEX analyses_pending      ON analyses (status) WHERE status IN ('QUEUED','PROCESSING');
+
+-- Consentimentos -----------------------------------------------------------
+CREATE TABLE consents (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     uuid             NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    document    consent_document NOT NULL,
+    version     text             NOT NULL,
+    accepted_at timestamptz      NOT NULL DEFAULT now(),
+    UNIQUE (user_id, document, version)
+);
+
+-- Tentativas do quiz -------------------------------------------------------
+CREATE TABLE quiz_attempts (
+    id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    uuid         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    image_id   uuid         NOT NULL REFERENCES images(id),
+    answer     tissue_class NOT NULL,
+    correct    boolean      NOT NULL,
+    created_at timestamptz  NOT NULL DEFAULT now()
+);
+CREATE INDEX quiz_attempts_user ON quiz_attempts (user_id, created_at DESC); -- progresso (RF16)
+
+COMMIT;
