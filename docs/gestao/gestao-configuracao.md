@@ -9,7 +9,7 @@
 
 | Branch | Uso | Exemplo |
 |---|---|---|
-| `main` | Código integrado e estável; protegida (só recebe merge via *pull request* com CI verde) | — |
+| `main` | Código integrado e estável; só recebe merge via *pull request* com CI verde | — |
 | `feat/<id>-<descricao>` | Nova funcionalidade ligada a uma história ou habilitador | `feat/HU07-gradcam-opacidade` |
 | `fix/<descricao>` | Correção de defeito | `fix/sse-reconexao` |
 | `docs/<descricao>` | Documentação e monografia | `docs/cap4-arquitetura` |
@@ -19,6 +19,8 @@
 - O GitFlow mantém branches longas (`develop`, `release/*`, `hotfix/*`) pensadas para equipes com várias versões em paralelo.
 - Com um desenvolvedor e entrega contínua, essa estrutura só adiciona *merges* sem benefício.
 - Branches curtas a partir da `main`, integradas por *pull request*, mantêm o histórico rastreável e são o padrão do trunk-based.
+
+**Proteção da `main`:** em repositório privado, o GitHub só permite regras de proteção de branch no plano Pro, que estudantes conseguem de graça pelo GitHub Student Developer Pack. Enquanto o Pro não estiver ativo, a regra "nada entra na `main` sem PR" é seguida por disciplina. A partir da Sprint 1, todo trabalho de código entra por PR.
 
 ## 3. Padrão de commits: Conventional Commits
 
