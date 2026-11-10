@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workstation de Patologia Digital — Protótipo</title>
+<style>
+:root{--bg:#090D16;--s1:#0F1420;--s2:#161C2B;--border:#232A3B;--border-strong:#64708A;--text:#E6E9EF;--muted:#94A0B8;--accent:#14B8A6;--accent2:#10B981;--warn:#F59E0B;--danger:#F97316;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+button,select,input{font:inherit;color:inherit}
+select{background:var(--s2);border:1px solid var(--border-strong);border-radius:6px;padding:5px 8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.banner{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;padding:8px 16px;background:#1A1608;border-bottom:1px solid #4A3A10;color:#F5D68A;font-size:13px}
+.banner.min{padding:3px 16px;font-size:12px}
+.banner .txt{flex:1}
+.banner.min .full{display:none}
+.banner button{background:none;border:1px solid #6b5518;border-radius:6px;padding:2px 8px;cursor:pointer;color:#F5D68A}
+header{display:flex;align-items:center;gap:20px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--s1)}
+.brand{font-weight:600;letter-spacing:.2px}.brand span{color:var(--accent)}
+nav{display:flex;gap:4px}
+nav button{background:none;border:1px solid transparent;border-radius:6px;padding:6px 12px;cursor:pointer;color:var(--muted)}
+nav button[aria-current=page]{color:var(--text);background:var(--s2);border-color:var(--border)}
+.proto-tag{margin-left:auto;font-size:12px;color:var(--muted);border:1px dashed var(--border);padding:3px 8px;border-radius:6px}
+main{padding:16px}
+.screen{display:none}.screen.on{display:block}
+.grid{display:grid;grid-template-columns:260px minmax(0,1fr) 340px;gap:16px;min-height:calc(100vh - 130px)}
+@media (max-width:1100px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 10px;font-weight:600}
+.drop{display:block;border:1.5px dashed var(--border-strong);border-radius:8px;padding:18px 10px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:#0d1a1f}
+.drop strong{color:var(--text)}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.thumb{position:relative;border:1px solid var(--border);border-radius:6px;padding:0;background:none;cursor:pointer;overflow:hidden}
+.thumb canvas{display:block;width:100%;height:auto}
+.thumb span{position:absolute;left:0;right:0;bottom:0;font:11px var(--mono);background:rgba(9,13,22,.8);padding:1px 0}
+.thumb:hover{border-color:var(--accent)}
+.btn{background:var(--accent);color:#04201c;border:0;border-radius:6px;padding:7px 12px;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--s2);color:var(--text);border:1px solid var(--border-strong);font-weight:500}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:6px;overflow:hidden}
+.seg button{background:var(--s2);border:0;padding:6px 10px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed=true]{background:#123a37;color:var(--text)}
+.viewers{display:grid;gap:10px;grid-template-columns:1fr}
+.viewers.sbs{grid-template-columns:1fr 1fr}
+.viewer{position:relative;aspect-ratio:1/1;max-height:62vh;background:#05070c;border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:grab;touch-action:none}
+.viewer:active{cursor:grabbing}
+.stage{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:auto}
+.stage.px canvas{image-rendering:pixelated}
+.vlabel{position:absolute;top:8px;left:8px;font:11px var(--mono);background:rgba(9,13,22,.75);padding:2px 6px;border-radius:4px;pointer-events:none}
+.cross{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border:1px solid #fff;border-radius:50%;pointer-events:none;display:none;mix-blend-mode:difference}
+.empty{display:grid;place-items:center;text-align:center;color:var(--muted);height:100%;padding:20px}
+.skeleton{background:linear-gradient(90deg,#121826 25%,#1a2233 50%,#121826 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skeleton{animation:none}*{transition:none!important}}
+.slider{display:flex;align-items:center;gap:10px;margin-top:10px}
+.slider input{flex:1;accent-color:var(--accent)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.result-top{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.result-top .cls{font:600 22px var(--mono);color:var(--accent)}
+.result-top .name{color:var(--muted)}
+.alert{display:flex;gap:8px;border:1px solid #6b4d0f;background:#1d1606;color:#F8D48A;border-radius:6px;padding:8px 10px;font-size:13px;margin:8px 0}
+.alert.err{border-color:#7a3a10;background:#1f1108;color:#FDBA8C}
+.bars{list-style:none;margin:8px 0 0;padding:0}
+.bar{display:grid;grid-template-columns:44px 1fr 52px;gap:8px;align-items:center;padding:3px 0;position:relative}
+.bar .lab{font:12px var(--mono);cursor:help;border-bottom:1px dotted #3a4560;justify-self:start}
+.track{height:10px;background:#1a2132;border-radius:3px;overflow:hidden}
+.fill{height:100%;background:#3a4a66;border-radius:3px;transform-origin:left;transition:transform .25s cubic-bezier(.2,0,0,1)}
+.bar.top .fill{background:var(--accent)}
+.bar .pct{font:12px var(--mono);text-align:right;color:var(--muted)}
+.bar.top .pct{color:var(--text)}
+.tip{position:absolute;z-index:4;left:52px;top:100%;width:270px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.tip b{color:var(--accent)}
+.bar:hover .tip,.bar:focus-within .tip{display:block}
+.meta{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;font-size:12px;color:var(--muted);display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+.meta b{color:var(--text);font-weight:500}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--border);font-size:13px}
+th{color:var(--muted);font-weight:500}
+tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
+.chip{font:11px var(--mono);padding:1px 6px;border-radius:4px;background:#123a37;color:#9ff0e3}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer;text-align:left}
+.card:hover{border-color:var(--accent)}
+.card canvas{width:100%;border-radius:4px;display:block}
+.card .t{margin-top:6px;font-size:13px}.card .t small{color:var(--muted);display:block}
+.quizbox{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.opts button{background:var(--s2);border:1px solid var(--border-strong);border-radius:6px;padding:8px;cursor:pointer;text-align:left}
+.opts button:hover{border-color:var(--accent)}
+.ok{color:var(--accent2)}.bad{color:var(--danger)}
+.kbd{font:11px var(--mono);border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="banner" id="banner" role="note">
+  <span aria-hidden="true">⚠</span>
+  <span class="txt"><strong>Ferramenta educacional e de apoio à triagem.</strong><span class="full"> Não substitui laudo anatomopatológico. A decisão clínica é sempre do médico (Res. CFM nº 2.454/2026).</span></span>
+  <button id="bannerToggle" aria-expanded="true">Minimizar</button>
+</div>
+<header>
+  <div class="brand">Patologia<span>Digital</span> · Workstation</div>
+  <nav aria-label="Seções">
+    <button data-go="ws" aria-current="page">Workstation</button>
+    <button data-go="gal">Galeria e quiz</button>
+    <button data-go="hist">Histórico</button>
+    <button data-go="sobre">Sobre o modelo</button>
+  </nav>
+  <span class="proto-tag">Protótipo · dados simulados</span>
+</header>
+
+<main>
+<!-- WORKSTATION -->
+<section class="screen on" id="ws" aria-label="Workstation">
+  <div class="grid">
+    <aside class="panel">
+      <h2>Enviar patch</h2>
+      <label class="drop" id="drop" tabindex="0">
+        <strong>Arraste uma imagem</strong><br>ou clique para escolher<br><small>PNG ou JPEG · até 5 MB · 224×224 px</small>
+        <input type="file" id="file" accept="image/png,image/jpeg" hidden>
+      </label>
+      <div id="dropErr"></div>
+      <h2 style="margin-top:16px">Amostras rápidas</h2>
+      <div class="thumbs" id="quick"></div>
+      <p class="hint">Atalhos: <span class="kbd">←</span><span class="kbd">→</span> opacidade · <span class="kbd">+</span><span class="kbd">−</span> zoom · <span class="kbd">0</span> restaurar · <span class="kbd">S</span> lado a lado</p>
+    </aside>
+
+    <section class="panel" aria-label="Visualizador">
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Modo de visualização">
+          <button id="mOverlay" aria-pressed="true">Sobreposição</button>
+          <button id="mSbs" aria-pressed="false">Lado a lado</button>
+        </div>
+        <label>Paleta <select id="cmap"><option value="turbo">turbo</option><option value="viridis">viridis</option></select></label>
+        <span class="mono" id="zoomLbl" style="color:var(--muted)">100%</span>
+        <button class="btn ghost" id="reset">Restaurar</button>
+      </div>
+      <div class="viewers" id="viewers">
+        <div class="viewer" id="v1"><div class="empty" id="emptyState"><div><div style="font-size:28px">🔬</div><p>Envie um patch ou escolha uma amostra para começar.</p></div></div>
+          <div class="stage" id="st1" hidden><canvas id="c1patch" width="224" height="224"></canvas><canvas id="c1heat" width="224" height="224"></canvas></div>
+          <span class="vlabel" id="l1" hidden>Patch + Grad-CAM</span><span class="cross" id="x1"></span></div>
+        <div class="viewer" id="v2" hidden>
+          <div class="stage" id="st2"><canvas id="c2heat" width="224" height="224"></canvas></div>
+          <span class="vlabel">Grad-CAM</span><span class="cross" id="x2"></span></div>
+      </div>
+      <div class="slider">
+        <label for="op">Opacidade do mapa</label>
+        <input type="range" id="op" min="0" max="100" step="5" value="40" aria-valuetext="Opacidade do mapa: 40%">
+        <span class="mono" id="opv">40%</span>
+      </div>
+      <p class="hint">O mapa de calor mostra as <strong>regiões que mais influenciaram</strong> a sugestão do modelo. Não é uma marcação do tumor nem de estruturas individuais.</p>
+    </section>
+
+    <aside class="panel" aria-label="Resultado" aria-live="polite">
+      <h2>Resultado</h2>
+      <div id="res"><p style="color:var(--muted)">Nenhuma análise ainda.</p></div>
+    </aside>
+  </div>
+</section>
+
+<!-- GALERIA E QUIZ -->
+<section class="screen" id="gal" aria-label="Galeria e quiz">
+  <div class="toolbar"><div class="seg" role="group" aria-label="Modo">
+    <button id="gExplore" aria-pressed="true">Explorar</button><button id="gQuiz" aria-pressed="false">Modo quiz</button></div>
+    <span class="hint" style="margin:0">Amostras ilustrativas geradas por código; no MVP serão patches reais do NCT-CRC-HE-100K.</span></div>
+  <div id="galBody"></div>
+</section>
+
+<!-- HISTÓRICO -->
+<section class="screen" id="hist" aria-label="Histórico">
+  <div class="panel">
+    <div class="toolbar"><h2 style="margin:0">Minhas análises</h2>
+      <label style="margin-left:auto">Classe <select id="hf"><option value="">todas</option></select></label>
+      <button class="btn ghost" id="csv">Exportar CSV</button></div>
+    <table><thead><tr><th>Data</th><th>Origem</th><th>Classe sugerida</th><th>Confiança</th><th>Modelo</th><th>Tempo</th></tr></thead><tbody id="hb"></tbody></table>
+    <p class="hint">Clique numa linha para reabrir a análise com a mesma visualização.</p>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section class="screen" id="sobre" aria-label="Sobre o modelo">
+  <div class="panel" style="max-width:820px">
+    <h2>Sobre o modelo</h2>
+    <div class="meta" style="border:0;padding:0;font-size:14px">
+      <span>Versão</span><b class="mono">resnet50-nct 0.1.0 (simulada)</b>
+      <span>Dados de treino</span><b>NCT-CRC-HE-100K (Kather et al., 2018) — 100 mil patches H&amp;E, 9 classes</b>
+      <span>Teste independente</span><b>[[métricas a coletar após o treinamento]]</b>
+    </div>
+    <h2 style="margin-top:18px">Limitações conhecidas</h2>
+    <ul>
+      <li>Treinado com lâminas de um único centro europeu; imagens de outros laboratórios, colorações ou fotos de celular podem ter desempenho pior.</li>
+      <li>Classifica apenas 9 tipos de tecido colorretal; não reconhece outros tecidos nem identifica estruturas individuais.</li>
+      <li>O mapa Grad-CAM tem baixa resolução e indica influência na decisão, não localização de lesão.</li>
+      <li>Uso exclusivamente educacional e de apoio à triagem. Não emite diagnóstico.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<script>
+"use strict";
+const CL = ["ADI","BACK","DEB","LYM","MUC","MUS","NORM","STR","TUM"];
+const INFO = {
+  ADI:["Tecido adiposo","Adipócitos grandes com citoplasma claro (lipídio dissolvido no processamento) e núcleo achatado na periferia.","Não confundir com fundo ou espaços artefatuais."],
+  BACK:["Fundo","Área sem tecido: vidro, borda da lâmina, bolhas.","Não é tecido normal."],
+  DEB:["Detritos / necrose","Restos celulares, núcleos picnóticos e fragmentados, material eosinofílico amorfo.","Cariorrexe pode lembrar linfócitos."],
+  LYM:["Linfócitos","Células pequenas e redondas, núcleo escuro ocupando quase toda a célula, alta densidade.","Diferencie de detritos com núcleos fragmentados."],
+  MUC:["Muco","Material extracelular pálido, azulado-acinzentado, frouxo e pouco celular.","Pode lembrar edema ou fundo."],
+  MUS:["Músculo liso","Feixes de fibras fusiformes eosinofílicas com núcleos alongados de pontas rombas.","Principal confusão: estroma."],
+  NORM:["Mucosa colônica normal","Criptas regulares e paralelas, muitas células caliciformes, núcleos pequenos na base.","Cortes tangenciais podem lembrar tumor."],
+  STR:["Estroma associado ao câncer","Tecido conjuntivo desmoplásico com fibroblastos e colágeno, sem epitélio.","Principal confusão: músculo liso."],
+  TUM:["Epitélio de adenocarcinoma","Glândulas irregulares, núcleos aumentados, pleomórficos e estratificados, perda de polaridade.","Compare com a regularidade da mucosa normal."]
+};
+const DIFF = {"MUS|STR":"Músculo liso forma feixes organizados com núcleos alongados de pontas rombas; o estroma desmoplásico é desorganizado, com fibroblastos dispersos e colágeno.",
+  "NORM|TUM":"Na mucosa normal as criptas são regulares e os núcleos ficam na base; no tumor as glândulas são irregulares e os núcleos aumentados e estratificados.",
+  "DEB|LYM":"Linfócitos são redondos e uniformes; nos detritos há núcleos fragmentados de tamanhos variados em fundo eosinofílico amorfo."};
+const diffText=(a,b)=>DIFF[[a,b].sort().join("|")]||`Compare os critérios: ${INFO[a][1]} × ${INFO[b][1]}`;
+
+// ---------- gerador de patches ilustrativos ----------
+function rng(seed){let s=seed>>>0;return()=>((s=Math.imul(s^s>>>15,1|s)+0x6D2B79F5|0,((s^s>>>7)>>>0)/4294967296))}
+function drawPatch(cv,cls,seed=1){
+  const g=cv.getContext("2d"),r=rng(seed*97+CL.indexOf(cls)*7919),W=224;
+  const pink=(a=1)=>`rgba(${220+r()*25|0},${140+r()*40|0},${185+r()*30|0},${a})`;
+  const nuc=(a=1)=>`rgba(${70+r()*40|0},${30+r()*30|0},${120+r()*40|0},${a})`;
+  g.fillStyle={BACK:"#ECE9EE",MUC:"#C9CCDD",ADI:"#F3EEF2"}[cls]||pink();g.fillRect(0,0,W,W);
+  const dot=(x,y,rx,ry,c,rot=0)=>{g.fillStyle=c;g.beginPath();g.ellipse(x,y,rx,ry,rot,0,7);g.fill()};
+  if(cls==="BACK"){for(let i=0;i<14;i++)dot(r()*W,r()*W,2+r()*6,2+r()*6,"rgba(200,190,205,.5)")}
+  if(cls==="ADI"){g.strokeStyle="rgba(214,140,180,.9)";g.lineWidth=2;for(let i=0;i<22;i++){g.beginPath();const cx=r()*W,cy=r()*W,R=18+r()*16;for(let k=0;k<7;k++){const a=k/7*6.283;g.lineTo(cx+Math.cos(a)*R*(0.85+r()*.3),cy+Math.sin(a)*R*(0.85+r()*.3))}g.closePath();g.stroke();dot(cx+R*.8,cy,3,1.5,nuc(.9))}}
+  if(cls==="MUC"){for(let i=0;i<40;i++)dot(r()*W,r()*W,10+r()*30,4+r()*10,"rgba(170,175,210,.35)",r()*3);for(let i=0;i<8;i++)dot(r()*W,r()*W,3,3,nuc(.6))}
+  if(cls==="LYM"){for(let i=0;i<520;i++)dot(r()*W,r()*W,3+r()*1.4,3+r()*1.4,nuc(.95))}
+  if(cls==="DEB"){for(let i=0;i<60;i++)dot(r()*W,r()*W,6+r()*14,4+r()*8,pink(.8),r()*3);for(let i=0;i<220;i++)dot(r()*W,r()*W,.8+r()*2.5,.8+r()*2.5,nuc(.8))}
+  if(cls==="MUS"||cls==="STR"){const n=cls==="MUS"?90:55;for(let i=0;i<n;i++){g.strokeStyle=pink(.9);g.lineWidth=2+r()*3;g.beginPath();const y=r()*W,a=cls==="MUS"?.15:(r()-.5)*1.2;g.moveTo(-10,y);g.bezierCurveTo(70,y+a*60+r()*10,150,y-a*60,234,y+(cls==="STR"?(r()-.5)*40:0));g.stroke()}
+    for(let i=0;i<(cls==="MUS"?70:30);i++)dot(r()*W,r()*W,cls==="MUS"?9:6,1.8,nuc(.9),cls==="MUS"?.1:r()*3)}
+  if(cls==="NORM"||cls==="TUM"){const n=cls==="NORM"?9:7;for(let i=0;i<n;i++){const cx=cls==="NORM"?28+(i%3)*84+r()*6:r()*W,cy=cls==="NORM"?32+Math.floor(i/3)*80+r()*6:r()*W,R=cls==="NORM"?24:20+r()*22;
+      dot(cx,cy,R+8,R+8,cls==="NORM"?"rgba(235,215,230,1)":"rgba(225,170,205,1)");dot(cx,cy,R*.45,R*.45,"rgba(245,240,245,1)");
+      const k=cls==="NORM"?22:34;for(let j=0;j<k;j++){const a=j/k*6.283+r()*.1,rr=R+(cls==="TUM"?(r()-.5)*10:2);dot(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,cls==="NORM"?2.4:3.6+r()*2,cls==="NORM"?2.4:3+r()*2,nuc(.95),a)}}}
+}
+function turbo(t){const r=34.61+t*(1172.33-t*(10793.56-t*(33300.12-t*(38394.49-t*14825.05)))),g=23.31+t*(557.33+t*(1225.33-t*(3574.96-t*(1073.77+t*707.56)))),b=27.2+t*(3211.1-t*(15327.97-t*(27814-t*(22569.18-t*6838.66))));return[r,g,b].map(v=>Math.max(0,Math.min(255,v)))}
+function viridis(t){const s=[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],x=t*4,i=Math.min(3,Math.floor(x)),f=x-i;return s[i].map((v,k)=>v+(s[i+1][k]-v)*f)}
+function drawHeat(cv,seed,cmap){const g=cv.getContext("2d"),r=rng(seed*31+5),W=224,img=g.createImageData(W,W),bl=[];
+  for(let i=0;i<4;i++)bl.push([30+r()*164,30+r()*164,28+r()*40,.5+r()*.5]);
+  for(let y=0;y<W;y++)for(let x=0;x<W;x++){let v=0;for(const[bx,by,s,w]of bl)v+=w*Math.exp(-((x-bx)**2+(y-by)**2)/(2*s*s));v=Math.min(1,v);
+    const[c0,c1,c2]=(cmap==="viridis"?viridis:turbo)(v),o=(y*W+x)*4;img.data[o]=c0;img.data[o+1]=c1;img.data[o+2]=c2;img.data[o+3]=255*Math.min(1,v*1.4)}
+  g.putImageData(img,0,0)}
+
+// ---------- estado ----------
+const $=s=>document.querySelector(s);
+const st={mode:"overlay",zoom:1,tx:0,ty:0,op:40,cur:null,hist:[]};
+function probsFor(cls,seed){const r=rng(seed*13+3);let p={};let main=cls;
+  if(cls==="STR"&&seed===2){p={STR:.52,MUS:.41}}else{p[main]=.80+r()*.15}
+  let rest=1-Object.values(p).reduce((a,b)=>a+b,0);const others=CL.filter(c=>!(c in p)),w=others.map(()=>r()**2),sw=w.reduce((a,b)=>a+b,0);
+  others.forEach((c,i)=>p[c]=rest*w[i]/sw);return p}
+
+// ---------- navegação ----------
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>go(b.dataset.go));
+function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));
+  document.querySelectorAll("nav button").forEach(b=>{if(b.dataset.go!==id)b.removeAttribute("aria-current");else b.setAttribute("aria-current","page")});
+  if(id==="hist")renderHist();if(id==="gal")renderGal()}
+$("#bannerToggle").onclick=e=>{const m=$("#banner").classList.toggle("min");e.target.textContent=m?"Expandir":"Minimizar";e.target.setAttribute("aria-expanded",!m)};
+
+// ---------- workstation ----------
+const quick=$("#quick");["TUM","NORM","STR","MUS","LYM","ADI"].forEach((c,i)=>{const b=document.createElement("button");b.className="thumb";b.title=`Analisar amostra ${c}`;
+  const cv=document.createElement("canvas");cv.width=cv.height=224;drawPatch(cv,c,i===2?2:1);b.append(cv);const s=document.createElement("span");s.textContent=c;b.append(s);
+  b.onclick=()=>analyze({cls:c,seed:i===2?2:1,src:"Galeria"});quick.append(b)});
+// demonstração: abrir com #demo-STR (ou outra classe) analisa a amostra automaticamente; #demo-STR-sbs abre lado a lado
+{const m=location.hash.match(/^#demo-([A-Z]+)(-sbs)?$/);if(m&&CL.includes(m[1])){analyze({cls:m[1],seed:m[1]==="STR"?2:1,src:"Galeria"});if(m[2])setTimeout(()=>setMode("sbs"),0)}}
+function analyze({cls,seed,src,file,truth=true}){
+  go("ws");$("#emptyState").hidden=true;$("#st1").hidden=false;$("#l1").hidden=false;
+  const p1=$("#c1patch");if(file){const im=new Image();im.onload=()=>p1.getContext("2d").drawImage(im,0,0,224,224);im.src=URL.createObjectURL(file)}else drawPatch(p1,cls,seed);
+  $("#c1heat").getContext("2d").clearRect(0,0,224,224);$("#c2heat").getContext("2d").clearRect(0,0,224,224);
+  $("#res").innerHTML=`<div class="skeleton" style="height:28px;border-radius:6px;margin-bottom:10px"></div>${Array(9).fill('<div class="skeleton" style="height:12px;border-radius:3px;margin:9px 0"></div>').join("")}<p class="mono hint" id="tm">Na fila… 0 ms</p>`;
+  const t0=performance.now(),iv=setInterval(()=>{const e=$("#tm");if(e)e.textContent=`Processando… ${Math.round(performance.now()-t0)} ms`},50);
+  setTimeout(()=>{clearInterval(iv);const ms=Math.round(performance.now()-t0);const pr=probsFor(cls,seed);
+    const a={id:Date.now(),date:new Date(),cls,seed,src,probs:pr,ms,ood:!!file,truth:file?null:cls,fileUrl:file?$("#c1patch").toDataURL():null};
+    st.hist.unshift(a);show(a)},450+Math.random()*500)}
+function show(a){st.cur=a;const pr=a.probs,rank=CL.slice().sort((x,y)=>pr[y]-pr[x]),top=rank[0],marg=pr[rank[0]]-pr[rank[1]];
+  if(a.fileUrl){const im=new Image();im.onload=()=>$("#c1patch").getContext("2d").drawImage(im,0,0);im.src=a.fileUrl}else drawPatch($("#c1patch"),a.cls,a.seed);
+  paintHeat();
+  $("#res").innerHTML=`${a.ood?`<div class="alert err" role="alert">⚠ Esta imagem difere do padrão usado no treino do modelo (ex.: foto de celular ou outra coloração). O resultado pode não ser confiável.</div>`:""}
+  <div class="result-top"><span class="cls">${top}</span><span class="name">${INFO[top][0]}</span></div>
+  <div class="mono" style="color:var(--muted);font-size:12px">classe sugerida · ${(pr[top]*100).toFixed(1)}%</div>
+  ${(pr[top]<.6||marg<.15)?`<div class="alert">⚠ Baixa confiança — interprete com cautela. ${rank[0]} e ${rank[1]} estão próximos: ${diffText(rank[0],rank[1])}</div>`:""}
+  <ul class="bars">${rank.map(c=>`<li class="bar ${c===top?"top":""}"><span class="lab" tabindex="0" aria-describedby="t-${c}">${c}</span><div class="track"><div class="fill" style="transform:scaleX(${pr[c]})"></div></div><span class="pct">${(pr[c]*100).toFixed(1)}%</span>
+    <div class="tip" role="tooltip" id="t-${c}"><b>${c} — ${INFO[c][0]}</b><br>${INFO[c][1]}<br><span style="color:var(--warn)">Atenção:</span> ${INFO[c][2]}</div></li>`).join("")}</ul>
+  <div class="meta"><span>Modelo</span><b class="mono">resnet50-nct 0.1.0</b><span>Tempo</span><b class="mono">${a.ms} ms</b><span>Cache</span><b>${a.cache?"sim":"não"}</b>${a.truth?`<span>Classe verdadeira</span><b class="mono">${a.truth}</b>`:""}</div>`}
+function paintHeat(){if(!st.cur)return;const s=st.cur.seed*10+CL.indexOf(st.cur.cls),cm=$("#cmap").value;drawHeat($("#c1heat"),s,cm);drawHeat($("#c2heat"),s,cm);setOp(st.op)}
+$("#cmap").onchange=paintHeat;
+function setOp(v){st.op=v;$("#c1heat").style.opacity=st.mode==="overlay"?v/100:0;$("#opv").textContent=v+"%";$("#op").value=v;$("#op").setAttribute("aria-valuetext",`Opacidade do mapa: ${v}%`)}
+$("#op").oninput=e=>setOp(+e.target.value);
+function setMode(m){st.mode=m;$("#mOverlay").setAttribute("aria-pressed",m==="overlay");$("#mSbs").setAttribute("aria-pressed",m==="sbs");
+  $("#viewers").classList.toggle("sbs",m==="sbs");$("#v2").hidden=m!=="sbs";$("#l1").textContent=m==="sbs"?"Patch":"Patch + Grad-CAM";setOp(st.op)}
+$("#mOverlay").onclick=()=>setMode("overlay");$("#mSbs").onclick=()=>setMode("sbs");
+function applyT(){const px=st.zoom>=4;["#st1","#st2"].forEach(s=>{const e=$(s);e.style.transform=`translate(${st.tx}px,${st.ty}px) scale(${st.zoom})`;e.classList.toggle("px",px)});$("#zoomLbl").textContent=Math.round(st.zoom*100)+"%"}
+function zoomAt(f,cx,cy){const nz=Math.min(8,Math.max(1,st.zoom*f));const k=nz/st.zoom;st.tx=cx-(cx-st.tx)*k;st.ty=cy-(cy-st.ty)*k;st.zoom=nz;if(nz===1){st.tx=st.ty=0}applyT()}
+$("#reset").onclick=()=>{st.zoom=1;st.tx=st.ty=0;applyT()};
+["#v1","#v2"].forEach(v=>{const el=$(v);let drag=null;
+  el.addEventListener("wheel",e=>{e.preventDefault();const r=el.getBoundingClientRect();zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+  el.addEventListener("pointerdown",e=>{drag=[e.clientX,e.clientY,st.tx,st.ty];el.setPointerCapture(e.pointerId)});
+  el.addEventListener("pointermove",e=>{const r=el.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;["#x1","#x2"].forEach(c=>{const o=$(c);o.style.display=st.mode==="sbs"?"block":"none";o.style.left=x+"px";o.style.top=y+"px"});
+    if(drag&&st.zoom>1){st.tx=drag[2]+e.clientX-drag[0];st.ty=drag[3]+e.clientY-drag[1];applyT()}});
+  el.addEventListener("pointerup",()=>drag=null);el.addEventListener("pointerleave",()=>["#x1","#x2"].forEach(c=>$(c).style.display="none"))});
+document.addEventListener("keydown",e=>{if(e.target.matches("input,select,textarea"))return;const v=$("#v1").getBoundingClientRect();
+  if(e.key==="ArrowRight")setOp(Math.min(100,st.op+5));else if(e.key==="ArrowLeft")setOp(Math.max(0,st.op-5));
+  else if(e.key==="+"||e.key==="=")zoomAt(1.25,v.width/2,v.height/2);else if(e.key==="-")zoomAt(.8,v.width/2,v.height/2);
+  else if(e.key==="0")$("#reset").click();else if(e.key.toLowerCase()==="s")setMode(st.mode==="sbs"?"overlay":"sbs");else if(e.key.toLowerCase()==="g")go("gal")});
+// envio
+const drop=$("#drop");
+function handle(f){const err=$("#dropErr");err.innerHTML="";if(!f)return;
+  if(!["image/png","image/jpeg"].includes(f.type)){err.innerHTML=`<div class="alert err" role="alert">Formato não suportado. Envie PNG ou JPEG.</div>`;return}
+  if(f.size>5*1024*1024){err.innerHTML=`<div class="alert err" role="alert">Arquivo maior que 5 MB.</div>`;return}
+  const r=rng(f.size);analyze({cls:CL[Math.floor(r()*9)],seed:3,src:"Envio",file:f})}
+$("#file").onchange=e=>handle(e.target.files[0]);
+drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#file").click()}});
+["dragover","dragenter"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>handle(e.dataTransfer.files[0]));
+document.addEventListener("paste",e=>{const f=[...e.clipboardData.files][0];if(f)handle(f)});
+
+// ---------- galeria e quiz ----------
+let quiz=false;$("#gExplore").onclick=()=>{quiz=false;tg()};$("#gQuiz").onclick=()=>{quiz=true;tg()};
+function tg(){$("#gExplore").setAttribute("aria-pressed",!quiz);$("#gQuiz").setAttribute("aria-pressed",quiz);renderGal()}
+function renderGal(){const b=$("#galBody");b.innerHTML="";
+  if(!quiz){const g=document.createElement("div");g.className="gal";CL.forEach(c=>[1,4].forEach(sd=>{const d=document.createElement("button");d.className="card";
+    const cv=document.createElement("canvas");cv.width=cv.height=224;drawPatch(cv,c,sd);d.append(cv);d.insertAdjacentHTML("beforeend",`<div class="t"><span class="mono">${c}</span> · ${INFO[c][0]}<small>amostra ${sd===1?"A":"B"} — clique para analisar</small></div>`);
+    d.onclick=()=>analyze({cls:c,seed:sd,src:"Galeria"});g.append(d)}));b.append(g);return}
+  const c=CL[Math.floor(Math.random()*9)],sd=1+Math.floor(Math.random()*5);
+  b.innerHTML=`<div class="quizbox"><div class="panel"><canvas id="qc" width="224" height="224" style="width:100%;border-radius:6px"></canvas></div>
+  <div class="panel"><h2>Que tecido é este?</h2><p style="color:var(--muted);margin:0">Escolha uma classe. A resposta só aparece depois.</p><div class="opts" id="qo"></div><div id="qf" aria-live="polite"></div></div></div>`;
+  drawPatch($("#qc"),c,sd);CL.forEach(o=>{const bt=document.createElement("button");bt.innerHTML=`<span class="mono">${o}</span><br><small style="color:var(--muted)">${INFO[o][0]}</small>`;
+    bt.onclick=()=>{const ok=o===c;$("#qo").querySelectorAll("button").forEach(x=>x.disabled=true);
+      $("#qf").innerHTML=`<p class="${ok?"ok":"bad"}" style="font-weight:600">${ok?"✓ Acertou!":"✗ Não foi dessa vez."} Classe correta: <span class="mono">${c}</span> — ${INFO[c][0]}</p>
+      ${ok?`<p>${INFO[c][1]}</p>`:`<p><strong>Por que não é ${o}?</strong> ${diffText(c,o)}</p>`}<button class="btn" id="qn">Próxima amostra</button> <button class="btn ghost" id="qa">Ver análise do modelo</button>`;
+      $("#qn").onclick=renderGal;$("#qa").onclick=()=>analyze({cls:c,seed:sd,src:"Quiz"})};$("#qo").append(bt)})}
+
+// ---------- histórico ----------
+CL.forEach(c=>$("#hf").insertAdjacentHTML("beforeend",`<option>${c}</option>`));$("#hf").onchange=renderHist;
+function renderHist(){const f=$("#hf").value,rows=st.hist.filter(a=>!f||topClass(a)===f);
+  $("#hb").innerHTML=rows.length?rows.map((a,i)=>`<tr class="row" tabindex="0" data-i="${st.hist.indexOf(a)}"><td class="mono">${a.date.toLocaleString("pt-BR")}</td><td>${a.src}</td><td><span class="chip">${topClass(a)}</span></td><td class="mono">${(a.probs[topClass(a)]*100).toFixed(1)}%</td><td class="mono">0.1.0</td><td class="mono">${a.ms} ms</td></tr>`).join("")
+   :`<tr><td colspan="6" style="color:var(--muted)">Nenhuma análise. Que tal começar pela <a href="#" id="toGal" style="color:var(--accent)">galeria de amostras</a>?</td></tr>`;
+  $("#hb").querySelectorAll("tr.row").forEach(r=>{const open=()=>{go("ws");$("#emptyState").hidden=true;$("#st1").hidden=false;$("#l1").hidden=false;show(st.hist[+r.dataset.i])};r.onclick=open;r.onkeydown=e=>{if(e.key==="Enter")open()}});
+  const tgl=$("#toGal");if(tgl)tgl.onclick=e=>{e.preventDefault();go("gal")}}
+function topClass(a){return CL.slice().sort((x,y)=>a.probs[y]-a.probs[x])[0]}
+$("#csv").onclick=()=>{const l=["data,origem,classe,confianca,modelo,tempo_ms",...st.hist.map(a=>[a.date.toISOString(),a.src,topClass(a),a.probs[topClass(a)].toFixed(4),"0.1.0",a.ms].join(","))].join("\n");
+  const u=URL.createObjectURL(new Blob([l],{type:"text/csv"})),x=document.createElement("a");x.href=u;x.download="historico.csv";x.click()};
+</script>
+</body>
+</html>
