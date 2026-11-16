@@ -94,6 +94,25 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
 .ok{color:var(--accent2)}.bad{color:var(--danger)}
 .kbd{font:11px var(--mono);border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--muted)}
 .hint{font-size:12px;color:var(--muted);margin-top:10px}
+/* ---- modo de teste remoto (?teste) ---- */
+.teste{position:fixed;right:16px;bottom:16px;z-index:20;width:330px;max-width:calc(100vw - 32px);background:var(--s2);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5);font-size:13px}
+.teste header{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:none}
+.teste header b{flex:1}
+.teste .corpo{padding:10px 12px}
+.teste.fechado .corpo{display:none}
+.teste ol{margin:6px 0 10px;padding-left:18px}
+.teste li{margin:6px 0}
+.teste li.feita{color:var(--muted)}
+.teste li.feita::marker{color:var(--accent2)}
+.teste label{display:flex;gap:6px;align-items:flex-start;cursor:pointer}
+.teste input{accent-color:var(--accent);margin-top:3px}
+.teste header .btn{width:auto;margin:0}
+.teste .corpo .btn{width:100%;margin-top:6px;text-align:center;display:block;text-decoration:none}
+.teste .corpo .btn[aria-disabled=true]{opacity:.45;pointer-events:none}
+@media (max-width:700px){.teste{left:16px;right:16px;width:auto}
+  header{flex-wrap:wrap;gap:8px}.brand small{display:none}nav{overflow-x:auto;max-width:100%;scrollbar-width:none}nav button{white-space:nowrap}
+  .proto-tag{display:none}main{padding:10px}.viewer{max-height:none}}
+.zoom-btn{min-width:32px;padding:5px 8px}
 </style>
 </head>
 <body>
@@ -137,6 +156,7 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
         </div>
         <label>Paleta <select id="cmap"><option value="turbo">turbo</option><option value="viridis">viridis</option></select></label>
         <span class="mono" id="zoomLbl" style="color:var(--muted)">100%</span>
+        <button class="btn ghost zoom-btn" id="zMenos" aria-label="Diminuir zoom">−</button><button class="btn ghost zoom-btn" id="zMais" aria-label="Aumentar zoom">+</button>
         <button class="btn ghost" id="reset">Restaurar</button>
       </div>
       <div class="viewers" id="viewers">
@@ -297,6 +317,7 @@ $("#mOverlay").onclick=()=>setMode("overlay");$("#mSbs").onclick=()=>setMode("sb
 function applyT(){const px=st.zoom>=4;["#st1","#st2"].forEach(s=>{const e=$(s);e.style.transform=`translate(${st.tx}px,${st.ty}px) scale(${st.zoom})`;e.classList.toggle("px",px)});$("#zoomLbl").textContent=Math.round(st.zoom*100)+"%"}
 function zoomAt(f,cx,cy){const nz=Math.min(8,Math.max(1,st.zoom*f));const k=nz/st.zoom;st.tx=cx-(cx-st.tx)*k;st.ty=cy-(cy-st.ty)*k;st.zoom=nz;if(nz===1){st.tx=st.ty=0}applyT()}
 $("#reset").onclick=()=>{st.zoom=1;st.tx=st.ty=0;applyT()};
+["#zMais","#zMenos"].forEach((id,k)=>{$(id).onclick=()=>{const r=$("#v1").getBoundingClientRect();zoomAt(k===0?1.5:1/1.5,r.width/2,r.height/2)}});
 ["#v1","#v2"].forEach(v=>{const el=$(v);let drag=null;
   el.addEventListener("wheel",e=>{e.preventDefault();const r=el.getBoundingClientRect();zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top)},{passive:false});
   el.addEventListener("pointerdown",e=>{drag=[e.clientX,e.clientY,st.tx,st.ty];el.setPointerCapture(e.pointerId)});
@@ -346,6 +367,38 @@ function renderHist(){const f=$("#hf").value,rows=st.hist.filter(a=>!f||topClass
 function topClass(a){return CL.slice().sort((x,y)=>a.probs[y]-a.probs[x])[0]}
 $("#csv").onclick=()=>{const l=["data,origem,classe,confianca,modelo,tempo_ms",...st.hist.map(a=>[a.date.toISOString(),a.src,topClass(a),a.probs[topClass(a)].toFixed(4),"0.1.0",a.ms].join(","))].join("\n");
   const u=URL.createObjectURL(new Blob([l],{type:"text/csv"})),x=document.createElement("a");x.href=u;x.download="historico.csv";x.click()};
+
+// ---------- modo de teste remoto: abrir com ?teste (ex.: index.html?teste) ----------
+const FORMULARIO_AVALIACAO = "[[LINK DO FORMULÁRIO DE AVALIAÇÃO]]"; // preencher após gerar o formulário
+const TAREFAS = [
+  "Na tela <b>Workstation</b>, analise uma das <b>amostras rápidas</b> (lado esquerdo) e veja qual classe o sistema sugeriu.",
+  "No mesmo resultado, mexa na <b>opacidade do mapa</b> e depois ative o modo <b>Lado a lado</b>. Use os botões <b>+</b> e <b>−</b> (ou a roda do mouse) para dar zoom e arraste a imagem.",
+  "Abra <b>Galeria e quiz</b>, ative o <b>Modo quiz</b> e responda pelo menos uma amostra.",
+  "Abra o <b>Histórico</b> e reabra uma das análises que você fez."
+];
+if (new URLSearchParams(location.search).has("teste")) {
+  let feitas = [];
+  try { feitas = JSON.parse(localStorage.getItem("histolente-teste") || "[]"); } catch (e) { feitas = []; }
+  const box = document.createElement("aside");
+  box.className = "teste"; box.setAttribute("aria-label", "Roteiro do teste");
+  box.innerHTML = `<header><b>Teste do protótipo</b><button class="btn ghost" id="tMin" style="padding:3px 8px">Minimizar</button></header>
+    <div class="corpo"><p style="margin:0 0 4px;color:var(--muted)">Faça as tarefas na ordem e marque cada uma ao terminar. Se travar em alguma, marque mesmo assim e conte no formulário.</p>
+    <ol id="tLista">${TAREFAS.map((t,i)=>`<li${feitas.includes(i)?' class="feita"':''}><label><input type="checkbox" data-i="${i}"${feitas.includes(i)?" checked":""}><span>${t}</span></label></li>`).join("")}</ol>
+    <a class="btn" id="tForm" target="_blank" rel="noopener" href="${FORMULARIO_AVALIACAO}">Responder o formulário (5 min)</a>
+    <p class="hint" style="margin-top:8px">Os dados e imagens deste protótipo são simulados. Nada do que você faz aqui é enviado.</p></div>`;
+  document.body.append(box);
+  const atualizar = () => { $("#tForm").setAttribute("aria-disabled", feitas.length < TAREFAS.length ? "true" : "false"); };
+  box.querySelectorAll("input[type=checkbox]").forEach(c => c.onchange = () => {
+    const i = +c.dataset.i; feitas = c.checked ? [...new Set([...feitas, i])] : feitas.filter(x => x !== i);
+    c.closest("li").classList.toggle("feita", c.checked);
+    try { localStorage.setItem("histolente-teste", JSON.stringify(feitas)); } catch (e) {}
+    atualizar();
+  });
+  if (window.matchMedia("(max-width:700px)").matches) { box.classList.add("fechado"); }
+  $("#tMin").onclick = () => { const f = box.classList.toggle("fechado"); $("#tMin").textContent = f ? "Abrir" : "Minimizar"; };
+  $("#tMin").textContent = box.classList.contains("fechado") ? "Abrir" : "Minimizar";
+  atualizar();
+}
 </script>
 </body>
 </html>
