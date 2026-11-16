@@ -80,16 +80,25 @@ Estação de trabalho escura, densa e silenciosa, em que **a lâmina é a protag
 | 2.3.3 Animação por interação | Respeita a configuração de reduzir movimento |
 
 ## 4.5 Validação do protótipo com usuários
-**Situação:** planejada para a Sprint 0 ou 1. Os participantes serão as pessoas que deixaram contato no formulário de elicitação.
+
+**Formato:** teste de usabilidade **remoto e não moderado**. Os participantes moram em outro município, por isso não há sessão presencial nem gravação.
 
 **Protocolo:**
-1. Enviar o link do protótipo com o TCLE.
-2. Pedir que o participante execute 4 tarefas:
-   - analisar uma amostra da galeria;
-   - ajustar a opacidade e usar o modo lado a lado;
-   - responder uma questão do quiz;
+1. O participante recebe dois links: o protótipo em modo de teste (`index.html?teste`) e o formulário de avaliação. O formulário é gerado por `docs/pesquisa/criar-formulario-avaliacao-prototipo.gs` e contém o TCLE.
+2. No protótipo, um painel mostra as 4 tarefas, que o participante marca ao concluir:
+   - analisar uma amostra rápida;
+   - ajustar a opacidade, usar o lado a lado e o zoom;
+   - responder no modo quiz;
    - reabrir uma análise do histórico.
-3. Registrar, para cada tarefa: conclusão (sim/não), dificuldades e comentários.
-4. Aplicar uma versão curta do SUS ao fim do teste.
+   O botão do formulário só é liberado depois das 4 tarefas.
+3. No formulário, o participante informa o resultado de cada tarefa (sem dificuldade / com dificuldade / não conseguiu) e o que aconteceu, e responde ao SUS completo (10 itens) e a duas perguntas abertas.
+4. O protótipo não envia dados: o registro das tarefas fica só no navegador do participante.
 
-**Registro dos resultados:** `[[RESULTADO A COLETAR]]`. Os ajustes decorrentes entram no backlog da sprint seguinte.
+**Análise:**
+- Taxa de conclusão de cada tarefa (meta do RNF02: pelo menos 90% sem ajuda).
+- Escore SUS por participante e média, com o cálculo de Brooke (1996).
+- Dificuldades relatadas, convertidas em itens do backlog.
+
+**Limitação:** sem observação direta, o teste depende do que o participante relata. Não se mede o tempo das tarefas nem se vê onde a pessoa hesitou.
+
+**Registro dos resultados:** `[[RESULTADO A COLETAR]]`.
