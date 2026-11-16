@@ -25,7 +25,7 @@
 | 5 | MER, modelo lógico, modelo físico (SQL) e dicionário de dados | 4.3 | Concluído em 10/11 (`docs/projeto/03-…`, `infra/db/schema.sql`) |
 | 6 | Guia de estilo, critérios WCAG e protótipo navegável | 4.4 | Guia e protótipo concluídos em 10/11; validação com usuários pendente |
 | 7 | Seção de segurança e LGPD | 4.5 | Concluído em 10/11 (`docs/projeto/05-…`) |
-| 8 | Consolidar as respostas da elicitação (Seção 1.4) e revisar o MoSCoW | 3.1 | Aguardando respostas |
+| 8 | Consolidar as respostas da elicitação (Seção 1.4) e revisar o MoSCoW | 3.1 | Concluído em 16/11 (4 respostas; RF17 → Must, RF15 → Should, novo RF18) |
 | 9 | Confirmar com o orientador: CEP, política de uso de IA, prazos | 2.4 | A fazer |
 
 **Riscos observados no planning:** R04 (poucas respostas), R05 (CEP) e R06 (escopo).

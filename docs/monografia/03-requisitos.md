@@ -14,13 +14,38 @@ As técnicas documentais definiram o núcleo do problema e as restrições regul
 | T2 | Análise do *dataset* público | Aplicada | NCT-CRC-HE-100K (KATHER et al., 2018) | RF01, RF02, RF03 |
 | T3 | Análise de normas e regulação | Aplicada | Resolução CFM nº 2.454/2026; Lei nº 13.709/2018 | RF07, RF08, RF13, RNF04, RNF07 |
 | T4 | Sessões de ideação (*brainstorming*) | Aplicada | Autor | RF09, RF10, RF12, RF14, RF15, RF16, RNF09 |
-| T5 | Entrevista estruturada escrita, aplicada remotamente | Em coleta | Estudantes de Medicina, professores de Patologia e profissionais de laboratório | Validação e priorização de todos os RF |
+| T5 | Entrevista estruturada escrita, aplicada remotamente | Aplicada (n = 4) | 3 estudantes de Medicina e 1 profissional de laboratório | Validação e priorização dos RF; RF18 |
 | T7 | Observação de aula prática de Patologia | Planejada | Turma de Patologia da instituição | Validação de RF01, RF09 e RNF02 |
 | T8 | Prototipação de baixa fidelidade | Planejada | Participantes de T5 e T7 | Refinamento de RF03, RF04 e RNF02 |
 
 Fonte: elaborado pelo autor (2026). Nota: a técnica T6 (questionário separado) foi incorporada à T5, cujo quadro de funcionalidades cumpre o papel de questionário fechado.
 
-A entrevista estruturada escrita (T5) foi aplicada por meio de formulário online, com duração estimada de dez minutos, sem gravação e sem coleta de nome ou endereço de e-mail. O formulário apresenta o TCLE em sua primeira seção e direciona cada participante, conforme o perfil declarado (estudante, professor ou profissional de laboratório), a perguntas específicas. Em seguida, todos respondem a seis perguntas abertas sobre dificuldades atuais no reconhecimento de padrões histológicos, tecidos frequentemente confundidos, uso pretendido da ferramenta, percepção sobre o mapa de calor, origem das imagens disponíveis e condições para confiar na ferramenta. Por fim, classificam seis funcionalidades candidatas como essenciais, úteis ou dispensáveis. O instrumento completo encontra-se no Apêndice D. As respostas abertas serão analisadas por categorias temáticas, e o quadro de funcionalidades será tabulado por frequência para recalibrar as prioridades apresentadas nas Seções 3.3 e 3.4: `[[RESULTADO A COLETAR]]`.
+A entrevista estruturada escrita (T5) foi aplicada por meio de formulário online, com duração estimada de dez minutos, sem gravação e sem coleta de nome ou endereço de e-mail. O formulário apresenta o TCLE em sua primeira seção e direciona cada participante, conforme o perfil declarado (estudante, professor ou profissional de laboratório), a perguntas específicas. Em seguida, todos respondem a seis perguntas abertas sobre dificuldades atuais no reconhecimento de padrões histológicos, tecidos frequentemente confundidos, uso pretendido da ferramenta, percepção sobre o mapa de calor, origem das imagens disponíveis e condições para confiar na ferramenta. Por fim, classificam seis funcionalidades candidatas como essenciais, úteis ou dispensáveis. O instrumento completo encontra-se no Apêndice D. As respostas abertas foram agrupadas por categorias temáticas, e o quadro de funcionalidades foi tabulado por frequência.
+
+O formulário recebeu quatro respostas entre 11 e 12 de novembro de 2026, todas com aceite do TCLE: três estudantes de Medicina do 6º período, identificados como E01 a E03, e um profissional do setor de expedição de um laboratório de anatomia patológica (L01). Nenhum professor respondeu. A Tabela 1 apresenta a classificação das funcionalidades candidatas; nenhuma delas foi considerada dispensável.
+
+**Tabela 1 — Classificação das funcionalidades candidatas pelos participantes (n = 4)**
+
+| Funcionalidade | Essencial | Útil | Dispensável |
+|---|---|---|---|
+| Critérios morfológicos de cada classe e o que não confundir | 4 | 0 | 0 |
+| Percentual de confiança das nove classes | 3 | 1 | 0 |
+| Galeria com vários exemplos de cada classe | 2 | 2 | 0 |
+| Histórico e acompanhamento do progresso | 2 | 2 | 0 |
+| Mapa de calor com controle de transparência e comparação lado a lado | 1 | 3 | 0 |
+| Modo quiz com explicação do erro | 1 | 3 | 0 |
+
+Fonte: dados da pesquisa (2026).
+
+A descrição dos critérios morfológicos foi a única funcionalidade considerada essencial por todos os participantes. Isso converge com a principal dificuldade relatada, a de diferenciar tecidos que "se coram de forma parecida" (E01), e com os pares de tecidos citados como mais confundidos: músculo e estroma (E02), mucosa normal e tumor (E03). Esses pares correspondem aos previstos no RF15, que foi confirmado e teve a prioridade elevada.
+
+Quanto à origem das imagens, três dos quatro participantes enviariam fotografias do microscópio tiradas com o celular, e o laboratório de L01 não dispõe de scanner nem de câmera acoplada. Esse dado confirma o risco de diferença entre as imagens de uso e as de treinamento, discutido por Zehra et al. (2023) para contextos de poucos recursos, e elevou o RF17 (alerta de imagem fora do padrão) à prioridade máxima.
+
+Todos os participantes consideraram que o mapa de calor ajudaria, sobretudo quando a lâmina tem qualidade ruim ou a estrutura é difícil de identificar. Entre as condições para confiar na ferramenta, foram citadas não confundir estruturas, não deixar passar um tumor evidente, não indicar região errada de lesão e responder mais rápido que um estudante. Essas condições reforçam o RNF01 e orientam a avaliação do modelo a reportar a sensibilidade da classe tumoral.
+
+Por fim, a sugestão de apresentar imagens "erradas" para que o estudante identifique o que foge do padrão normal (E02) originou o RF18.
+
+A amostra é pequena, de conveniência e concentrada num único período do curso, e não inclui professores. Por isso, os requisitos voltados ao professor continuam sem validação direta e serão verificados na observação de aula (T7) e com o orientador.
 
 Não estão previstas, nesta etapa, entrevistas presenciais com patologistas em ambiente clínico real; profissionais de laboratório participam apenas da entrevista escrita. Essa restrição constitui limitação apontada como trabalho futuro.
 
@@ -35,7 +60,7 @@ Não estão previstas, nesta etapa, entrevistas presenciais com patologistas em 
 
 ## 3.3 Requisitos funcionais
 
-Os requisitos funcionais foram priorizados pelo método MoSCoW [FONTE PENDENTE: método MoSCoW], que classifica cada requisito em quatro categorias: obrigatório para a primeira versão (*Must have*, M); importante, mas não bloqueante (*Should have*, S); desejável (*Could have*, C); e fora do escopo desta versão (*Won't have*). Os requisitos RF01 a RF07 provêm do projeto inicial; os requisitos RF08 a RF17 foram incorporados durante a elicitação. Os requisitos assinalados com o símbolo † dependem exclusivamente de ideação e serão confirmados ou descartados na consolidação da técnica T5. O Quadro 2 apresenta os requisitos funcionais com seus critérios de aceite.
+Os requisitos funcionais foram priorizados pelo método MoSCoW [FONTE PENDENTE: método MoSCoW], que classifica cada requisito em quatro categorias: obrigatório para a primeira versão (*Must have*, M); importante, mas não bloqueante (*Should have*, S); desejável (*Could have*, C); e fora do escopo desta versão (*Won't have*). Os requisitos RF01 a RF07 provêm do projeto inicial; os requisitos RF08 a RF18 foram incorporados durante a elicitação. As prioridades foram revisadas após a consolidação da técnica T5. Os requisitos assinalados com o símbolo † ainda não foram validados por usuários: não foram avaliados pelo formulário ou foram sugeridos por um único participante. O Quadro 2 apresenta os requisitos funcionais com seus critérios de aceite.
 
 **Quadro 2 — Requisitos funcionais**
 
@@ -49,15 +74,16 @@ Os requisitos funcionais foram priorizados pelo método MoSCoW [FONTE PENDENTE: 
 | RF06 | O sistema deve permitir ao usuário consultar e reabrir suas análises anteriores. | S | T1 | Lista paginada com filtros por classe, data e lote; reabrir uma análise reproduz a mesma visualização. |
 | RF07 | O sistema deve exibir, em todas as telas, aviso de que os resultados têm caráter educacional e de apoio à triagem e não substituem laudo médico. | M | T3 | Aviso presente em todas as telas autenticadas; pode ser minimizado, mas não removido. |
 | RF08 | O sistema deve autenticar usuários e controlar o acesso conforme o perfil (Estudante, Professor, Administrador). | M | T3 | Rotas protegidas exigem autenticação; cada perfil acessa apenas as funções permitidas. |
-| RF09 † | O sistema deve oferecer modo quiz, no qual o estudante escolhe a classe da amostra antes de ver a sugestão do modelo e recebe explicação em caso de erro. | S | T4, T5 | A resposta correta só aparece após a escolha; em caso de erro, são exibidos os critérios que diferenciam a classe escolhida da correta. |
+| RF09 | O sistema deve oferecer modo quiz, no qual o estudante escolhe a classe da amostra antes de ver a sugestão do modelo e recebe explicação em caso de erro. | S | T4, T5 | A resposta correta só aparece após a escolha; em caso de erro, são exibidos os critérios que diferenciam a classe escolhida da correta. |
 | RF10 † | O sistema deve permitir exportar o histórico de análises em formato CSV. | C | T4 | O arquivo contém data, classe sugerida, confiança e versão do modelo de cada análise filtrada. |
 | RF11 | O sistema deve exibir a versão do modelo em uso e suas limitações conhecidas. | S | T3, T4 | Tela informativa com versão, data de treino, métricas de teste e limitações. |
 | RF12 † | O sistema deve permitir ao Administrador definir a versão ativa do modelo de classificação. | C | T4 | A troca de versão não exige recompilar o backend; novas análises registram a nova versão. |
 | RF13 | O sistema deve registrar o aceite do termo de uso, e do TCLE para participantes da pesquisa, antes do primeiro uso. | S | T3 | Sem aceite registrado, a análise não é liberada; o aceite guarda versão do termo e data. |
 | RF14 | O sistema deve informar falhas no processamento e permitir o reenvio da análise. | S | T4 | Em caso de falha, o usuário recebe mensagem clara e opção de reenvio, sem perder a imagem enviada. |
-| RF15 † | O sistema deve permitir comparar, lado a lado, amostras de duas classes frequentemente confundidas. | C | T4, T5 | O usuário escolhe um par de classes (ex.: STR × MUS) e visualiza amostras e critérios diferenciais. |
-| RF16 † | O sistema deve exibir ao estudante seu desempenho no modo quiz, por classe e ao longo do tempo. | C | T4, T5 | Percentual de acertos por classe e evolução por sessão, visíveis apenas ao próprio estudante. |
-| RF17 | O sistema deve alertar quando a imagem enviada parecer fora do padrão do *dataset* de treino (ex.: fotografia de celular, coloração diferente de H&E, ausência de tecido). | S | T1, T5 | Antes de exibir a classificação, apresenta aviso de que o resultado pode não ser confiável. |
+| RF15 | O sistema deve permitir comparar, lado a lado, amostras de duas classes frequentemente confundidas. | S | T4, T5 | O usuário escolhe um par de classes (ex.: STR × MUS) e visualiza amostras e critérios diferenciais. |
+| RF16 | O sistema deve exibir ao estudante seu desempenho no modo quiz, por classe e ao longo do tempo. | C | T4, T5 | Percentual de acertos por classe e evolução por sessão, visíveis apenas ao próprio estudante. |
+| RF17 | O sistema deve alertar quando a imagem enviada parecer fora do padrão do *dataset* de treino (ex.: fotografia de celular, coloração diferente de H&E, ausência de tecido). | M | T1, T5 | Antes de exibir a classificação, apresenta aviso de que o resultado pode não ser confiável. |
+| RF18 † | O sistema deve oferecer um desafio em que o estudante aponta, num conjunto de amostras, a que foge do padrão. | C | T5 | Grade com 4 a 6 amostras, uma de classe diferente; a resposta só aparece após a escolha. |
 
 Fonte: elaborado pelo autor (2026).
 
@@ -86,7 +112,7 @@ Os requisitos não funcionais foram organizados segundo as características de q
 | RNF05 | Disponibilidade | O sistema deve permanecer estável durante aulas e demonstrações. | ≥ 99% de requisições bem-sucedidas em sessão de 60 min; reinício automático de serviços; nenhuma análise perdida em falha. | Teste de longa duração; verificação de saúde dos serviços. |
 | RNF06 | Manutenibilidade | O serviço de IA deve ser separado do backend, com versionamento independente do modelo. | O serviço de IA não acessa o banco de dados e comunica-se apenas por fila de mensagens; troca de modelo sem recompilar o backend; cobertura de testes ≥ 70%. | Teste de arquitetura; integração contínua. |
 | RNF07 | Segurança | O sistema deve proteger contas, sessões e entradas. | Senhas com *hash* Argon2 ou bcrypt; sessão em *cookie* protegido; HTTPS fora do ambiente local; validação do tipo real do arquivo; limite de requisições por usuário. | Testes de integração; checklist OWASP Top 10. |
-| RNF08 | Compatibilidade | A interface deve funcionar nos equipamentos dos laboratórios de informática. | Versões recentes de Chrome, Edge e Firefox; resolução mínima 1366 × 768; serviço de IA funcional apenas com CPU. | Testes automatizados em vários navegadores; teste em máquina do laboratório. |
+| RNF08 | Compatibilidade | A interface deve funcionar nos equipamentos dos laboratórios de informática. | Versões recentes de Chrome, Edge e Firefox; resolução mínima 1366 × 768; tema claro legível em projetor; serviço de IA funcional apenas com CPU. | Testes automatizados em vários navegadores; teste em máquina do laboratório. |
 | RNF09 | Escalabilidade | O sistema deve absorver picos de uso simultâneo em aula sem esgotar a memória. | 30 usuários simultâneos sem erro; o número de instâncias do serviço de IA pode ser aumentado sem alteração de código. | Teste de carga com uma e com duas instâncias. |
 
 Fonte: elaborado pelo autor (2026).
@@ -111,7 +137,7 @@ Fonte: elaborado pelo autor (2026).
 
 Para orientar o desenvolvimento em *sprints* do Scrum, os requisitos foram desdobrados em histórias de usuário no formato "Como [papel], quero [funcionalidade], para [benefício]" (COHN, 2004), agrupadas em seis épicos: análise de imagens, explicabilidade visual, apoio pedagógico, histórico e rastreabilidade, acesso e conformidade, e administração do modelo. Os critérios de aceitação das histórias principais foram descritos em cenários na notação Gherkin (Dado / Quando / Então), o que permite convertê-los diretamente em testes automatizados.
 
-O *Product Backlog* inicial reúne 22 histórias de usuário e 6 itens habilitadores técnicos, como o pipeline de treinamento do modelo, o ambiente Docker Compose e o contrato de mensagens entre os serviços. Esses itens somam 133 pontos de história, distribuídos em seis *sprints* de duas semanas. A ordem do backlog prioriza, nas duas primeiras *sprints*, a infraestrutura e o fluxo central de envio, classificação e exibição do resultado. Os itens de prioridade *Could have* ficam para a última *sprint*. As histórias completas, os cenários Gherkin e o backlog encontram-se no Apêndice A.
+O *Product Backlog* inicial reúne 23 histórias de usuário e 6 itens habilitadores técnicos, como o pipeline de treinamento do modelo, o ambiente Docker Compose e o contrato de mensagens entre os serviços. Esses itens somam 138 pontos de história, distribuídos em seis *sprints* de duas semanas. A ordem do backlog prioriza, nas duas primeiras *sprints*, a infraestrutura e o fluxo central de envio, classificação e exibição do resultado. Os itens de prioridade *Could have* ficam para a última *sprint*. As histórias completas, os cenários Gherkin e o backlog encontram-se no Apêndice A.
 
 ## 3.6 Modelagem de casos de uso
 
@@ -127,10 +153,10 @@ Os casos de uso principais foram especificados com atores, requisitos relacionad
 
 ## 3.7 Rastreabilidade de requisitos
 
-Para garantir que cada requisito seja implementado e verificado, foi construída uma matriz de rastreabilidade. Ela liga cada requisito à técnica de elicitação e à lacuna do referencial teórico (Seção 1.8) que o originaram, às histórias de usuário e aos casos de uso que o realizam, aos casos de teste que o verificam e à etapa de validação correspondente (Seção 2.4). Foram especificados 39 casos de teste, de unidade, integração, ponta a ponta, carga, segurança e usabilidade.
+Para garantir que cada requisito seja implementado e verificado, foi construída uma matriz de rastreabilidade. Ela liga cada requisito à técnica de elicitação e à lacuna do referencial teórico (Seção 1.8) que o originaram, às histórias de usuário e aos casos de uso que o realizam, aos casos de teste que o verificam e à etapa de validação correspondente (Seção 2.4). Foram especificados 40 casos de teste, de unidade, integração, ponta a ponta, carga, segurança e usabilidade.
 
 A verificação da matriz indica que:
-- todos os 17 requisitos funcionais e os 9 requisitos não funcionais possuem ao menos uma história ou item habilitador e ao menos um caso de teste;
+- todos os 18 requisitos funcionais e os 9 requisitos não funcionais possuem ao menos uma história ou item habilitador e ao menos um caso de teste;
 - todos os 15 casos de uso derivam de ao menos um requisito;
 - as três lacunas identificadas na Seção 1.8 estão cobertas por requisitos.
 
