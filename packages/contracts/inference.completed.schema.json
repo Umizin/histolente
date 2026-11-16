@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Umizin/histolente/packages/contracts/inference.completed.schema.json",
+  "title": "inference.completed",
+  "description": "Resultado publicado pelo serviço de inferência na fila inference.completed e consumido pelo backend de orquestração.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "job_id", "analysis_id", "status", "model", "completed_at", "correlation_id"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "job_id": { "type": "string", "format": "uuid" },
+    "analysis_id": { "type": "string", "format": "uuid" },
+    "status": { "enum": ["DONE", "FAILED"] },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "sha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "predicted_class": { "$ref": "#/$defs/tissue_class" },
+    "probabilities": {
+      "type": "object",
+      "description": "Probabilidade por classe. A soma deve ser 1 ± 1e-4 (verificada pelo consumidor; JSON Schema não expressa somas).",
+      "additionalProperties": false,
+      "required": ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"],
+      "patternProperties": {
+        "^(ADI|BACK|DEB|LYM|MUC|MUS|NORM|STR|TUM)$": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "out_of_distribution": {
+      "type": "boolean",
+      "description": "true quando a imagem parece fora do padrão do dataset de treino (RF17)."
+    },
+    "gradcam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_layer", "target_class", "heatmap_png_b64", "colormap", "resolution"],
+      "properties": {
+        "target_layer": { "type": "string" },
+        "target_class": { "$ref": "#/$defs/tissue_class" },
+        "heatmap_png_b64": { "type": "string", "contentEncoding": "base64", "minLength": 4 },
+        "colormap": { "enum": ["turbo", "viridis", "gray"] },
+        "resolution": {
+          "type": "array",
+          "prefixItems": [{ "const": 224 }, { "const": 224 }],
+          "items": false
+        }
+      }
+    },
+    "timings_ms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preprocess", "inference", "gradcam", "total_worker"],
+      "properties": {
+        "preprocess": { "type": "number", "minimum": 0 },
+        "inference": { "type": "number", "minimum": 0 },
+        "gradcam": { "type": "number", "minimum": 0 },
+        "total_worker": { "type": "number", "minimum": 0 }
+      }
+    },
+    "error": { "type": ["string", "null"] },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "correlation_id": { "type": "string", "format": "uuid" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "DONE" } } },
+      "then": {
+        "required": ["predicted_class", "probabilities", "gradcam", "timings_ms", "out_of_distribution"],
+        "properties": { "error": { "type": "null" } }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "FAILED" } } },
+      "then": {
+        "required": ["error"],
+        "properties": { "error": { "type": "string", "minLength": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "tissue_class": { "enum": ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"] }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "job_id": "6b2f6a1e-0c1f-4d7a-9a51-3f3b0c9b7c11",
+  "analysis_id": "f0b7a1d2-63c4-4e8f-8d6b-2a9a4c1e5d33",
+  "status": "FAILED",
+  "model": { "name": "resnet50-nct", "version": "0.1.0", "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" },
+  "error": "imagem corrompida: não foi possível decodificar o PNG",
+  "completed_at": "2026-11-16T14:03:12.410Z",
+  "correlation_id": "0d3c1f8e-6c2b-4b5a-a1f3-9e8d7c6b5a40"
+}
