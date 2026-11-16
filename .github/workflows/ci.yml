@@ -36,6 +36,24 @@ jobs:
       - run: pip install -r packages/contracts/requirements-dev.txt
       - run: pytest -q packages/contracts
 
+  ambiente:
+    name: Ambiente Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sobe Postgres, Redis e RabbitMQ
+        run: |
+          cp infra/.env.example infra/.env
+          docker compose -f infra/docker-compose.yml up -d --wait
+      - name: Testes de ponta a ponta do ambiente
+        run: docker compose -f infra/docker-compose.yml --profile teste run --rm verificador
+      - name: Logs em caso de falha
+        if: failure()
+        run: docker compose -f infra/docker-compose.yml logs --tail=200
+      - name: Derruba
+        if: always()
+        run: docker compose -f infra/docker-compose.yml down -v
+
   ferramentas:
     name: Ferramentas de documentação
     runs-on: ubuntu-latest
