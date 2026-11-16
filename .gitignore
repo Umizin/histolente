@@ -38,3 +38,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.swp
+
+# Saídas de treino (checkpoints ficam no Drive / ml/models)
+ml/runs/
