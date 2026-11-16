@@ -52,9 +52,9 @@ Sprints de duas semanas, começando em 10/11/2026. As datas a partir da Sprint 3
 
 | Sprint | Período | Meta da sprint | Itens principais (EAP / backlog) | Pontos |
 |---|---|---|---|---|
-| S0 | 10/11 – 23/11/2026 | Base do projeto e design | 1.1–1.3; 4.1–4.5 (classes, sequência, dados, guia de estilo, protótipo); consolidação da elicitação | — (preparação) |
-| S1 | 24/11 – 07/12/2026 | Modelo treinado e ambiente rodando | EN01, EN02, EN03 | 21 |
-| S2 | 08/12 – 21/12/2026 | Fluxo central de ponta a ponta | EN04, HU14, HU01, HU19, HU04, HU12 | 29 |
+| S0 | 10/11 – 16/11/2026 (encerrada antes) | Base do projeto e design | 1.1–1.3; 4.1–4.5 (classes, sequência, dados, guia de estilo, protótipo); consolidação da elicitação | — (preparação) |
+| S1 | 16/11 – 29/11/2026 | Modelo treinado e ambiente rodando | EN01, EN02, EN03 | 21 |
+| S2 | 30/11 – 13/12/2026 | Fluxo central de ponta a ponta | EN04, HU14, HU01, HU19, HU04, HU12 | 29 |
 | — | recesso de fim de ano | `[[confirmar com o calendário da UVS]]` | — | — |
 | S3 | `[[a definir]]` | Explicabilidade e galeria | HU07, HU02, HU05, HU10 | 19 |
 | S4 | `[[a definir]]` | Robustez e conformidade | HU08, HU06, HU18, HU17, HU15, HU22 | 23 |
