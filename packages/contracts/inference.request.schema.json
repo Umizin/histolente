@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Umizin/histolente/packages/contracts/inference.request.schema.json",
+  "title": "inference.request",
+  "description": "Pedido de inferência publicado pelo backend de orquestração na fila inference.request e consumido pelo serviço de inferência.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "job_id", "analysis_id", "image_sha256", "image_b64", "mime_type", "requested_at", "correlation_id"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "job_id": { "type": "string", "format": "uuid", "description": "Identificador da mensagem; garante idempotência." },
+    "analysis_id": { "type": "string", "format": "uuid" },
+    "image_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "image_b64": {
+      "type": "string",
+      "contentEncoding": "base64",
+      "minLength": 4,
+      "maxLength": 7000000,
+      "description": "Imagem PNG/JPEG em base64 (até 5 MB antes da codificação)."
+    },
+    "mime_type": { "enum": ["image/png", "image/jpeg"] },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "target_class": {
+      "description": "Classe para a qual gerar o Grad-CAM. null = classe predita.",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/tissue_class" }]
+    },
+    "correlation_id": { "type": "string", "format": "uuid" }
+  },
+  "$defs": {
+    "tissue_class": { "enum": ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"] }
+  }
+}

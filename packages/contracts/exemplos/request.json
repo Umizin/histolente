@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "job_id": "6b2f6a1e-0c1f-4d7a-9a51-3f3b0c9b7c11",
+  "analysis_id": "f0b7a1d2-63c4-4e8f-8d6b-2a9a4c1e5d33",
+  "image_sha256": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+  "image_b64": "iVBORw0KGgo=",
+  "mime_type": "image/png",
+  "requested_at": "2026-11-16T14:03:12Z",
+  "target_class": null,
+  "correlation_id": "0d3c1f8e-6c2b-4b5a-a1f3-9e8d7c6b5a40"
+}
