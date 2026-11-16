@@ -1,0 +1,93 @@
+# HistoLente — ambiente de infraestrutura (EN02)
+#
+#   cp infra/.env.example infra/.env      # ajuste as senhas
+#   docker compose -f infra/docker-compose.yml up -d --wait
+#   docker compose -f infra/docker-compose.yml --profile teste run --rm verificador
+#
+# Redes (RNF06):
+#   backend_net -> api <-> postgres            (o serviço de inferência NÃO entra aqui)
+#   mq_net      -> api <-> rabbitmq <-> redis <-> inferência
+# Os serviços api/web (HU01) e inference (EN04) entram neste arquivo quando forem implementados.
+
+name: histolente
+
+services:
+  postgres:
+    image: postgres:16.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [backend_net]
+    mem_limit: 512m
+
+  redis:
+    image: redis:7.4.1-alpine
+    restart: unless-stopped
+    command: >
+      redis-server --requirepass ${REDIS_PASSWORD}
+      --maxmemory 256mb --maxmemory-policy allkeys-lru --save "" --appendonly no
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [mq_net]
+    mem_limit: 320m
+
+  rabbitmq:
+    image: rabbitmq:3.13.7-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+    ports:
+      - "127.0.0.1:15672:15672"   # painel de administração, só na máquina local
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    networks: [mq_net]
+    mem_limit: 512m
+
+  # Verificação de ponta a ponta do ambiente (usada na CI e localmente)
+  verificador:
+    profiles: [teste]
+    image: python:3.12.7-slim
+    working_dir: /repo
+    volumes:
+      - ..:/repo:ro
+    environment:
+      POSTGRES_DSN: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      AMQP_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+    command: >
+      sh -c "pip install -q --root-user-action=ignore -r infra/tests/requirements.txt
+      && python -m pytest -q -p no:cacheprovider infra/tests"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    networks: [backend_net, mq_net]
+
+networks:
+  backend_net:
+  mq_net:
+
+volumes:
+  pgdata:
+  rabbitdata:
