@@ -19,9 +19,9 @@ O processo de pesquisa segue a metodologia de *Design Science Research* de Peffe
 |---|---|---|---|
 | 1. Identificação do problema e motivação | Até set./2026 | Pré-TCC | Pré-TCC; histórico do projeto |
 | 2. Definição dos objetivos da solução | Sprint 0 | RF01–RF18, RNF01–RNF11, priorização com a elicitação (T5) | Documento de requisitos (v1.2) |
-| 3. Projeto e desenvolvimento | Sprints 0 a 4 | Arquitetura, modelos, protótipo; contratos, ambiente, pipeline de ML; MVP | Documento de projeto; PRs #40–#42 em diante |
+| 3. Projeto e desenvolvimento | Sprints 0 a 6 | Arquitetura, modelos, protótipo; contratos, ambiente, pipeline de ML; MVP | Documento de projeto; PRs #40–#42 em diante |
 | 4. Demonstração | Sprints 1 a 4 | Protótipo navegável; depois, o MVP funcionando | Telas no documento de projeto; *deploy* |
-| 5. Avaliação | Sprints 1 (formativa) e 5–6 (somativa) | Avaliação do protótipo; métricas do modelo; desempenho; SUS e estudo de caso | Relatórios de avaliação (a coletar) |
+| 5. Avaliação | Formativa após o parecer ético; somativa nas Sprints 5–6 | Avaliação do protótipo; métricas do modelo; desempenho; SUS e estudo de caso | Relatórios de avaliação (a coletar) |
 | 6. Comunicação | Contínua | Entregas da disciplina, monografia e defesa | PDFs e monografia |
 
 ## Adaptação dos papéis

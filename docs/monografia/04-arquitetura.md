@@ -1,5 +1,7 @@
 # 4 Arquitetura Conceitual da Solução
 
+> **Nota de trabalho (18/11/2026, remover na versão final):** este capítulo ainda descreve a versão anterior do projeto. As decisões revisadas (versão do modelo no pedido, evento de início, novas tentativas por filas de espera, canal SSE por usuário, recorte central) estão em `docs/projeto/01-arquitetura.md` §1.5 e serão incorporadas aqui junto com a implementação da Sprint 2.
+
 ## 4.1 Visão geral
 
 A arquitetura conceitual da solução foi projetada em torno da separação clara entre três domínios de responsabilidade:
