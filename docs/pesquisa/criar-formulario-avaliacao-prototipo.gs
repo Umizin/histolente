@@ -27,19 +27,20 @@ const TAREFAS = [
   'Tarefa 4 — Reabrir uma análise no histórico',
 ];
 
-// Itens do System Usability Scale (Brooke, 1996), adaptados para "esta ferramenta".
-// Ímpares positivos, pares negativos — não alterar a ordem (o cálculo do escore depende dela).
+// Itens da versão brasileira validada do System Usability Scale (LOURENÇO; CARMONA; LOPES, 2022,
+// Aquichan, v. 22, n. 2, e2228, Tabela 1), transcritos sem alteração. "Sistema" = a ferramenta HistoLente.
+// Ímpares positivos, pares negativos — não alterar a ordem (o cálculo do escore depende dela; BROOKE, 1996).
 const SUS = [
-  'Eu acho que gostaria de usar esta ferramenta com frequência.',
-  'Eu achei a ferramenta desnecessariamente complexa.',
-  'Eu achei a ferramenta fácil de usar.',
-  'Eu acho que precisaria do apoio de uma pessoa com conhecimentos técnicos para usar a ferramenta.',
-  'Eu achei que as diversas funções da ferramenta estavam bem integradas.',
-  'Eu achei que havia muita inconsistência na ferramenta.',
-  'Eu imagino que a maioria das pessoas aprenderia a usar esta ferramenta rapidamente.',
-  'Eu achei a ferramenta muito complicada de usar.',
-  'Eu me senti muito confiante ao usar a ferramenta.',
-  'Eu precisei aprender muitas coisas antes de conseguir usar a ferramenta.',
+  'Eu acho que gostaria de usar esse sistema frequentemente.',
+  'Eu achei esse sistema desnecessariamente complexo.',
+  'Eu achei esse sistema fácil de usar.',
+  'Eu achei que precisaria de ajuda de uma pessoa técnica para ser capaz de usar esse sistema.',
+  'Eu achei que as várias funções desse sistema foram bem integradas.',
+  'Eu acho que o sistema apresenta muita inconsistência.',
+  'Eu imagino que a maioria das pessoas pode aprender a usar esse sistema rapidamente.',
+  'Eu achei esse sistema muito pesado para usar.',
+  'Eu me senti muito seguro usando o sistema.',
+  'Eu precisei aprender muitas coisas antes que pudesse utilizar esse sistema.',
 ];
 
 function criarFormularioAvaliacao() {
@@ -92,7 +93,7 @@ function criarFormularioAvaliacao() {
   form.addScaleItem().setTitle('Quanto você confiaria na sugestão do modelo para estudar?').setBounds(1, 5).setLabels('Nada', 'Totalmente');
 
   form.addPageBreakItem().setTitle('Sua opinião sobre a ferramenta')
-    .setHelpText('Para cada frase, marque de 1 (discordo totalmente) a 5 (concordo totalmente). Responda rápido, com sua primeira impressão.');
+    .setHelpText('"Sistema" aqui é o protótipo do HistoLente que você acabou de usar. Para cada frase, marque de 1 (discordo totalmente) a 5 (concordo totalmente). Responda rápido, com sua primeira impressão.');
   form.addGridItem().setTitle('Questionário de usabilidade').setRequired(true)
     .setRows(SUS)
     .setColumns(['1 — Discordo totalmente', '2', '3', '4', '5 — Concordo totalmente']);

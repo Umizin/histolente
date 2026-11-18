@@ -2,7 +2,7 @@
 
 **Projeto:** Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência Artificial: Uma Ferramenta de Apoio à Patologia Digital
 **Autor:** Paulo Victor Silva Gonçalves — Engenharia de Software, Universidade de Vassouras (UVS), Campus Maricá
-**Versão do documento:** 1.3 — 18/11/2026 (histórico de revisões ao final)
+**Versão do documento:** 1.4 — 18/11/2026 (histórico de revisões ao final)
 **Base:** Pré-TCC (set. 2026), análise do dataset NCT-CRC-HE-100K (KATHER et al., 2018), Resolução CFM nº 2.454/2026 (CONSELHO FEDERAL DE MEDICINA, 2026), LGPD (BRASIL, 2018) e decisões de arquitetura registradas no repositório do projeto.
 
 > **Situação da elicitação.** As técnicas documentais (análise de literatura, de normas e do dataset) e as sessões de ideação já foram aplicadas. A **entrevista estruturada escrita**, aplicada remotamente via Google Forms com TCLE integrado, recebeu **4 respostas** entre 11 e 12/11/2026 e foi consolidada na Seção 1.5. Com amostra pequena e sem professores, a T5 **não confirma** requisitos: ela não refutou as hipóteses de RF09, RF15 e RF16, motivou a elevação do RF17 para *Must* (com base numa pergunta factual sobre a origem das imagens) e originou o RF18. A observação de aula, a validação de conteúdo por especialista e a validação do protótipo estão planejadas. Continuam marcados como **"a validar"** os requisitos que o formulário não cobriu (RF10, RF12 e HU09) e o RF18, sugerido por um único participante.
@@ -117,7 +117,7 @@ Os requisitos RF01–RF07 vêm do Pré-TCC. Os requisitos RF08–RF18 foram iden
 | RF14 *(proposto)* | O sistema deve informar falhas no processamento e permitir o reenvio da análise. | **S** | T4 | Em caso de falha, o usuário recebe mensagem clara e um botão de reenvio, sem perder o *upload*. |
 | RF15 *(proposto; hipótese não refutada na T5)* | O sistema deve permitir comparar, lado a lado, amostras de duas classes frequentemente confundidas (ex.: STR × MUS, NORM × TUM, DEB × LYM). | **C** | T4, T5 | O usuário escolhe um par de classes e vê amostras da galeria lado a lado, com os critérios que as diferenciam. |
 | RF16 *(proposto; hipótese não refutada na T5)* | O sistema deve exibir ao estudante seu desempenho no modo quiz, por classe e ao longo do tempo. | **C** | T4, T5 | Painel com percentual de acertos por classe e evolução por sessão; dados visíveis apenas ao próprio estudante. |
-| RF17 *(proposto)* | O sistema deve sinalizar como "fora do padrão" as imagens cujo escore de fora da distribuição exceda o limiar calibrado da versão do modelo (ex.: foto de celular, coloração diferente de H&E, pouco tecido, desfoque). | **M** | T1, T5 | **Método em duas camadas:** heurísticas de qualidade (fração de tecido, nitidez, estatísticas de cor H&E) e um escore do modelo (energia ou Mahalanobis nas ativações, com a probabilidade máxima como linha de base). **Limiar** fixado na validação para 95% de verdadeiros positivos nos dados do domínio, antes de usar o teste. **Aceite:** AUROC ≥ `[[definir]]` num conjunto rotulado de fotos de celular e outras colorações, e taxa de falso alarme no CRC-VAL-HE-7K ≤ 5%. O escore, o método e o limiar são gravados com a análise; o aviso aparece antes da classificação e o mapa Grad-CAM fica recolhido. |
+| RF17 *(proposto)* | O sistema deve sinalizar como "fora do padrão" as imagens cujo escore de fora da distribuição exceda o limiar calibrado da versão do modelo (ex.: foto de celular, coloração diferente de H&E, pouco tecido, desfoque). | **M** | T1, T5 | **Método em duas camadas:** heurísticas de qualidade (fração de tecido, nitidez, estatísticas de cor H&E) e um escore do modelo (energia ou Mahalanobis nas ativações, com a probabilidade máxima como linha de base). **Limiar** fixado na validação para 95% de verdadeiros positivos nos dados do domínio, antes de usar o teste. **Aceite:** AUROC ≥ 0,85 (meta do autor) num conjunto rotulado de fotos de celular e outras colorações, e taxa de falso alarme no CRC-VAL-HE-7K ≤ 5%. O escore, o método e o limiar são gravados com a análise; o aviso aparece antes da classificação e o mapa Grad-CAM fica recolhido. |
 | RF18 *(proposto, a validar)* | O sistema deve oferecer o desafio "Encontre o intruso": o estudante recebe um conjunto de amostras e aponta a que pertence a outro tecido (ex.: um *patch* de tumor entre *patches* de mucosa normal). | **C** | T5 | Grade com 4 a 6 amostras, sendo uma de classe diferente; a resposta e os critérios diferenciais só aparecem após a escolha. |
 
 **Fora do escopo (Won't have nesta versão):**
@@ -139,7 +139,7 @@ Os requisitos RNF01–RNF06 vêm do Pré-TCC, agora com métricas verificáveis.
 | ID | Característica (base: ISO/IEC 25010:2011) | Requisito | Métrica / critério | Como medir |
 |---|---|---|---|---|
 | RNF01 | **Desempenho** (eficiência de desempenho) | O serviço de inferência e o sistema devem respeitar os tempos de resposta ao lado, medidos no hardware de referência declarado (máquina do laboratório, ociosa). | Serviço de inferência (pré-processamento + inferência + Grad-CAM): p95 < 500 ms em N ≥ 1.000 *patches*, descartadas 50 execuções de aquecimento. Do envio ao resultado na tela: p95 < 1,5 s com 1 usuário. Imagem já analisada (cache): p95 < 150 ms. *Limiares definidos pelo autor como decisão de projeto, para manter a interação fluida em aula.* | Tempos registrados em cada análise; teste de carga (k6) |
-| RNF02 | **Usabilidade** | A interface deve ser utilizável por pessoas sem conhecimento técnico em IA. | SUS médio ≥ 85 (meta do autor), mínimo aceitável 68, interpretado pela escala adjetiva de Bangor, Kortum e Miller (2009); ≥ 90% dos participantes concluem a tarefa principal sem ajuda (medido apenas em avaliação moderada) | Questionário SUS (BROOKE, 1996) e teste de tarefas |
+| RNF02 | **Usabilidade** | A interface deve ser utilizável por pessoas sem conhecimento técnico em IA. | SUS médio ≥ 85 (meta do autor), mínimo aceitável 68, interpretado pela escala adjetiva de Bangor, Kortum e Miller (2009), com os itens da versão brasileira validada (LOURENÇO; CARMONA; LOPES, 2022); ≥ 90% dos participantes concluem a tarefa principal sem ajuda (medido apenas em avaliação moderada) | Questionário SUS (BROOKE, 1996) e teste de tarefas |
 | RNF03 | Portabilidade | O sistema deve executar em ambiente containerizado. | Todo o ambiente sobe com um único comando (`docker compose up`) em menos de 10 min numa máquina limpa, com ou sem GPU | Checklist em máquina limpa |
 | RNF04 | **Segurança — privacidade** | Os dados de participantes devem ser tratados conforme a LGPD. | Nenhum dado de paciente; participantes pseudonimizados; aceite do TCLE registrado; logs sem e-mail nem imagem | Revisão do banco de dados; teste automatizado dos logs |
 | RNF05 | **Disponibilidade** | O sistema deve permanecer estável durante aulas e demonstrações. | ≥ 99% de requisições bem-sucedidas em sessão de 60 min; reinício automático de serviços; nenhum pedido de análise perdido em falha | Teste de longa duração (k6); verificação de saúde dos serviços |
@@ -147,8 +147,8 @@ Os requisitos RNF01–RNF06 vêm do Pré-TCC, agora com métricas verificáveis.
 | RNF07 *(proposto)* | **Segurança** | O sistema deve proteger contas, sessões e entradas. | Senhas com hash Argon2 ou bcrypt; sessão em cookie `httpOnly`/`Secure`; HTTPS fora do ambiente local; validação do tipo real do arquivo; limite de requisições por usuário; nenhum segredo no código | Testes de integração; checklist OWASP Top 10 |
 | RNF08 *(proposto)* | **Compatibilidade** | A interface deve funcionar nos navegadores e equipamentos dos laboratórios de informática. | Versões recentes de Chrome, Edge e Firefox; resolução mínima 1366 × 768; tema claro legível em projetor de sala de aula; serviço de IA funcional apenas com CPU, sem GPU | Testes automatizados de interface em vários navegadores; teste em máquina do laboratório |
 | RNF09 *(proposto)* | **Escalabilidade** (capacidade) | O sistema deve absorver picos de uso simultâneo em aula sem esgotar a memória. | 30 usuários virtuais por 10 min, cada um enviando 1 *patch* a cada 20 s, com taxa de erro < 1% e p95 do envio ao resultado < 3 s; o número de serviços de IA pode ser aumentado sem mudar o código; a fila controla a carga sobre cada serviço de IA | Teste de carga com 1 e com 2 serviços de IA (k6) |
-| RNF10 *(proposto)* | **Adequação funcional** (qualidade do modelo) | O modelo ativo deve atingir o desempenho mínimo no conjunto de teste independente. | No CRC-VAL-HE-7K: acurácia balanceada ≥ `[[meta a definir com o orientador]]` e sensibilidade da classe TUM ≥ `[[meta]]`, com IC 95% por *bootstrap*; proporção de NORM classificada como TUM ≤ `[[meta]]`. Calibração reportada pelo ECE, antes e depois de *temperature scaling* | Relatório de avaliação (`ml/reports`) e *model card* |
-| RNF11 *(proposto)* | **Usabilidade** (acessibilidade) | A interface deve atender às WCAG 2.2, nível AA (WORLD WIDE WEB CONSORTIUM, 2023), nas telas autenticadas. | Zero violações graves no axe-core em todas as rotas; verificação manual dos critérios 2.1.1, 2.1.4, 2.5.7 e 1.4.13 | Testes automatizados (Playwright + axe) e checklist manual |
+| RNF10 *(proposto)* | **Adequação funcional** (qualidade do modelo) | O modelo ativo deve atingir o desempenho mínimo no conjunto de teste independente. | No CRC-VAL-HE-7K: acurácia balanceada ≥ 0,90 e sensibilidade da classe TUM ≥ 0,90, com IC 95% por *bootstrap*; proporção de NORM classificada como TUM ≤ 5%; ECE ≤ 0,05 após *temperature scaling* (ECE antes e depois também reportados). *Metas definidas pelo autor como decisão de projeto, a serem fixadas em commit datado antes da primeira avaliação no conjunto de teste* | Relatório de avaliação (`ml/reports`) e *model card* |
+| RNF11 *(proposto)* | **Usabilidade** (acessibilidade) | A interface deve atender às WCAG 2.2, nível AA (WORLD WIDE WEB CONSORTIUM, 2024), nas telas autenticadas. | Zero violações graves no axe-core em todas as rotas; verificação manual dos critérios 2.1.1, 2.1.4, 2.5.7 e 1.4.13 | Testes automatizados (Playwright + axe) e checklist manual |
 
 **Regras de negócio** (referenciadas nos casos de uso):
 
@@ -599,6 +599,7 @@ Os casos de teste abaixo estão **especificados**; a execução é registrada em
 |---|---|---|
 | 1.0 | 10/11/2026 | Primeira versão: técnicas, RF, RNF, histórias, UML e rastreabilidade |
 | 1.1 | 16/11/2026 | Consolidação da T5 (4 respostas); RF17 → *Must*, RF15 → *Should*, novo RF18; backlog reordenado |
+| 1.4 | 18/11/2026 | Datas de acesso das referências, metas do RNF10 e do RF17, versão brasileira validada do SUS |
 | 1.3 | 18/11/2026 | Segunda revisão interna: situação ética da T5 declarada, critério (iii) de priorização, RF15 volta a *Could*, HU17 → *Must* (S2), UC02-A2 alinhado à RN01, banner e "rótulo de referência" alinhados ao protótipo, relação com o DSR |
 | 1.2 | 18/11/2026 | Correções da revisão interna: vieses e limitações da T5, regra de priorização, RF17 especificado, RN01 sem redução de escala, RN03 calibrada, RN08 e RN09, RNF10 (qualidade do modelo) e RNF11 (acessibilidade), status do backlog e referências |
 
@@ -606,25 +607,27 @@ Os casos de teste abaixo estão **especificados**; a execução é registrada em
 
 BANGOR, Aaron; KORTUM, Philip; MILLER, James. Determining what individual SUS scores mean: adding an adjective rating scale. **Journal of Usability Studies**, v. 4, n. 3, p. 114-123, maio 2009.
 
-BRASIL. **Lei nº 13.709, de 14 de agosto de 2018**. Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília, DF: Presidência da República, 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm.
+BRASIL. **Lei nº 13.709, de 14 de agosto de 2018**. Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília, DF: Presidência da República, 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. Acesso em: 16 set. 2026.
 
-BRAUN, Virginia; CLARKE, Victoria. Using thematic analysis in psychology. **Qualitative Research in Psychology**, v. 3, n. 2, p. 77-101, 2006. Disponível em: https://doi.org/10.1191/1478088706qp063oa.
+BRAUN, Virginia; CLARKE, Victoria. Using thematic analysis in psychology. **Qualitative Research in Psychology**, v. 3, n. 2, p. 77-101, 2006. Disponível em: https://doi.org/10.1191/1478088706qp063oa. Acesso em: 18 nov. 2026.
 
 BROOKE, John. SUS: a quick and dirty usability scale. In: JORDAN, Patrick W. et al. (ed.). **Usability evaluation in industry**. London: Taylor & Francis, 1996. p. 189-194.
 
 COHN, Mike. **User stories applied**: for agile software development. Boston: Addison-Wesley, 2004.
 
-CONSELHO FEDERAL DE MEDICINA (CFM). **Resolução CFM nº 2.454, de 27 de fevereiro de 2026**. Dispõe sobre o uso da inteligência artificial na medicina. Brasília, DF: CFM, 2026. Disponível em: https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/2026/2454_2026.pdf.
+CONSELHO FEDERAL DE MEDICINA (CFM). **Resolução CFM nº 2.454, de 27 de fevereiro de 2026**. Dispõe sobre o uso da inteligência artificial na medicina. Brasília, DF: CFM, 2026. Disponível em: https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/2026/2454_2026.pdf. Acesso em: 16 set. 2026.
 
 INTERNATIONAL ORGANIZATION FOR STANDARDIZATION. **ISO/IEC 25010**: systems and software engineering — systems and software quality requirements and evaluation (SQuaRE) — system and software quality models. Geneva: ISO, 2011.
 
-KATHER, Jakob Nikolas et al. **100,000 histological images of human colorectal cancer and healthy tissue**. Zenodo, 2018. Conjunto de dados. Disponível em: https://doi.org/10.5281/zenodo.1214456.
+KATHER, Jakob Nikolas et al. **100,000 histological images of human colorectal cancer and healthy tissue**. Zenodo, 2018. Conjunto de dados. Disponível em: https://doi.org/10.5281/zenodo.1214456. Acesso em: 16 set. 2026.
 
 LITJENS, Geert et al. A survey on deep learning in medical image analysis. **Medical Image Analysis**, v. 42, p. 60-88, dez. 2017. Disponível em: https://doi.org/10.1016/j.media.2017.07.005. Acesso em: 16 set. 2026.
 
+LOURENÇO, Douglas Fabiano; CARMONA, Elenice Valentim; LOPES, Maria Helena Baena de Moraes. Tradução e adaptação transcultural da System Usability Scale para o português do Brasil. **Aquichan**, v. 22, n. 2, e2228, 2022. Disponível em: https://doi.org/10.5294/aqui.2022.22.2.8. Acesso em: 18 nov. 2026.
+
 NIAZI, Muhammad Khalid Khan; PARWANI, Anil V.; GURCAN, Metin N. Digital pathology and artificial intelligence. **The Lancet Oncology**, v. 20, n. 5, p. e253-e261, maio 2019. Disponível em: https://doi.org/10.1016/S1470-2045(19)30154-8. Acesso em: 16 set. 2026.
 
-PEFFERS, Ken et al. A design science research methodology for information systems research. **Journal of Management Information Systems**, v. 24, n. 3, p. 45-77, 2007. Disponível em: https://doi.org/10.2753/MIS0742-1222240302.
+PEFFERS, Ken et al. A design science research methodology for information systems research. **Journal of Management Information Systems**, v. 24, n. 3, p. 45-77, 2007. Disponível em: https://doi.org/10.2753/MIS0742-1222240302. Acesso em: 18 nov. 2026.
 
 PRESSMAN, Roger S.; MAXIM, Bruce R. **Engenharia de software**: uma abordagem profissional. 8. ed. Porto Alegre: AMGH, 2016.
 
@@ -634,6 +637,6 @@ SOCIEDADE BRASILEIRA DE PATOLOGIA (SBP). **Demografia Médica 2025**: pesquisa a
 
 SOMMERVILLE, Ian. **Engenharia de software**. 10. ed. São Paulo: Pearson Education do Brasil, 2019.
 
-WORLD WIDE WEB CONSORTIUM (W3C). **Web Content Accessibility Guidelines (WCAG) 2.2**. W3C Recommendation, 5 out. 2023. Disponível em: https://www.w3.org/TR/WCAG22/.
+WORLD WIDE WEB CONSORTIUM (W3C). **Web Content Accessibility Guidelines (WCAG) 2.2**. W3C Recommendation, 12 dez. 2024. Disponível em: https://www.w3.org/TR/WCAG22/. Acesso em: 18 nov. 2026.
 
 ZEHRA, Talat et al. A suggested way forward for adoption of AI-enabled digital pathology in low resource organizations in the developing world. **Diagnostic Pathology**, v. 18, n. 68, p. 1-10, jun. 2023. Disponível em: https://doi.org/10.1186/s13000-023-01352-6. Acesso em: 16 set. 2026.
