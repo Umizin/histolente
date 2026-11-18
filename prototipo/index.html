@@ -368,6 +368,11 @@ function topClass(a){return CL.slice().sort((x,y)=>a.probs[y]-a.probs[x])[0]}
 $("#csv").onclick=()=>{const l=["data,origem,classe,confianca,modelo,tempo_ms",...st.hist.map(a=>[a.date.toISOString(),a.src,topClass(a),a.probs[topClass(a)].toFixed(4),"0.1.0",a.ms].join(","))].join("\n");
   const u=URL.createObjectURL(new Blob([l],{type:"text/csv"})),x=document.createElement("a");x.href=u;x.download="historico.csv";x.click()};
 
+// telas diretas para documentação: #tela-gal, #tela-quiz, #tela-hist, #tela-sobre
+{const t=location.hash.match(/^#tela-(gal|quiz|hist|sobre)$/);
+ if(t){if(t[1]==="hist"){["TUM","STR","NORM"].forEach((c,i)=>setTimeout(()=>analyze({cls:c,seed:c==="STR"?2:1,src:"Galeria"}),i*1200));setTimeout(()=>go("hist"),4200)}
+  else if(t[1]==="quiz"){go("gal");quiz=true;tg()}else go(t[1])}}
+
 // ---------- modo de teste remoto: abrir com ?teste (ex.: index.html?teste) ----------
 const FORMULARIO_AVALIACAO = "[[LINK DO FORMULÁRIO DE AVALIAÇÃO]]"; // preencher após gerar o formulário
 const TAREFAS = [

@@ -91,10 +91,12 @@ IMG = re.compile(r"^!\[([^\]]*)\]\(([^)]+)\)(\{\.paisagem\})?\s*$")
 BLOCO = re.compile(r"^(#|\||>|```|\s*([-*]|\d+\.) |---$|!\[)")
 
 
-def md_para_html(md: str, base: Path) -> str:
+def md_para_html(md: str, base: Path, stem: str | None = None) -> str:
+    """stem: nome do arquivo .md; blocos ```mermaid viram figuras/<stem>-<n>.svg se a imagem existir (tools/mermaid_svg.py)."""
     lines = md.split("\n")
     out: list[str] = []
     i = 0
+    n_mermaid = 0
     while i < len(lines):
         ln = lines[i]
         mi = IMG.match(ln)
@@ -110,7 +112,14 @@ def md_para_html(md: str, base: Path) -> str:
             while j < len(lines) and not lines[j].startswith("```"):
                 buf.append(lines[j])
                 j += 1
-            out.append(f'<pre class="{lang}"><code>{html.escape(chr(10).join(buf))}</code></pre>')
+            svg = None
+            if lang == "mermaid" and stem:
+                n_mermaid += 1
+                svg = base / "figuras" / f"{stem}-{n_mermaid}.svg"
+            if svg is not None and svg.exists():
+                out.append(f'<figure class="diagrama"><img src="file://{svg.resolve()}" alt="Diagrama {n_mermaid}"/></figure>')
+            else:
+                out.append(f'<pre class="{lang}"><code>{html.escape(chr(10).join(buf))}</code></pre>')
             i = j + 1
         elif re.match(r"^#{1,6} ", ln):
             lvl = len(ln) - len(ln.lstrip("#"))
@@ -283,9 +292,37 @@ def requisitos() -> None:
              f.with_suffix(".pdf"))
 
 
+CSS_PROJETO = CSS_REQUISITOS.replace("h2 { font-size: 13.5pt; text-transform: uppercase; margin: 0 0 10pt; color: #0F3D3A; page-break-before: always; }",
+    "h1 { font-size: 14pt; text-transform: uppercase; margin: 0 0 12pt; color: #0F3D3A; page-break-before: always; }\n"
+    "h1.semquebra { page-break-before: auto; }\n"
+    "h2 { font-size: 12.5pt; margin: 16pt 0 8pt; color: #0F3D3A; }") + """
+figure.diagrama img { width: auto; max-width: 100%; max-height: 22cm; }
+figure img { width: auto; max-width: 100%; max-height: 19cm; border: 0.6pt solid #ccc; }
+.paisagem figure img, figure.diagrama img { border: 0; }
+figure.tela.celular img { width: 6cm; }
+"""
+
+
+def projeto() -> None:
+    pasta = ROOT / "docs/projeto"
+    partes = []
+    for f in sorted(pasta.glob("[0-9][0-9]-*.md")):
+        partes.append(md_para_html(f.read_text(encoding="utf-8"), f.parent, f.stem))
+    sumario = ("<h1 class='semquebra'>Sumário</h1><ol>" + "".join(
+        f"<li>{t}</li>" for t in ("Arquitetura de software", "Modelagem estrutural e comportamental", "Modelagem de dados",
+                                  "Design de interface (UX/UI)", "Segurança e LGPD")) + "</ol>"
+               "<p>Repositório: https://github.com/Umizin/histolente (privado; acesso mediante convite).</p>")
+    sub = ("Projeto: Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência "
+           "Artificial: Uma Ferramenta de Apoio à Patologia Digital — ferramenta HistoLente")
+    imprimir(_html("Projeto de Software", CSS_PROJETO, capa("PROJETO DE SOFTWARE (DESIGN)", sub) + sumario + "\n".join(partes)),
+             pasta / "projeto-de-software.pdf")
+
+
 if __name__ == "__main__":
     alvo = sys.argv[1] if len(sys.argv) > 1 else "todos"
     if alvo in ("monografia", "todos"):
         monografia()
     if alvo in ("requisitos", "todos"):
         requisitos()
+    if alvo in ("projeto", "todos"):
+        projeto()

@@ -18,6 +18,57 @@ Estação de trabalho escura, densa e silenciosa, em que **a lâmina é a protag
 
 > As imagens histológicas do protótipo são **ilustrações geradas por código**, não imagens reais do dataset. No MVP, a galeria usará *patches* do NCT-CRC-HE-100K.
 
+### Telas do protótipo
+
+**Figura 2 — Workstation no primeiro acesso (estado vazio)**
+
+![Workstation no primeiro acesso (estado vazio)](figuras/telas/01-workstation-vazia.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 3 — Resultado com alerta de baixa confiança, barras das 9 classes e Grad-CAM sobreposto**
+
+![Resultado com alerta de baixa confiança, barras das 9 classes e Grad-CAM sobreposto](figuras/telas/02-resultado-baixa-confianca.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 4 — Modo lado a lado: patch e mapa Grad-CAM com zoom sincronizado**
+
+![Modo lado a lado: patch e mapa Grad-CAM com zoom sincronizado](figuras/telas/03-lado-a-lado.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 5 — Galeria com amostras das 9 classes**
+
+![Galeria com amostras das 9 classes](figuras/telas/04-galeria.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 6 — Modo quiz: o estudante escolhe a classe antes de ver a resposta**
+
+![Modo quiz: o estudante escolhe a classe antes de ver a resposta](figuras/telas/05-quiz.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 7 — Histórico de análises com filtro e exportação CSV**
+
+![Histórico de análises com filtro e exportação CSV](figuras/telas/06-historico.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 8 — Sobre o modelo: versão e limitações**
+
+![Sobre o modelo: versão e limitações](figuras/telas/07-sobre-o-modelo.png)
+
+Fonte: elaborado pelo autor (2026).
+
+**Figura 9 — Celular, com o painel do teste remoto recolhido**
+
+![Celular, com o painel do teste remoto recolhido](figuras/telas/08-celular-modo-teste.png)
+
+Fonte: elaborado pelo autor (2026).
+
+
 ## 4.3 Guia de estilo
 
 ### Cores
@@ -101,4 +152,4 @@ Estação de trabalho escura, densa e silenciosa, em que **a lâmina é a protag
 
 **Limitação:** sem observação direta, o teste depende do que o participante relata. Não se mede o tempo das tarefas nem se vê onde a pessoa hesitou.
 
-**Registro dos resultados:** `[[RESULTADO A COLETAR]]`.
+**Situação em 18/11/2026:** protótipo com modo de teste e formulário de avaliação prontos; aplicação aos participantes em andamento. Os resultados (taxa de conclusão das tarefas e escore SUS) serão anexados a este documento ao fim da coleta.

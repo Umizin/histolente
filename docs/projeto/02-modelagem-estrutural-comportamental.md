@@ -1,12 +1,12 @@
 # 2. Modelagem Estrutural e Comportamental
 
-> Os diagramas estão em Mermaid. Eles são renderizados automaticamente no GitHub e no VS Code (extensão *Markdown Preview Mermaid Support*).
+> Os diagramas estão em Mermaid. Eles são renderizados no GitHub e no VS Code (extensão *Markdown Preview Mermaid Support*), e as imagens usadas nos PDFs ficam em `docs/projeto/figuras/` (geradas por `tools/mermaid_svg.py`).
 
-## 2.1 Diagrama de classes — Backend de orquestração (domínio, aplicação e portas)
+## 2.1 Diagrama de classes — Modelo de domínio do backend de orquestração
 
 ```mermaid
 classDiagram
-    direction LR
+    direction TB
 
     class Perfil {
         <<enumeration>>
@@ -113,6 +113,15 @@ classDiagram
     Usuario --> Perfil
     Analise --> StatusAnalise
 
+```
+
+## 2.2 Diagrama de classes — Casos de uso, portas e adaptadores (arquitetura hexagonal)
+
+Os casos de uso dependem apenas das portas (interfaces). As implementações concretas, os adaptadores, ficam na camada de infraestrutura e podem ser trocadas sem alterar o domínio.
+
+```mermaid
+classDiagram
+    direction LR
     class SubmeterAnalise {
         <<caso de uso>>
         +executar(cmd) RespostaSubmissao
@@ -187,7 +196,7 @@ classDiagram
 | Strategy | Backbone da CNN e colormap do Grad-CAM (serviço de inferência) | Trocar a arquitetura do modelo ou a paleta sem alterar o fluxo |
 | Idempotent Consumer | `ProcessarResultado` (ignora `job_id` repetido) | Mensagens duplicadas não geram efeitos duplicados |
 
-## 2.2 Diagrama de classes — Serviço de inferência
+## 2.3 Diagrama de classes — Serviço de inferência
 
 ```mermaid
 classDiagram
@@ -231,7 +240,7 @@ classDiagram
     RabbitMqPublicadorResultados ..|> PublicadorResultados
 ```
 
-## 2.3 Diagramas de sequência dos fluxos principais
+## 2.4 Diagramas de sequência dos fluxos principais
 
 ### SQ1 — Enviar *patch* (sem resultado em cache) — UC02, RF01–RF05, RNF01
 
