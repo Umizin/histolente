@@ -1,6 +1,7 @@
 /**
  * Formulário de avaliação do protótipo do HistoLente (teste remoto não moderado).
- * TCLE + perfil + resultado de cada tarefa + SUS (10 itens) + 2 perguntas abertas.
+ * TCLE + perfil + resultado de cada tarefa + tarefa de diferenciação + itens de compreensão + SUS (10 itens) + 2 perguntas abertas.
+ * NÃO APLICAR antes do parecer escrito sobre a necessidade de registro no CEP.
  *
  * COMO USAR
  * 1. https://script.google.com → Novo projeto → cole este arquivo → preencha o CONFIG.
@@ -15,6 +16,8 @@ const CONFIG = {
   orientador: '[[NOME DO(A) ORIENTADOR(A)]]',
   cep: '[[CONTATO DO CEP — ou remover a frase se o CEP for dispensado]]',
   linkPrototipo: '[[LINK DO PROTÓTIPO COM ?teste]]',
+  linkTclePdf: '[[LINK PARA O PDF DO TCLE]]',
+  prazoGuarda: '[[PRAZO DE GUARDA DEFINIDO NO PARECER ÉTICO]]',
 };
 
 const TAREFAS = [
@@ -71,6 +74,19 @@ function criarFormularioAvaliacao() {
     .setColumns(['Consegui sem dificuldade', 'Consegui com alguma dificuldade', 'Não consegui']);
   form.addParagraphTextItem().setTitle('Se teve dificuldade em alguma tarefa, o que aconteceu?');
 
+  form.addPageBreakItem().setTitle('Diferenciar e entender').setHelpText('Responda com base no que você viu no protótipo. Não há problema em errar.');
+  form.addParagraphTextItem()
+    .setTitle('Tarefa 5 — No modo quiz ou na galeria, compare estroma (STR) e músculo liso (MUS). Que critério você usou para diferenciar os dois?');
+  form.addGridItem().setTitle('Verdadeiro ou falso?')
+    .setRows([
+      'O mapa de calor mostra onde está o tumor.',
+      'Uma confiança de 86% significa que o resultado está 86% certo.',
+      'O modelo sempre escolhe uma das 9 classes, mesmo que a imagem não seja de nenhuma delas.',
+      'A ferramenta pode ser usada para fazer o laudo de um paciente.',
+    ])
+    .setColumns(['Verdadeiro', 'Falso', 'Não sei']);
+  form.addScaleItem().setTitle('Quanto você confiaria na sugestão do modelo para estudar?').setBounds(1, 5).setLabels('Nada', 'Totalmente');
+
   form.addPageBreakItem().setTitle('Sua opinião sobre a ferramenta')
     .setHelpText('Para cada frase, marque de 1 (discordo totalmente) a 5 (concordo totalmente). Responda rápido, com sua primeira impressão.');
   form.addGridItem().setTitle('Questionário de usabilidade').setRequired(true)
@@ -78,7 +94,7 @@ function criarFormularioAvaliacao() {
     .setColumns(['1 — Discordo totalmente', '2', '3', '4', '5 — Concordo totalmente']);
 
   form.addPageBreakItem().setTitle('Para terminar');
-  form.addParagraphTextItem().setTitle('O que mais ajudou no estudo dos tecidos?');
+  form.addParagraphTextItem().setTitle('O que mais ajudou a entender a sugestão do modelo?');
   form.addParagraphTextItem().setTitle('O que mais atrapalhou ou faltou?');
 
   aceite.setChoices([
@@ -106,11 +122,14 @@ function textoTcle_() {
     'O QUE VOCÊ FARÁ: usar o protótipo seguindo 4 tarefas (cerca de 10 minutos) e responder este formulário (cerca de 5 minutos). Não há gravação de tela, áudio ou vídeo, e o protótipo não envia nenhum dado.',
     'RISCOS: mínimos — cansaço ou desconforto ao responder. Você pode deixar perguntas em branco e parar a qualquer momento, sem prejuízo.',
     'BENEFÍCIOS: indiretos — contribuir para uma ferramenta de apoio ao ensino de Patologia.',
-    'SIGILO: o formulário não coleta nome nem e-mail. As respostas são identificadas apenas por códigos e usadas só nesta pesquisa, conforme a LGPD (Lei nº 13.709/2018). Os resultados são divulgados de forma agregada.',
-    'VOLUNTARIEDADE: a participação é voluntária e não afeta notas, avaliações ou vínculos com a instituição. Não há pagamento nem custos.',
+    'SIGILO: o formulário não coleta nome nem e-mail. As respostas são pseudonimizadas (identificadas apenas por códigos) e usadas só nesta pesquisa, conforme a LGPD (Lei nº 13.709/2018). Os resultados são divulgados de forma agregada.',
+    'VOLUNTARIEDADE: a participação é voluntária e não afeta notas, avaliações ou vínculos com a instituição. Não há pagamento nem custos. O pesquisador é estudante e não avalia nenhum participante.',
+    'RESSARCIMENTO E INDENIZAÇÃO: não há despesas previstas; caso ocorram, serão ressarcidas, e eventuais danos decorrentes da pesquisa serão indenizados nos termos da legislação vigente.',
+    'RETIRADA: como as respostas não são identificadas, não é possível excluí-las depois do envio; você pode interromper a qualquer momento antes de enviar.',
+    'ARMAZENAMENTO: as respostas são coletadas pelo Google Forms (servidores que podem ficar fora do Brasil), exportadas para arquivo local protegido, apagadas do Google após a consolidação e eliminadas em ' + CONFIG.prazoGuarda + '.',
     'A ferramenta é educacional e não faz diagnóstico (Res. CFM nº 2.454/2026). As imagens do protótipo são ilustrações, não lâminas reais.',
     'CONTATO: ' + CONFIG.contatoPesquisador + '. Comitê de Ética em Pesquisa: ' + CONFIG.cep + '.',
     '',
-    'CÓPIA DO TERMO: recomendamos salvar ou imprimir esta página (Ctrl+P).',
+    'CÓPIA DO TERMO: baixe sua via em ' + CONFIG.linkTclePdf + ' ou salve/imprima esta página (Ctrl+P).',
   ].join('\n');
 }

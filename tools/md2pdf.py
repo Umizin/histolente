@@ -300,6 +300,7 @@ figure.diagrama img { width: auto; max-width: 100%; max-height: 22cm; }
 figure img { width: auto; max-width: 100%; max-height: 19cm; border: 0.6pt solid #ccc; }
 .paisagem figure img, figure.diagrama img { border: 0; }
 figure.tela.celular img { width: 6cm; }
+.ref p { text-align: left; margin-bottom: 10pt; }
 """
 
 
@@ -307,10 +308,11 @@ def projeto() -> None:
     pasta = ROOT / "docs/projeto"
     partes = []
     for f in sorted(pasta.glob("[0-9][0-9]-*.md")):
-        partes.append(md_para_html(f.read_text(encoding="utf-8"), f.parent, f.stem))
+        html_parte = md_para_html(f.read_text(encoding="utf-8"), f.parent, f.stem)
+        partes.append(f'<div class="ref">{html_parte}</div>' if f.name.startswith("90-") else html_parte)
     sumario = ("<h1 class='semquebra'>Sumário</h1><ol>" + "".join(
         f"<li>{t}</li>" for t in ("Arquitetura de software", "Modelagem estrutural e comportamental", "Modelagem de dados",
-                                  "Design de interface (UX/UI)", "Segurança e LGPD")) + "</ol>"
+                                  "Design de interface (UX/UI)", "Segurança e LGPD", "Referências")) + "</ol>"
                "<p>Repositório: https://github.com/Umizin/histolente (privado; acesso mediante convite).</p>")
     sub = ("Projeto: Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência "
            "Artificial: Uma Ferramenta de Apoio à Patologia Digital — ferramenta HistoLente")

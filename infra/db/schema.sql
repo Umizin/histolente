@@ -49,6 +49,7 @@ CREATE TABLE images (
     source             image_source NOT NULL DEFAULT 'UPLOAD',
     ground_truth_class tissue_class,
     created_at         timestamptz  NOT NULL DEFAULT now(),
+    UNIQUE (id, source),                       -- permite FK composta: quiz só com imagens da galeria
     CONSTRAINT gallery_has_ground_truth
         CHECK ((source = 'SAMPLE_GALLERY') = (ground_truth_class IS NOT NULL))
 );
@@ -61,6 +62,10 @@ CREATE TABLE batches (
     created_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- Soma das probabilidades (RF03): 1 ± 1e-4
+CREATE FUNCTION prob_sum(j jsonb) RETURNS numeric
+    LANGUAGE sql IMMUTABLE AS $$ SELECT coalesce(sum(value::numeric), 0) FROM jsonb_each_text(j) $$;
+
 -- Análises -----------------------------------------------------------------
 CREATE TABLE analyses (
     id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -68,13 +73,18 @@ CREATE TABLE analyses (
     image_id            uuid            NOT NULL REFERENCES images(id),
     model_version_id    uuid            NOT NULL REFERENCES model_versions(id),
     batch_id            uuid            REFERENCES batches(id) ON DELETE SET NULL,
-    job_id              uuid            NOT NULL UNIQUE,          -- idempotência do consumidor
+    job_id              uuid            UNIQUE,                   -- idempotência do consumidor; nulo em resultado de cache
+    retry_of            uuid            REFERENCES analyses(id),  -- reenvio cria nova análise (RF14)
     status              analysis_status NOT NULL DEFAULT 'QUEUED',
     predicted_class     tissue_class,
     probabilities       jsonb,
     heatmap_storage_key text,
+    gradcam_target_class tissue_class,                            -- classe do mapa (padrão: a sugerida; HU09)
     cache_hit           boolean         NOT NULL DEFAULT false,
     out_of_distribution boolean         NOT NULL DEFAULT false,
+    ood_score           real,                                     -- escore do RF17, gravado para recalibrar o limiar
+    ood_method          text,
+    ood_threshold       real,
     worker_ms           integer CHECK (worker_ms >= 0),
     e2e_ms              integer CHECK (e2e_ms >= 0),
     error               text,
@@ -88,7 +98,9 @@ CREATE TABLE analyses (
         probabilities IS NULL
         OR (probabilities ?& ARRAY['ADI','BACK','DEB','LYM','MUC','MUS','NORM','STR','TUM'])
     ),
-    CONSTRAINT failed_has_error CHECK (status <> 'FAILED' OR error IS NOT NULL)
+    CONSTRAINT failed_has_error CHECK (status <> 'FAILED' OR error IS NOT NULL),
+    CONSTRAINT job_or_cache CHECK (cache_hit OR job_id IS NOT NULL),
+    CONSTRAINT probabilities_sum_one CHECK (probabilities IS NULL OR abs(prob_sum(probabilities) - 1) <= 0.0001)
 );
 CREATE INDEX analyses_user_created ON analyses (user_id, created_at DESC);   -- histórico (RF06)
 CREATE INDEX analyses_user_class   ON analyses (user_id, predicted_class);  -- filtro por classe
@@ -98,7 +110,7 @@ CREATE INDEX analyses_pending      ON analyses (status) WHERE status IN ('QUEUED
 -- Consentimentos -----------------------------------------------------------
 CREATE TABLE consents (
     id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id     uuid             NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id     uuid             REFERENCES users(id) ON DELETE SET NULL,  -- prova do consentimento sobrevive à exclusão da conta (anonimizada)
     document    consent_document NOT NULL,
     version     text             NOT NULL,
     accepted_at timestamptz      NOT NULL DEFAULT now(),
@@ -109,10 +121,12 @@ CREATE TABLE consents (
 CREATE TABLE quiz_attempts (
     id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id    uuid         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    image_id   uuid         NOT NULL REFERENCES images(id),
+    image_id   uuid         NOT NULL,
+    image_source image_source NOT NULL DEFAULT 'SAMPLE_GALLERY' CHECK (image_source = 'SAMPLE_GALLERY'),
     answer     tissue_class NOT NULL,
     correct    boolean      NOT NULL,
-    created_at timestamptz  NOT NULL DEFAULT now()
+    created_at timestamptz  NOT NULL DEFAULT now(),
+    FOREIGN KEY (image_id, image_source) REFERENCES images (id, source)
 );
 CREATE INDEX quiz_attempts_user ON quiz_attempts (user_id, created_at DESC); -- progresso (RF16)
 
