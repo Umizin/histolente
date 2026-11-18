@@ -59,6 +59,6 @@ Um item só é considerado pronto quando:
 
 HEVNER, Alan R. et al. Design science in information systems research. **MIS Quarterly**, v. 28, n. 1, p. 75-105, mar. 2004.
 
-PEFFERS, Ken et al. A design science research methodology for information systems research. **Journal of Management Information Systems**, v. 24, n. 3, p. 45-77, 2007. Disponível em: https://doi.org/10.2753/MIS0742-1222240302.
+PEFFERS, Ken et al. A design science research methodology for information systems research. **Journal of Management Information Systems**, v. 24, n. 3, p. 45-77, 2007. Disponível em: https://doi.org/10.2753/MIS0742-1222240302. Acesso em: 18 nov. 2026.
 
-SCHWABER, Ken; SUTHERLAND, Jeff. **The Scrum Guide**: the definitive guide to Scrum: the rules of the game. 2020. Disponível em: https://scrumguides.org/scrum-guide.html.
+SCHWABER, Ken; SUTHERLAND, Jeff. **The Scrum Guide**: the definitive guide to Scrum: the rules of the game. 2020. Disponível em: https://scrumguides.org/scrum-guide.html. Acesso em: 18 nov. 2026.

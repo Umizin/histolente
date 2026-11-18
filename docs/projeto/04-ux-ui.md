@@ -118,7 +118,7 @@ Fonte: elaborado pelo autor (2026).
 
 ## 4.4 Critérios de acessibilidade (WCAG 2.2, nível AA)
 
-Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2023) verificados no protótipo em 18/11/2026. A verificação automatizada com axe-core (RNF11, CT42) entra com o frontend definitivo.
+Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2024) verificados no protótipo em 18/11/2026. A verificação automatizada com axe-core (RNF11, CT42) entra com o frontend definitivo.
 
 | Critério WCAG | Como é atendido |
 |---|---|
@@ -157,7 +157,7 @@ Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2023) verificados no protóti
 **Análise:**
 - Taxa de conclusão autorrelatada por tarefa (indicador formativo; o critério "sem ajuda" do RNF02 só é medido na avaliação moderada).
 - Meta de 8 a 12 participantes, adequada a uma avaliação formativa; com número menor, os resultados são apresentados só de forma descritiva.
-- Escore SUS por participante, com média, desvio-padrão, mediana e IC 95%, calculado por Brooke (1996) e interpretado pela escala adjetiva de Bangor, Kortum e Miller (2009). A tradução dos itens para o português precisa ter fonte validada `[FONTE PENDENTE]`.
+- Escore SUS por participante, com média, desvio-padrão, mediana e IC 95%, calculado por Brooke (1996) e interpretado pela escala adjetiva de Bangor, Kortum e Miller (2009). Os itens usam a versão brasileira validada por Lourenço, Carmona e Lopes (2022), com 100 participantes e alfa de Cronbach de 0,76.
 - Acertos nos itens de compreensão (o mapa não indica o tumor; confiança não é certeza).
 - Resultados separados por aparelho (computador ou celular), já que a *workstation* foi projetada para telas largas.
 - Dificuldades relatadas, convertidas em itens do backlog.

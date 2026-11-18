@@ -69,7 +69,7 @@ O sistema trata **dois grupos de dados**, com finalidades diferentes (BRASIL, 20
 
 ## 5.5 Proteções da aplicação (OWASP Top 10)
 
-As ameaças seguem a lista OWASP Top 10 de 2021 (OPEN WORLDWIDE APPLICATION SECURITY PROJECT, 2021).
+As ameaças seguem a lista OWASP Top 10 de 2025 (OPEN WORLDWIDE APPLICATION SECURITY PROJECT, 2025).
 
 | Ameaça | Medida |
 |---|---|
