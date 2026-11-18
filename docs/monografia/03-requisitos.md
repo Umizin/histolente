@@ -22,7 +22,7 @@ Fonte: elaborado pelo autor (2026). Nota: a técnica T6 (questionário separado)
 
 A entrevista estruturada escrita (T5) foi aplicada por meio de formulário online, com duração estimada de dez minutos, sem gravação e sem coleta de nome ou endereço de e-mail. O formulário apresenta o TCLE em sua primeira seção e direciona cada participante, conforme o perfil declarado (estudante, professor ou profissional de laboratório), a perguntas específicas. Em seguida, todos respondem a seis perguntas abertas sobre dificuldades atuais no reconhecimento de padrões histológicos, tecidos frequentemente confundidos, uso pretendido da ferramenta, percepção sobre o mapa de calor, origem das imagens disponíveis e condições para confiar na ferramenta. Por fim, classificam seis funcionalidades candidatas como essenciais, úteis ou dispensáveis. O instrumento completo encontra-se no Apêndice D. As respostas abertas foram agrupadas por categorias temáticas, e o quadro de funcionalidades foi tabulado por frequência.
 
-O formulário recebeu quatro respostas entre 11 e 12 de novembro de 2026, todas com aceite do TCLE: três estudantes de Medicina do 6º período, identificados como E01 a E03, e um profissional do setor de expedição de um laboratório de anatomia patológica (L01). Nenhum professor respondeu. A Tabela 1 apresenta a classificação das funcionalidades candidatas; nenhuma delas foi considerada dispensável.
+O formulário recebeu quatro respostas entre 11 e 12 de novembro de 2026, todas com aceite do TCLE: três estudantes de Medicina do 6º período, identificados como E01 a E03, e um profissional de laboratório de anatomia patológica (L01). Nenhum professor respondeu. A Tabela 1 apresenta a classificação das funcionalidades candidatas; nenhuma delas foi considerada dispensável.
 
 **Tabela 1 — Classificação das funcionalidades candidatas pelos participantes (n = 4)**
 
@@ -37,7 +37,7 @@ O formulário recebeu quatro respostas entre 11 e 12 de novembro de 2026, todas 
 
 Fonte: dados da pesquisa (2026).
 
-A descrição dos critérios morfológicos foi a única funcionalidade considerada essencial por todos os participantes. Isso converge com a principal dificuldade relatada, a de diferenciar tecidos que "se coram de forma parecida" (E01), e com os pares de tecidos citados como mais confundidos: músculo e estroma (E02), mucosa normal e tumor (E03). Esses pares correspondem aos previstos no RF15, que foi confirmado e teve a prioridade elevada.
+A descrição dos critérios morfológicos foi a única funcionalidade considerada essencial por todos os participantes. Isso converge com a principal dificuldade relatada, a de diferenciar tecidos que "se coram de forma parecida" (E01), e com os pares de tecidos citados como mais confundidos: músculo e estroma (E02), mucosa normal e tumor (E03). Esses pares coincidem com os exemplos dados no enunciado da pergunta, o que impede tratá-los como evidência independente: o RF15 foi mantido como hipótese não refutada, com prioridade elevada, e será avaliado com o artefato.
 
 Quanto à origem das imagens, três dos quatro participantes enviariam fotografias do microscópio tiradas com o celular, e o laboratório de L01 não dispõe de scanner nem de câmera acoplada. Esse dado confirma o risco de diferença entre as imagens de uso e as de treinamento, discutido por Zehra et al. (2023) para contextos de poucos recursos, e elevou o RF17 (alerta de imagem fora do padrão) à prioridade máxima.
 

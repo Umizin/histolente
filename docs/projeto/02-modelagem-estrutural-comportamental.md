@@ -1,5 +1,7 @@
 # 2. Modelagem Estrutural e Comportamental
 
+> Revisão de 18/11/2026: os fluxos SQ1 e SQ3 e as classes de domínio foram atualizados após a revisão interna (assinatura antes da leitura no SSE, canal por usuário, versão do modelo no pedido, evento `inference.started`, novas tentativas por filas de espera). Os contratos e a topologia correspondentes serão implementados com o serviço de inferência (EN04) e o backend (HU01), na Sprint 2.
+>
 > Os diagramas estão em Mermaid. Eles são renderizados no GitHub e no VS Code (extensão *Markdown Preview Mermaid Support*), e as imagens usadas nos PDFs ficam em `docs/projeto/figuras/` (geradas por `tools/mermaid_svg.py`).
 
 ## 2.1 Diagrama de classes — Modelo de domínio do backend de orquestração
@@ -28,10 +30,10 @@ classDiagram
     }
     class StatusAnalise {
         <<enumeration>>
-        NA_FILA
-        PROCESSANDO
-        CONCLUIDA
-        FALHOU
+        QUEUED
+        PROCESSING
+        DONE
+        FAILED
     }
 
     class Usuario {
@@ -52,7 +54,7 @@ classDiagram
         +String chaveArmazenamento
         +ClasseTecidual? classeVerdadeira
         +validar() void
-        +foraDoPadrao() bool
+        +recorteCentral() Imagem
     }
     class VersaoModelo {
         +UUID id
@@ -70,12 +72,16 @@ classDiagram
         +String? erro
         +concluir(r: ResultadoInferencia) void
         +falhar(motivo: String) void
+        +UUID? reenvioDe
         +reenviar() Analise
     }
     class ResultadoInferencia {
         +ClasseTecidual classeSugerida
         +Map~ClasseTecidual,float~ probabilidades
         +MapaGradCam mapa
+        +float escoreForaDoPadrao
+        +bool foraDoPadrao
+        +String versaoModelo
         +bool baixaConfianca()
         +ranking() List~ClasseTecidual~
     }
@@ -184,17 +190,19 @@ classDiagram
     DiscoArmazenamentoImagens ..|> ArmazenamentoImagens
 ```
 
+Os valores de `StatusAnalise` são os mesmos do banco e do contrato de mensagens; a interface mostra rótulos em português ("na fila", "processando", "concluída", "falhou"). `reenviar()` cria uma **nova** análise ligada à original por `reenvioDe`, preservando o histórico de tentativas. A decisão de imagem fora do padrão (RF17) é produzida pelo serviço de inferência e chega no resultado; por isso pertence a `ResultadoInferencia`, e não a `Imagem`.
+
 **Padrões de projeto aplicados:**
 
 | Padrão | Onde | Para quê |
 |---|---|---|
-| Ports & Adapters (Hexagonal) | Portas `*Repository`, `CacheResultados`, `PublicadorJobs`; adaptadores Prisma, Redis, RabbitMQ | Isolar o domínio da infraestrutura |
-| Repository | `AnaliseRepository` | Abstrair a persistência |
+| Ports & Adapters, hexagonal (COCKBURN, 2005) | Portas `*Repository`, `CacheResultados`, `PublicadorJobs`; adaptadores Prisma, Redis, RabbitMQ | Isolar o domínio da infraestrutura |
+| Repository (FOWLER, 2002) | `AnaliseRepository` | Abstrair a persistência |
 | Command / Use Case | `SubmeterAnalise`, `ProcessarResultado`… | Uma operação de negócio por classe (responsabilidade única) |
-| Value Object | `Sha256`, `Email`, `Duracao` | Validar na criação e evitar dados inválidos no domínio |
-| Observer / Pub-Sub | `NotificadorEventos` → SSE | Notificar o navegador quando o resultado chega |
-| Strategy | Backbone da CNN e colormap do Grad-CAM (serviço de inferência) | Trocar a arquitetura do modelo ou a paleta sem alterar o fluxo |
-| Idempotent Consumer | `ProcessarResultado` (ignora `job_id` repetido) | Mensagens duplicadas não geram efeitos duplicados |
+| Value Object (EVANS, 2003) | `Sha256`, `Email`, `Duracao` | Validar na criação e evitar dados inválidos no domínio |
+| Observer (GAMMA et al., 1994) / Publish-Subscribe (HOHPE; WOOLF, 2003) | `NotificadorEventos` → SSE | Notificar o navegador quando o resultado chega |
+| Strategy (GAMMA et al., 1994) | Backbone da CNN e colormap do Grad-CAM (serviço de inferência) | Trocar a arquitetura do modelo ou a paleta sem alterar o fluxo |
+| Idempotent Receiver (HOHPE; WOOLF, 2003) | `ProcessarResultado` (ignora `job_id` repetido) | Mensagens duplicadas não geram efeitos duplicados |
 
 ## 2.3 Diagrama de classes — Serviço de inferência
 
@@ -260,18 +268,23 @@ sequenceDiagram
     BE->>BE: valida tipo, tamanho, dimensões (RN01) e calcula SHA-256
     BE->>RD: GET cache:sha256:{hash}:{versão}
     RD-->>BE: (vazio)
-    BE->>PG: INSERT analyses (NA_FILA)
-    BE->>MQ: publish inference.request
-    BE-->>FE: 202 {analysisId, streamUrl}
-    FE->>BE: GET /api/analyses/{id}/stream (SSE)
-    BE->>PG: SELECT status (recupera estado)
-    BE->>RD: SUBSCRIBE job:{id}
+    BE->>PG: INSERT analyses (QUEUED)
+    BE->>MQ: publish inference.request (com model_version)
+    MQ-->>BE: confirmação do broker (publisher confirm)
+    BE-->>FE: 202 {analysisId}
+    Note over FE,BE: um único canal SSE por usuário (GET /api/events), multiplexado por analysisId
+    FE->>BE: GET /api/events (SSE)
+    BE->>RD: SUBSCRIBE user:{id}
+    BE->>PG: SELECT status das análises pendentes (assina antes de ler: evita perder evento)
     MQ->>WK: entrega job
-    WK->>WK: pré-processa → classifica → Grad-CAM
-    WK->>MQ: publish inference.completed
+    WK->>MQ: publish inference.started
+    WK->>WK: pré-processa → classifica + Grad-CAM (uma passagem) → escore fora do padrão
+    WK->>MQ: publish inference.completed (versão e SHA-256 do modelo que rodou)
     MQ->>BE: entrega resultado
-    BE->>PG: UPDATE analyses (CONCLUIDA, probabilidades, mapa, versão, tempos)
-    BE->>RD: SET cache + PUBLISH job:{id}
+    BE->>BE: confere versão/SHA-256 com model_versions
+    BE->>PG: UPDATE analyses (DONE, probabilidades, mapa, versão, tempos)
+    BE->>RD: SET cache + PUBLISH user:{id}
+    BE->>MQ: ack
     RD-->>BE: mensagem
     BE-->>FE: event: completed
     FE-->>U: barras de confiança + Grad-CAM interativo
@@ -291,12 +304,14 @@ sequenceDiagram
     FE->>BE: POST /api/analyses
     BE->>RD: GET cache:sha256:{hash}:{versão}
     RD-->>BE: resultado
-    BE->>PG: INSERT analyses (CONCLUIDA, cache_hit = true)
+    BE->>PG: INSERT analyses (DONE, cache_hit = true, sem job_id)
     BE-->>FE: 200 {analysisId, resultado}
     FE-->>U: resultado imediato (< 150 ms)
 ```
 
 ### SQ3 — Falha no processamento e reenvio — RF14, RNF05
+
+As novas tentativas são feitas por filas de espera com tempo de vida (1 s, 5 s e 25 s), que devolvem a mensagem à fila principal. Na última tentativa, o próprio serviço de inferência publica o resultado com `status: FAILED`, porque o RabbitMQ não gera eventos de domínio. Uma rotina do backend marca como falha as análises paradas há mais de 5 minutos (serviço fora do ar).
 
 ```mermaid
 sequenceDiagram
@@ -306,20 +321,25 @@ sequenceDiagram
     participant BE as Orquestração
     participant MQ as RabbitMQ
     participant WK as Serviço de inferência
-    MQ->>WK: entrega job
-    WK--xMQ: erro (nack)
-    loop até 3 tentativas com espera crescente
-        MQ->>WK: reentrega
-        WK--xMQ: erro
+    MQ->>WK: entrega job (tentativa 1)
+    WK->>WK: erro
+    loop tentativas 2 e 3
+        WK->>MQ: republica em inference.request.retry.n (espera 1 s / 5 s)
+        WK->>MQ: ack da mensagem original
+        MQ->>WK: reentrega após a espera
+        WK->>WK: erro
     end
-    MQ->>MQ: encaminha para inference.dlq
-    MQ->>BE: evento de falha (status FAILED)
+    WK->>MQ: publish inference.completed (status FAILED, error)
+    WK->>MQ: nack sem reenfileirar → inference.dlq (auditoria)
+    MQ->>BE: entrega resultado FAILED
     BE->>BE: Analise.falhar(motivo)
     BE-->>FE: event: failed
     FE-->>U: "Não foi possível analisar. Tentar novamente?"
     U->>FE: clica em reenviar
     FE->>BE: POST /api/analyses/{id}/retry
+    BE->>BE: cria nova Analise (reenvioDe = id)
     BE->>MQ: publish inference.request (novo job_id)
+    BE-->>FE: 201 {novaAnaliseId}
 ```
 
 ### SQ4 — Consultar e reabrir análise do histórico — UC10, RF06, RN06

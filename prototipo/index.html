@@ -42,7 +42,13 @@ main{padding:16px}
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:6px;overflow:hidden}
 .seg button{background:var(--s2);border:0;padding:6px 10px;cursor:pointer;color:var(--muted)}
-.seg button[aria-pressed=true]{background:#123a37;color:var(--text)}
+.seg button[aria-pressed=true]{background:#123a37;color:var(--text);box-shadow:inset 0 -2px 0 var(--accent)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.semtip .tip{display:none!important}
+.banner .mini{display:none}.banner.min .mini{display:inline}
+.legenda{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:6px}.legenda i{flex:0 0 160px;height:10px;border-radius:3px;border:1px solid var(--border-strong)}
+.aviso-envio{display:block;margin-top:8px;color:var(--warn)}
+.viewer:focus-visible{outline:2px solid var(--accent)}
 .viewers{display:grid;gap:10px;grid-template-columns:1fr}
 .viewers.sbs{grid-template-columns:1fr 1fr}
 .viewer{position:relative;aspect-ratio:1/1;max-height:62vh;background:#05070c;border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:grab;touch-action:none}
@@ -111,14 +117,14 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
 .teste .corpo .btn[aria-disabled=true]{opacity:.45;pointer-events:none}
 @media (max-width:700px){.teste{left:16px;right:16px;width:auto}
   header{flex-wrap:wrap;gap:8px}.brand small{display:none}nav{overflow-x:auto;max-width:100%;scrollbar-width:none}nav button{white-space:nowrap}
-  .proto-tag{display:none}main{padding:10px}.viewer{max-height:none}}
+  .proto-tag{font-size:11px;padding:2px 6px}main{padding:10px}.viewer{max-height:none}}
 .zoom-btn{min-width:32px;padding:5px 8px}
 </style>
 </head>
 <body>
 <div class="banner" id="banner" role="note">
   <span aria-hidden="true">⚠</span>
-  <span class="txt"><strong>Ferramenta educacional e de apoio à triagem.</strong><span class="full"> Não substitui laudo anatomopatológico. A decisão clínica é sempre do médico (Res. CFM nº 2.454/2026).</span></span>
+  <span class="txt"><strong>Ferramenta educacional para estudo de padrões histológicos.</strong><span class="full"> Não substitui o exame anatomopatológico nem o laudo. A decisão clínica é sempre do médico (Res. CFM nº 2.454/2026).</span><span class="mini"> Não substitui laudo · decisão do médico.</span></span>
   <button id="bannerToggle" aria-expanded="true">Minimizar</button>
 </div>
 <header>
@@ -139,29 +145,31 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
     <aside class="panel">
       <h2>Enviar patch</h2>
       <label class="drop" id="drop" tabindex="0">
-        <strong>Arraste uma imagem</strong><br>ou clique para escolher<br><small>PNG ou JPEG · até 5 MB · 224×224 px</small>
+        <strong>Arraste uma imagem</strong><br>ou clique para escolher<br><small>PNG ou JPEG · até 5 MB · mínimo 224×224 px</small><small class="aviso-envio">Envie só o recorte de tecido: sem etiqueta da lâmina, número de exame ou dados de paciente.</small>
         <input type="file" id="file" accept="image/png,image/jpeg" hidden>
       </label>
       <div id="dropErr"></div>
       <h2 style="margin-top:16px">Amostras rápidas</h2>
       <div class="thumbs" id="quick"></div>
-      <p class="hint">Atalhos: <span class="kbd">←</span><span class="kbd">→</span> opacidade · <span class="kbd">+</span><span class="kbd">−</span> zoom · <span class="kbd">0</span> restaurar · <span class="kbd">S</span> lado a lado</p>
+      <p class="hint">Atalhos (com o foco no visualizador): <span class="kbd">←</span><span class="kbd">→</span> opacidade · <span class="kbd">+</span><span class="kbd">−</span> zoom · <span class="kbd">Shift</span>+setas mover · <span class="kbd">0</span> restaurar · <span class="kbd">S</span> lado a lado</p>
     </aside>
 
-    <section class="panel" aria-label="Visualizador">
+    <section class="panel" aria-label="Visualizador" id="painelVis">
       <div class="toolbar">
         <div class="seg" role="group" aria-label="Modo de visualização">
           <button id="mOverlay" aria-pressed="true">Sobreposição</button>
           <button id="mSbs" aria-pressed="false">Lado a lado</button>
         </div>
-        <label>Paleta <select id="cmap"><option value="turbo">turbo</option><option value="viridis">viridis</option></select></label>
+        <label>Paleta <select id="cmap"><option value="viridis">viridis</option><option value="turbo">turbo</option></select></label>
+        <label><input type="checkbox" id="contorno"> Contorno</label>
         <span class="mono" id="zoomLbl" style="color:var(--muted)">100%</span>
         <button class="btn ghost zoom-btn" id="zMenos" aria-label="Diminuir zoom">−</button><button class="btn ghost zoom-btn" id="zMais" aria-label="Aumentar zoom">+</button>
+        <span class="seg" role="group" aria-label="Mover a imagem"><button id="pE" aria-label="Mover para a esquerda">←</button><button id="pC" aria-label="Mover para cima">↑</button><button id="pB" aria-label="Mover para baixo">↓</button><button id="pD" aria-label="Mover para a direita">→</button></span>
         <button class="btn ghost" id="reset">Restaurar</button>
       </div>
       <div class="viewers" id="viewers">
-        <div class="viewer" id="v1"><div class="empty" id="emptyState"><div><div style="font-size:28px">🔬</div><p>Envie um patch ou escolha uma amostra para começar.</p></div></div>
-          <div class="stage" id="st1" hidden><canvas id="c1patch" width="224" height="224"></canvas><canvas id="c1heat" width="224" height="224"></canvas></div>
+        <div class="viewer" id="v1" tabindex="0" aria-label="Visualizador do patch. Com o foco aqui: setas mudam a opacidade, + e − dão zoom, Shift+setas movem a imagem, 0 restaura, S alterna o lado a lado."><div class="empty" id="emptyState"><div><div style="font-size:28px">🔬</div><p>Envie um patch ou escolha uma amostra para começar.</p></div></div>
+          <div class="stage" id="st1" hidden><canvas id="c1patch" width="224" height="224" role="img" aria-label="Patch analisado"></canvas><canvas id="c1heat" width="224" height="224"></canvas></div>
           <span class="vlabel" id="l1" hidden>Patch + Grad-CAM</span><span class="cross" id="x1"></span></div>
         <div class="viewer" id="v2" hidden>
           <div class="stage" id="st2"><canvas id="c2heat" width="224" height="224"></canvas></div>
@@ -172,10 +180,11 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
         <input type="range" id="op" min="0" max="100" step="5" value="40" aria-valuetext="Opacidade do mapa: 40%">
         <span class="mono" id="opv">40%</span>
       </div>
-      <p class="hint">O mapa de calor mostra as <strong>regiões que mais influenciaram</strong> a sugestão do modelo. Não é uma marcação do tumor nem de estruturas individuais.</p>
+      <div class="legenda" aria-hidden="true">baixa<i id="legGrad"></i>alta influência</div>
+      <p class="hint">O mapa de calor mostra as <strong>regiões que mais influenciaram</strong> a sugestão do modelo, em escala relativa dentro da imagem. É calculado numa grade grosseira (cerca de 7×7) e ampliado: <strong>não marca tumor nem aponta núcleos</strong>. O recorte de 224×224 px corresponde a cerca de 112×112 µm de tecido, menor que um campo de grande aumento; o diagnóstico real exige a lâmina inteira, a arquitetura e a clínica.</p>
     </section>
 
-    <aside class="panel" aria-label="Resultado" aria-live="polite">
+    <aside class="panel" aria-label="Resultado"><p class="sr-only" role="status" id="srStatus"></p>
       <h2>Resultado</h2>
       <div id="res"><p style="color:var(--muted)">Nenhuma análise ainda.</p></div>
     </aside>
@@ -212,10 +221,11 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
     </div>
     <h2 style="margin-top:18px">Limitações conhecidas</h2>
     <ul>
-      <li>Treinado com lâminas de um único centro europeu; imagens de outros laboratórios, colorações ou fotos de celular podem ter desempenho pior.</li>
+      <li>Treinado com lâminas de instituições alemãs, com cor padronizada (normalização de Macenko); não foi validado em lâminas brasileiras. Imagens de outros laboratórios, outras colorações ou fotos de celular podem ter desempenho pior.</li>
+      <li>Sempre escolhe uma das 9 classes, mesmo diante de tecido que não pertence a nenhuma delas (ex.: adenoma, inflamação).</li>
       <li>Classifica apenas 9 tipos de tecido colorretal; não reconhece outros tecidos nem identifica estruturas individuais.</li>
       <li>O mapa Grad-CAM tem baixa resolução e indica influência na decisão, não localização de lesão.</li>
-      <li>Uso exclusivamente educacional e de apoio à triagem. Não emite diagnóstico.</li>
+      <li>Uso exclusivamente educacional. Não tem validação clínica e não emite diagnóstico.</li>
     </ul>
   </div>
 </section>
@@ -225,19 +235,23 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
 "use strict";
 const CL = ["ADI","BACK","DEB","LYM","MUC","MUS","NORM","STR","TUM"];
 const INFO = {
-  ADI:["Tecido adiposo","Adipócitos grandes com citoplasma claro (lipídio dissolvido no processamento) e núcleo achatado na periferia.","Não confundir com fundo ou espaços artefatuais."],
-  BACK:["Fundo","Área sem tecido: vidro, borda da lâmina, bolhas.","Não é tecido normal."],
-  DEB:["Detritos / necrose","Restos celulares, núcleos picnóticos e fragmentados, material eosinofílico amorfo.","Cariorrexe pode lembrar linfócitos."],
-  LYM:["Linfócitos","Células pequenas e redondas, núcleo escuro ocupando quase toda a célula, alta densidade.","Diferencie de detritos com núcleos fragmentados."],
-  MUC:["Muco","Material extracelular pálido, azulado-acinzentado, frouxo e pouco celular.","Pode lembrar edema ou fundo."],
-  MUS:["Músculo liso","Feixes de fibras fusiformes eosinofílicas com núcleos alongados de pontas rombas.","Principal confusão: estroma."],
-  NORM:["Mucosa colônica normal","Criptas regulares e paralelas, muitas células caliciformes, núcleos pequenos na base.","Cortes tangenciais podem lembrar tumor."],
-  STR:["Estroma associado ao câncer","Tecido conjuntivo desmoplásico com fibroblastos e colágeno, sem epitélio.","Principal confusão: músculo liso."],
-  TUM:["Epitélio de adenocarcinoma","Glândulas irregulares, núcleos aumentados, pleomórficos e estratificados, perda de polaridade.","Compare com a regularidade da mucosa normal."]
+  ADI:["Tecido adiposo","Adipócitos grandes, com citoplasma claro (o lipídio se dissolve no processamento) e núcleo achatado na periferia, formando uma rede de membranas finas.","Não confundir com fundo (BACK) ou com espaços artefatuais."],
+  BACK:["Fundo","Área sem tecido: vidro, borda da lâmina, bolhas, sujidade. Não há estrutura celular.","Não é tecido normal; gordura (ADI) ou muco (MUC) muito pálidos podem parecer fundo."],
+  DEB:["Detritos / necrose","Restos celulares, núcleos picnóticos e fragmentados (cariorrexe) e material eosinofílico amorfo; a necrose \"suja\" na luz glandular é típica do adenocarcinoma colorretal.","Fragmentos nucleares podem lembrar linfócitos (LYM)."],
+  LYM:["Linfócitos","Células pequenas, redondas e uniformes, com núcleo denso e escuro de contorno liso que ocupa quase toda a célula; citoplasma escasso; alta densidade.","Na necrose (DEB) os fragmentos nucleares são irregulares e de tamanhos variados."],
+  MUC:["Muco","Material extracelular pálido, azul-acinzentado, frouxo e pouco celular; pode conter células soltas. Comum no adenocarcinoma mucinoso.","Pode lembrar edema do estroma ou fundo (BACK)."],
+  MUS:["Músculo liso","Feixes compactos de células fusiformes com citoplasma eosinofílico e fibrilar; núcleos alongados de pontas rombas (\"em charuto\"); em corte transversal, núcleos redondos com halo claro.","Principal confusão com estroma (STR)."],
+  NORM:["Mucosa colônica normal","Criptas tubulares regulares e paralelas, ricas em células caliciformes; núcleos pequenos alinhados na base (polaridade preservada); lâmina própria entre as criptas.","Adenoma/displasia não é classe do modelo e pode ser sugerido como NORM ou TUM."],
+  STR:["Estroma associado ao câncer","Tecido conjuntivo desmoplásico com fibroblastos de núcleos finos, ondulados e afilados, dispersos em colágeno, às vezes frouxo ou mixoide; sem epitélio.","Pode lembrar músculo liso (MUS); compare a forma do núcleo e a matriz."],
+  TUM:["Epitélio de adenocarcinoma","Glândulas irregulares, fusionadas ou cribriformes; núcleos grandes, hipercromáticos, pleomórficos e estratificados, com perda de polaridade; mitoses; poucas células caliciformes.","Cripta normal cortada de viés pode parecer atípica."]
 };
-const DIFF = {"MUS|STR":"Músculo liso forma feixes organizados com núcleos alongados de pontas rombas; o estroma desmoplásico é desorganizado, com fibroblastos dispersos e colágeno.",
-  "NORM|TUM":"Na mucosa normal as criptas são regulares e os núcleos ficam na base; no tumor as glândulas são irregulares e os núcleos aumentados e estratificados.",
-  "DEB|LYM":"Linfócitos são redondos e uniformes; nos detritos há núcleos fragmentados de tamanhos variados em fundo eosinofílico amorfo."};
+const DIFF = {"MUS|STR":"Músculo liso: células com citoplasma próprio, eosinofílico e fibrilar, em feixes compactos; núcleos \"em charuto\", de pontas rombas. Estroma desmoplásico: fibroblastos com núcleos finos, ondulados e afilados, separados por colágeno extracelular, às vezes frouxo ou mixoide, com células inflamatórias. Em recortes pequenos a distinção pode ser incerta até para o especialista.",
+  "NORM|TUM":"Mucosa normal: criptas regulares e paralelas, muitas caliciformes, núcleos pequenos na base. Tumor: glândulas irregulares, fusionadas ou cribriformes, núcleos grandes e estratificados, perda de polaridade, mitoses e poucas caliciformes; pode haver necrose \"suja\" na luz.",
+  "DEB|LYM":"Linfócitos são redondos e uniformes; nos detritos há núcleos fragmentados de tamanhos variados em fundo eosinofílico amorfo.",
+  "BACK|MUC":"Muco tem cor azul-acinzentada e textura frouxa, às vezes com células soltas; o fundo é vidro, sem cor nem textura.",
+  "ADI|BACK":"Gordura forma uma rede de membranas finas com núcleos achatados na periferia; o fundo não tem membranas.",
+  "MUC|STR":"Estroma tem fibroblastos e colágeno rosado; muco é pálido-azulado e quase sem células.",
+  "DEB|TUM":"Na necrose não há glândulas íntegras nem núcleos viáveis organizados; no tumor, o epitélio atípico ainda forma glândulas."};
 const diffText=(a,b)=>DIFF[[a,b].sort().join("|")]||`Compare os critérios: ${INFO[a][1]} × ${INFO[b][1]}`;
 
 // ---------- gerador de patches ilustrativos ----------
@@ -255,16 +269,18 @@ function drawPatch(cv,cls,seed=1){
   if(cls==="DEB"){for(let i=0;i<60;i++)dot(r()*W,r()*W,6+r()*14,4+r()*8,pink(.8),r()*3);for(let i=0;i<220;i++)dot(r()*W,r()*W,.8+r()*2.5,.8+r()*2.5,nuc(.8))}
   if(cls==="MUS"||cls==="STR"){const n=cls==="MUS"?90:55;for(let i=0;i<n;i++){g.strokeStyle=pink(.9);g.lineWidth=2+r()*3;g.beginPath();const y=r()*W,a=cls==="MUS"?.15:(r()-.5)*1.2;g.moveTo(-10,y);g.bezierCurveTo(70,y+a*60+r()*10,150,y-a*60,234,y+(cls==="STR"?(r()-.5)*40:0));g.stroke()}
     for(let i=0;i<(cls==="MUS"?70:30);i++)dot(r()*W,r()*W,cls==="MUS"?9:6,1.8,nuc(.9),cls==="MUS"?.1:r()*3)}
+  setTimeout(()=>marca(cv),0);
   if(cls==="NORM"||cls==="TUM"){const n=cls==="NORM"?9:7;for(let i=0;i<n;i++){const cx=cls==="NORM"?28+(i%3)*84+r()*6:r()*W,cy=cls==="NORM"?32+Math.floor(i/3)*80+r()*6:r()*W,R=cls==="NORM"?24:20+r()*22;
       dot(cx,cy,R+8,R+8,cls==="NORM"?"rgba(235,215,230,1)":"rgba(225,170,205,1)");dot(cx,cy,R*.45,R*.45,"rgba(245,240,245,1)");
       const k=cls==="NORM"?22:34;for(let j=0;j<k;j++){const a=j/k*6.283+r()*.1,rr=R+(cls==="TUM"?(r()-.5)*10:2);dot(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,cls==="NORM"?2.4:3.6+r()*2,cls==="NORM"?2.4:3+r()*2,nuc(.95),a)}}}
 }
+function marca(cv){const g=cv.getContext("2d");g.fillStyle="rgba(9,13,22,.6)";g.fillRect(0,206,74,18);g.fillStyle="#fff";g.font="11px sans-serif";g.fillText("ilustração",6,219)}
 function turbo(t){const r=34.61+t*(1172.33-t*(10793.56-t*(33300.12-t*(38394.49-t*14825.05)))),g=23.31+t*(557.33+t*(1225.33-t*(3574.96-t*(1073.77+t*707.56)))),b=27.2+t*(3211.1-t*(15327.97-t*(27814-t*(22569.18-t*6838.66))));return[r,g,b].map(v=>Math.max(0,Math.min(255,v)))}
 function viridis(t){const s=[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],x=t*4,i=Math.min(3,Math.floor(x)),f=x-i;return s[i].map((v,k)=>v+(s[i+1][k]-v)*f)}
-function drawHeat(cv,seed,cmap){const g=cv.getContext("2d"),r=rng(seed*31+5),W=224,img=g.createImageData(W,W),bl=[];
+function drawHeat(cv,seed,cmap,cont){const g=cv.getContext("2d"),r=rng(seed*31+5),W=224,img=g.createImageData(W,W),bl=[];
   for(let i=0;i<4;i++)bl.push([30+r()*164,30+r()*164,28+r()*40,.5+r()*.5]);
   for(let y=0;y<W;y++)for(let x=0;x<W;x++){let v=0;for(const[bx,by,s,w]of bl)v+=w*Math.exp(-((x-bx)**2+(y-by)**2)/(2*s*s));v=Math.min(1,v);
-    const[c0,c1,c2]=(cmap==="viridis"?viridis:turbo)(v),o=(y*W+x)*4;img.data[o]=c0;img.data[o+1]=c1;img.data[o+2]=c2;img.data[o+3]=255*Math.min(1,v*1.4)}
+    const[c0,c1,c2]=(cmap==="viridis"?viridis:turbo)(v),o=(y*W+x)*4;img.data[o]=c0;img.data[o+1]=c1;img.data[o+2]=c2;img.data[o+3]=255*Math.min(1,v*1.4);if(cont){const n=(Math.abs(v-.5)<.012||Math.abs(v-.75)<.012);img.data[o]=img.data[o+1]=img.data[o+2]=255;img.data[o+3]=n?255:0}}
   g.putImageData(img,0,0)}
 
 // ---------- estado ----------
@@ -288,31 +304,35 @@ const quick=$("#quick");["TUM","NORM","STR","MUS","LYM","ADI"].forEach((c,i)=>{c
   b.onclick=()=>analyze({cls:c,seed:i===2?2:1,src:"Galeria"});quick.append(b)});
 // demonstração: abrir com #demo-STR (ou outra classe) analisa a amostra automaticamente; #demo-STR-sbs abre lado a lado
 {const m=location.hash.match(/^#demo-([A-Z]+)(-sbs)?$/);if(m&&CL.includes(m[1])){analyze({cls:m[1],seed:m[1]==="STR"?2:1,src:"Galeria"});if(m[2])setTimeout(()=>setMode("sbs"),0)}}
-function analyze({cls,seed,src,file,truth=true}){
+function analyze({cls,seed,src,file,dims}){
   go("ws");$("#emptyState").hidden=true;$("#st1").hidden=false;$("#l1").hidden=false;
-  const p1=$("#c1patch");if(file){const im=new Image();im.onload=()=>p1.getContext("2d").drawImage(im,0,0,224,224);im.src=URL.createObjectURL(file)}else drawPatch(p1,cls,seed);
+  const p1=$("#c1patch");if(file){const im=new Image();im.onload=()=>{const sx=Math.max(0,(im.naturalWidth-224)/2),sy=Math.max(0,(im.naturalHeight-224)/2);p1.getContext("2d").drawImage(im,sx,sy,224,224,0,0,224,224)};im.src=URL.createObjectURL(file)}else drawPatch(p1,cls,seed);
   $("#c1heat").getContext("2d").clearRect(0,0,224,224);$("#c2heat").getContext("2d").clearRect(0,0,224,224);
-  $("#res").innerHTML=`<div class="skeleton" style="height:28px;border-radius:6px;margin-bottom:10px"></div>${Array(9).fill('<div class="skeleton" style="height:12px;border-radius:3px;margin:9px 0"></div>').join("")}<p class="mono hint" id="tm">Na fila… 0 ms</p>`;
+  $("#res").innerHTML=`<div class="skeleton" style="height:28px;border-radius:6px;margin-bottom:10px"></div>${Array(9).fill('<div class="skeleton" style="height:12px;border-radius:3px;margin:9px 0"></div>').join("")}<p class="mono hint" id="tm" aria-hidden="true">Na fila… 0 ms</p>`;
   const t0=performance.now(),iv=setInterval(()=>{const e=$("#tm");if(e)e.textContent=`Processando… ${Math.round(performance.now()-t0)} ms`},50);
   setTimeout(()=>{clearInterval(iv);const ms=Math.round(performance.now()-t0);const pr=probsFor(cls,seed);
-    const a={id:Date.now(),date:new Date(),cls,seed,src,probs:pr,ms,ood:!!file,truth:file?null:cls,fileUrl:file?$("#c1patch").toDataURL():null};
+    const a={id:Date.now(),date:new Date(),cls,seed,src,probs:pr,ms,ood:!!file,recorte:!!(dims&&(dims[0]>224||dims[1]>224)),truth:file?null:cls,fileUrl:file?$("#c1patch").toDataURL():null};
     st.hist.unshift(a);show(a)},450+Math.random()*500)}
-function show(a){st.cur=a;const pr=a.probs,rank=CL.slice().sort((x,y)=>pr[y]-pr[x]),top=rank[0],marg=pr[rank[0]]-pr[rank[1]];
+function show(a){st.cur=a;const pr=a.probs,rank=CL.slice().sort((x,y)=>pr[y]-pr[x]),top=rank[0];
   if(a.fileUrl){const im=new Image();im.onload=()=>$("#c1patch").getContext("2d").drawImage(im,0,0);im.src=a.fileUrl}else drawPatch($("#c1patch"),a.cls,a.seed);
-  paintHeat();
-  $("#res").innerHTML=`${a.ood?`<div class="alert err" role="alert">⚠ Esta imagem difere do padrão usado no treino do modelo (ex.: foto de celular ou outra coloração). O resultado pode não ser confiável.</div>`:""}
+  paintHeat();if(a.ood)setOp(0);
+  $("#c1patch").setAttribute("aria-label",`Patch analisado; classe sugerida ${top}, ${(pr[top]*100).toFixed(1)}%`);
+  $("#srStatus").textContent=`Análise concluída: ${INFO[top][0]}, ${(pr[top]*100).toFixed(1)}%`+(a.ood?". Atenção: imagem fora do padrão.":"");
+  $("#res").innerHTML=`${a.ood?`<div class="alert err" role="alert">⚠ Esta imagem difere do padrão usado no treino do modelo (ex.: foto de celular ou outra coloração). O resultado pode não ser confiável. O mapa de calor foi ocultado; aumente a opacidade se quiser vê-lo.</div>`:""}${a.recorte?`<div class="alert">Foi analisado o recorte central de 224×224 px, sem reduzir a escala da imagem.</div>`:""}
   <div class="result-top"><span class="cls">${top}</span><span class="name">${INFO[top][0]}</span></div>
   <div class="mono" style="color:var(--muted);font-size:12px">classe sugerida · ${(pr[top]*100).toFixed(1)}%</div>
-  ${(pr[top]<.6||marg<.15)?`<div class="alert">⚠ Baixa confiança — interprete com cautela. ${rank[0]} e ${rank[1]} estão próximos: ${diffText(rank[0],rank[1])}</div>`:""}
+  ${pr[top]<.6?`<div class="alert">⚠ Baixa confiança — interprete com cautela. ${rank[0]} e ${rank[1]} estão próximos: ${diffText(rank[0],rank[1])}</div>`:""}
   <ul class="bars">${rank.map(c=>`<li class="bar ${c===top?"top":""}"><span class="lab" tabindex="0" aria-describedby="t-${c}">${c}</span><div class="track"><div class="fill" style="transform:scaleX(${pr[c]})"></div></div><span class="pct">${(pr[c]*100).toFixed(1)}%</span>
     <div class="tip" role="tooltip" id="t-${c}"><b>${c} — ${INFO[c][0]}</b><br>${INFO[c][1]}<br><span style="color:var(--warn)">Atenção:</span> ${INFO[c][2]}</div></li>`).join("")}</ul>
-  <div class="meta"><span>Modelo</span><b class="mono">resnet50-nct 0.1.0</b><span>Tempo</span><b class="mono">${a.ms} ms</b><span>Cache</span><b>${a.cache?"sim":"não"}</b>${a.truth?`<span>Classe verdadeira</span><b class="mono">${a.truth}</b>`:""}</div>`}
-function paintHeat(){if(!st.cur)return;const s=st.cur.seed*10+CL.indexOf(st.cur.cls),cm=$("#cmap").value;drawHeat($("#c1heat"),s,cm);drawHeat($("#c2heat"),s,cm);setOp(st.op)}
-$("#cmap").onchange=paintHeat;
+  <p class="hint">Confiança = probabilidade estimada pelo modelo entre as 9 classes, não certeza. O modelo pode errar com confiança alta, sobretudo em imagens diferentes das de treino. Confira os critérios morfológicos.</p>
+  <div class="meta"><span>Modelo</span><b class="mono">resnet50-nct 0.1.0</b><span>Tempo</span><b class="mono">${a.ms} ms</b><span>Cache</span><b>${a.cache?"sim":"não"}</b>${a.truth?`<span>Rótulo de referência (dataset)</span><b class="mono">${a.truth}</b>`:""}</div>`}
+function legenda(){const f=$("#cmap").value==="viridis"?viridis:turbo;$("#legGrad").style.background=`linear-gradient(90deg,${[0,.25,.5,.75,1].map(t=>`rgb(${f(t).map(Math.round).join(",")})`).join(",")})`}
+function paintHeat(){legenda();if(!st.cur)return;const s=st.cur.seed*10+CL.indexOf(st.cur.cls),cm=$("#cmap").value,c=$("#contorno").checked;drawHeat($("#c1heat"),s,cm,c);drawHeat($("#c2heat"),s,cm,false);setOp(st.op)}
+$("#cmap").onchange=paintHeat;$("#contorno").onchange=paintHeat;legenda();
 function setOp(v){st.op=v;$("#c1heat").style.opacity=st.mode==="overlay"?v/100:0;$("#opv").textContent=v+"%";$("#op").value=v;$("#op").setAttribute("aria-valuetext",`Opacidade do mapa: ${v}%`)}
 $("#op").oninput=e=>setOp(+e.target.value);
 function setMode(m){st.mode=m;$("#mOverlay").setAttribute("aria-pressed",m==="overlay");$("#mSbs").setAttribute("aria-pressed",m==="sbs");
-  $("#viewers").classList.toggle("sbs",m==="sbs");$("#v2").hidden=m!=="sbs";$("#l1").textContent=m==="sbs"?"Patch":"Patch + Grad-CAM";setOp(st.op)}
+  $("#viewers").classList.toggle("sbs",m==="sbs");$("#op").disabled=m==="sbs";$("#op").title=m==="sbs"?"A opacidade vale para o modo Sobreposição":"";$("#v2").hidden=m!=="sbs";$("#l1").textContent=m==="sbs"?"Patch":"Patch + Grad-CAM";setOp(st.op)}
 $("#mOverlay").onclick=()=>setMode("overlay");$("#mSbs").onclick=()=>setMode("sbs");
 function applyT(){const px=st.zoom>=4;["#st1","#st2"].forEach(s=>{const e=$(s);e.style.transform=`translate(${st.tx}px,${st.ty}px) scale(${st.zoom})`;e.classList.toggle("px",px)});$("#zoomLbl").textContent=Math.round(st.zoom*100)+"%"}
 function zoomAt(f,cx,cy){const nz=Math.min(8,Math.max(1,st.zoom*f));const k=nz/st.zoom;st.tx=cx-(cx-st.tx)*k;st.ty=cy-(cy-st.ty)*k;st.zoom=nz;if(nz===1){st.tx=st.ty=0}applyT()}
@@ -324,16 +344,25 @@ $("#reset").onclick=()=>{st.zoom=1;st.tx=st.ty=0;applyT()};
   el.addEventListener("pointermove",e=>{const r=el.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;["#x1","#x2"].forEach(c=>{const o=$(c);o.style.display=st.mode==="sbs"?"block":"none";o.style.left=x+"px";o.style.top=y+"px"});
     if(drag&&st.zoom>1){st.tx=drag[2]+e.clientX-drag[0];st.ty=drag[3]+e.clientY-drag[1];applyT()}});
   el.addEventListener("pointerup",()=>drag=null);el.addEventListener("pointerleave",()=>["#x1","#x2"].forEach(c=>$(c).style.display="none"))});
-document.addEventListener("keydown",e=>{if(e.target.matches("input,select,textarea"))return;const v=$("#v1").getBoundingClientRect();
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.body.classList.add("semtip");return}});
+document.addEventListener("mousemove",()=>document.body.classList.remove("semtip"));document.addEventListener("focusin",()=>document.body.classList.remove("semtip"));
+function mover(dx,dy){if(st.zoom<=1)return;st.tx+=dx;st.ty+=dy;applyT()}
+[["#pE",40,0],["#pC",0,40],["#pB",0,-40],["#pD",-40,0]].forEach(([id,dx,dy])=>{$(id).onclick=()=>mover(dx,dy)});
+// atalhos de uma tecla só valem com o foco no visualizador (WCAG 2.1.4)
+document.addEventListener("keydown",e=>{if(!e.target.closest("#v1,#v2"))return;const v=$("#v1").getBoundingClientRect();
+  if(e.shiftKey&&e.key.startsWith("Arrow")){e.preventDefault();mover({ArrowLeft:40,ArrowRight:-40}[e.key]||0,{ArrowUp:40,ArrowDown:-40}[e.key]||0);return}
+  if(e.key.startsWith("Arrow"))e.preventDefault();
   if(e.key==="ArrowRight")setOp(Math.min(100,st.op+5));else if(e.key==="ArrowLeft")setOp(Math.max(0,st.op-5));
   else if(e.key==="+"||e.key==="=")zoomAt(1.25,v.width/2,v.height/2);else if(e.key==="-")zoomAt(.8,v.width/2,v.height/2);
-  else if(e.key==="0")$("#reset").click();else if(e.key.toLowerCase()==="s")setMode(st.mode==="sbs"?"overlay":"sbs");else if(e.key.toLowerCase()==="g")go("gal")});
+  else if(e.key==="0")$("#reset").click();else if(e.key.toLowerCase()==="s")setMode(st.mode==="sbs"?"overlay":"sbs");});
 // envio
 const drop=$("#drop");
 function handle(f){const err=$("#dropErr");err.innerHTML="";if(!f)return;
   if(!["image/png","image/jpeg"].includes(f.type)){err.innerHTML=`<div class="alert err" role="alert">Formato não suportado. Envie PNG ou JPEG.</div>`;return}
   if(f.size>5*1024*1024){err.innerHTML=`<div class="alert err" role="alert">Arquivo maior que 5 MB.</div>`;return}
-  const r=rng(f.size);analyze({cls:CL[Math.floor(r()*9)],seed:3,src:"Envio",file:f})}
+  const im=new Image();im.onload=()=>{const d=[im.naturalWidth,im.naturalHeight];URL.revokeObjectURL(im.src);
+    if(d[0]<224||d[1]<224){err.innerHTML=`<div class="alert err" role="alert">Imagem menor que 224×224 px. Envie um recorte maior, sem reduzir a escala.</div>`;return}
+    const r=rng(f.size);analyze({cls:CL[Math.floor(r()*9)],seed:3,src:"Envio",file:f,dims:d})};im.src=URL.createObjectURL(f)}
 $("#file").onchange=e=>handle(e.target.files[0]);
 drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#file").click()}});
 ["dragover","dragenter"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
@@ -353,7 +382,7 @@ function renderGal(){const b=$("#galBody");b.innerHTML="";
   <div class="panel"><h2>Que tecido é este?</h2><p style="color:var(--muted);margin:0">Escolha uma classe. A resposta só aparece depois.</p><div class="opts" id="qo"></div><div id="qf" aria-live="polite"></div></div></div>`;
   drawPatch($("#qc"),c,sd);CL.forEach(o=>{const bt=document.createElement("button");bt.innerHTML=`<span class="mono">${o}</span><br><small style="color:var(--muted)">${INFO[o][0]}</small>`;
     bt.onclick=()=>{const ok=o===c;$("#qo").querySelectorAll("button").forEach(x=>x.disabled=true);
-      $("#qf").innerHTML=`<p class="${ok?"ok":"bad"}" style="font-weight:600">${ok?"✓ Acertou!":"✗ Não foi dessa vez."} Classe correta: <span class="mono">${c}</span> — ${INFO[c][0]}</p>
+      $("#qf").innerHTML=`<p class="${ok?"ok":"bad"}" style="font-weight:600">${ok?"✓ Acertou!":"✗ Não foi dessa vez."} Rótulo de referência: <span class="mono">${c}</span> — ${INFO[c][0]}</p>
       ${ok?`<p>${INFO[c][1]}</p>`:`<p><strong>Por que não é ${o}?</strong> ${diffText(c,o)}</p>`}<button class="btn" id="qn">Próxima amostra</button> <button class="btn ghost" id="qa">Ver análise do modelo</button>`;
       $("#qn").onclick=renderGal;$("#qa").onclick=()=>analyze({cls:c,seed:sd,src:"Quiz"})};$("#qo").append(bt)})}
 
@@ -392,7 +421,7 @@ if (new URLSearchParams(location.search).has("teste")) {
     <a class="btn" id="tForm" target="_blank" rel="noopener" href="${FORMULARIO_AVALIACAO}">Responder o formulário (5 min)</a>
     <p class="hint" style="margin-top:8px">Os dados e imagens deste protótipo são simulados. Nada do que você faz aqui é enviado.</p></div>`;
   document.body.append(box);
-  const atualizar = () => { $("#tForm").setAttribute("aria-disabled", feitas.length < TAREFAS.length ? "true" : "false"); };
+  const atualizar = () => { const ok = feitas.length >= TAREFAS.length, a = $("#tForm"); a.setAttribute("aria-disabled", ok ? "false" : "true"); if (ok) a.setAttribute("href", FORMULARIO_AVALIACAO); else a.removeAttribute("href"); };
   box.querySelectorAll("input[type=checkbox]").forEach(c => c.onchange = () => {
     const i = +c.dataset.i; feitas = c.checked ? [...new Set([...feitas, i])] : feitas.filter(x => x !== i);
     c.closest("li").classList.toggle("feita", c.checked);

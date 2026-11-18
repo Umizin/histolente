@@ -67,13 +67,18 @@ erDiagram
         uuid image_id FK
         uuid model_version_id FK
         uuid batch_id FK "opcional"
-        uuid job_id UK
+        uuid job_id UK "nulo se cache"
+        uuid retry_of FK "opcional"
         analysis_status status
         tissue_class predicted_class
         jsonb probabilities
         text heatmap_storage_key
         boolean cache_hit
         boolean out_of_distribution
+        real ood_score
+        text ood_method
+        real ood_threshold
+        tissue_class gradcam_target_class
         int worker_ms
         int e2e_ms
         text error
@@ -103,9 +108,13 @@ erDiagram
     images ||--o{ quiz_attempts : ""
     model_versions ||--o{ analyses : ""
     batches |o--o{ analyses : ""
+    analyses |o--o{ analyses : "reenvio"
 ```
 
-**Normalização:** o modelo está na 3ª forma normal. A exceção deliberada é `analyses.probabilities` (JSONB com as 9 probabilidades): elas são sempre lidas e gravadas juntas, nunca consultadas individualmente. Separá-las em 9 linhas por análise só aumentaria o custo sem benefício.
+**Normalização:** o modelo está na 3ª forma normal (ELMASRI; NAVATHE, 2018), com três desnormalizações deliberadas:
+- `analyses.probabilities` (JSONB): as 9 probabilidades são sempre lidas e gravadas juntas, nunca consultadas individualmente;
+- `analyses.predicted_class`: poderia ser derivada das probabilidades, mas é armazenada para indexar o filtro do histórico;
+- `quiz_attempts.correct`: poderia ser derivada da resposta e do rótulo, mas preserva o resultado histórico caso um rótulo da galeria seja corrigido.
 
 ## 3.3 Modelo físico
 Implementado em PostgreSQL 16: [`infra/db/schema.sql`](../../infra/db/schema.sql). Os tipos enumerados, as restrições `CHECK`, as chaves estrangeiras e os índices estão descritos no arquivo.
@@ -163,13 +172,17 @@ Implementado em PostgreSQL 16: [`infra/db/schema.sql`](../../infra/db/schema.sql
 | image_id | uuid | não | — | FK images | Imagem analisada |
 | model_version_id | uuid | não | — | FK model_versions | Versão do modelo usada |
 | batch_id | uuid | sim | — | FK batches | Lote, se houver |
-| job_id | uuid | não | — | UNIQUE | Identificador da mensagem (idempotência) |
+| job_id | uuid | sim | — | UNIQUE; obrigatório se não for cache | Identificador da mensagem (idempotência); nulo quando o resultado veio do cache |
+| retry_of | uuid | sim | — | FK analyses | Análise original, quando esta é um reenvio (RF14) |
 | status | analysis_status | não | 'QUEUED' | QUEUED, PROCESSING, DONE, FAILED | Estado do processamento |
 | predicted_class | tissue_class | sim | — | obrigatório se DONE | Classe sugerida |
-| probabilities | jsonb | sim | — | 9 chaves, soma ≈ 1 | Probabilidade por classe (RF03) |
+| probabilities | jsonb | sim | — | 9 chaves; soma = 1 ± 0,0001 (função `prob_sum`) | Probabilidade por classe (RF03) |
 | heatmap_storage_key | text | sim | — | — | Caminho do mapa Grad-CAM (RF04) |
 | cache_hit | boolean | não | false | — | Resultado reaproveitado do cache |
+| gradcam_target_class | tissue_class | sim | — | — | Classe do mapa Grad-CAM (padrão: a sugerida; HU09) |
 | out_of_distribution | boolean | não | false | — | Imagem fora do padrão (RF17) |
+| ood_score, ood_threshold | real | sim | — | — | Escore e limiar usados na decisão do RF17 (permitem recalibrar depois) |
+| ood_method | text | sim | — | — | Método do escore (ex.: energia) |
 | worker_ms | integer | sim | — | ≥ 0 | Tempo no serviço de inferência (RNF01) |
 | e2e_ms | integer | sim | — | ≥ 0 | Tempo do envio ao resultado (RNF01) |
 | error | text | sim | — | — | Motivo da falha (RF14) |
@@ -180,7 +193,7 @@ Implementado em PostgreSQL 16: [`infra/db/schema.sql`](../../infra/db/schema.sql
 | Coluna | Tipo | Nulo | Padrão | Restrições | Descrição |
 |---|---|---|---|---|---|
 | id | uuid | não | gen_random_uuid() | PK | Identificador |
-| user_id | uuid | não | — | FK users | Quem aceitou |
+| user_id | uuid | sim | — | FK users, `ON DELETE SET NULL` | Quem aceitou; vira nulo se a conta for excluída, preservando a prova anonimizada do consentimento |
 | document | consent_document | não | — | TERMS, TCLE | Documento aceito |
 | version | text | não | — | — | Versão do documento |
 | accepted_at | timestamptz | não | now() | — | Data e hora do aceite |
@@ -190,7 +203,7 @@ Implementado em PostgreSQL 16: [`infra/db/schema.sql`](../../infra/db/schema.sql
 |---|---|---|---|---|---|
 | id | uuid | não | gen_random_uuid() | PK | Identificador |
 | user_id | uuid | não | — | FK users | Estudante |
-| image_id | uuid | não | — | FK images (galeria) | Amostra usada |
+| image_id, image_source | uuid, image_source | não | — | FK composta para `images (id, source)`; `image_source` só aceita SAMPLE_GALLERY | Amostra usada (só da galeria, RN07/RN09) |
 | answer | tissue_class | não | — | — | Classe escolhida |
 | correct | boolean | não | — | — | Acertou? |
 | created_at | timestamptz | não | now() | — | Data da tentativa |

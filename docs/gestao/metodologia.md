@@ -11,6 +11,19 @@ O projeto adota o **Scrum** como processo de execução, em *sprints* de **duas 
 4. **Prazo acadêmico fixo.** Sprints com meta e revisão tornam o avanço visível para o orientador e permitem cortar escopo (itens *Could have*) se necessário.
 5. **Kanban complementar.** Com uma única pessoa executando, o limite de trabalho em andamento evita abrir muitas frentes ao mesmo tempo, risco comum em projetos individuais.
 
+## Relação com o Design Science Research
+
+O processo de pesquisa segue a metodologia de *Design Science Research* de Peffers et al. (2007), em seis atividades, observando as diretrizes de Hevner et al. (2004). O Scrum (SCHWABER; SUTHERLAND, 2020) organiza a execução: cada *sprint* é uma iteração das atividades 3 a 5.
+
+| Atividade DSR (PEFFERS et al., 2007) | Quando | Incremento | Evidência |
+|---|---|---|---|
+| 1. Identificação do problema e motivação | Até set./2026 | Pré-TCC | Pré-TCC; histórico do projeto |
+| 2. Definição dos objetivos da solução | Sprint 0 | RF01–RF18, RNF01–RNF11, priorização com a elicitação (T5) | Documento de requisitos (v1.2) |
+| 3. Projeto e desenvolvimento | Sprints 0 a 4 | Arquitetura, modelos, protótipo; contratos, ambiente, pipeline de ML; MVP | Documento de projeto; PRs #40–#42 em diante |
+| 4. Demonstração | Sprints 1 a 4 | Protótipo navegável; depois, o MVP funcionando | Telas no documento de projeto; *deploy* |
+| 5. Avaliação | Sprints 1 (formativa) e 5–6 (somativa) | Avaliação do protótipo; métricas do modelo; desempenho; SUS e estudo de caso | Relatórios de avaliação (a coletar) |
+| 6. Comunicação | Contínua | Entregas da disciplina, monografia e defesa | PDFs e monografia |
+
 ## Adaptação dos papéis
 
 | Papel do Scrum | Quem exerce | Observação |
@@ -41,3 +54,11 @@ Um item só é considerado pronto quando:
 - os critérios de aceite foram verificados;
 - o aviso ético (RF07) está presente nas telas afetadas;
 - a documentação e a seção correspondente da monografia foram atualizadas.
+
+## Referências
+
+HEVNER, Alan R. et al. Design science in information systems research. **MIS Quarterly**, v. 28, n. 1, p. 75-105, mar. 2004.
+
+PEFFERS, Ken et al. A design science research methodology for information systems research. **Journal of Management Information Systems**, v. 24, n. 3, p. 45-77, 2007. Disponível em: https://doi.org/10.2753/MIS0742-1222240302.
+
+SCHWABER, Ken; SUTHERLAND, Jeff. **The Scrum Guide**: the definitive guide to Scrum: the rules of the game. 2020. Disponível em: https://scrumguides.org/scrum-guide.html.

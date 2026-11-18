@@ -89,7 +89,7 @@ Fonte: elaborado pelo autor (2026).
 **Regras de cor:**
 - Nunca usar vermelho, rosa ou roxo como cor de interface, para não confundir com a coloração H&E.
 - Toda informação transmitida por cor também aparece como texto ou ícone.
-- Mapas de calor usam as paletas *turbo* ou *viridis*, que são legíveis por daltônicos.
+- O mapa de calor usa por padrão a paleta *viridis*, perceptualmente uniforme e legível por daltônicos, sem tons de rosa ou roxo no topo da escala; *turbo* fica como opção. Uma legenda "baixa → alta influência" acompanha o mapa, e o modo **contorno** mostra só as isolinhas de 50% e 75%, sem cobrir os núcleos.
 
 ### Tipografia
 | Uso | Fonte | Tamanho / peso |
@@ -107,28 +107,37 @@ Fonte: elaborado pelo autor (2026).
 ### Componentes
 | Componente | Comportamento-chave |
 |---|---|
-| Banner ético | Fixo no topo; pode ser minimizado, nunca removido (RF07) |
-| Área de envio | Arrastar e soltar, clique ou Ctrl+V; valida antes de enviar |
-| Visualizador | Zoom de 1× a 8× com a roda do mouse; arraste para mover; tecla `0` restaura |
+| Banner ético | Fixo no topo: "Ferramenta educacional para estudo de padrões histológicos. Não substitui o exame anatomopatológico nem o laudo. A decisão clínica é sempre do médico". Minimizado, mantém "Não substitui laudo · decisão do médico"; nunca é removido (RF07; CONSELHO FEDERAL DE MEDICINA, 2026) |
+| Área de envio | Arrastar e soltar, clique ou Ctrl+V; valida antes de enviar; orienta a enviar só o recorte de tecido, sem etiqueta ou dados de paciente (RN08); imagens maiores que 224 × 224 px são analisadas por recorte central, sem redução de escala (RN01) |
+| Visualizador | Zoom de 1× a 8× com roda do mouse, botões + e − ou teclado; mover arrastando, pelos botões de seta ou com Shift+setas; tecla `0` restaura. Texto fixo sobre a escala (224 × 224 px ≈ 112 × 112 µm) e a resolução do mapa (≈ 7 × 7, ampliada) |
 | Controle de opacidade | 0–100% (padrão 40%); setas do teclado mudam de 5 em 5% |
-| Barras de confiança | 9 barras ordenadas; classe sugerida em *teal*; *tooltip* morfológico |
-| Alerta de baixa confiança | Âmbar, com ícone e texto (RN03) |
+| Barras de confiança | 9 barras ordenadas; classe sugerida em *teal*; *tooltip* morfológico (fecha com Esc); texto fixo: "Confiança = probabilidade estimada pelo modelo entre as 9 classes, não certeza" |
+| Alerta de baixa confiança | Âmbar, com ícone e texto, mostrando os critérios que diferenciam as duas classes mais prováveis (RN03) |
+| Alerta de imagem fora do padrão | Aparece antes da classificação e oculta o mapa de calor, que pode ser reexibido pela opacidade (RF17) |
 | Tabela de histórico | Paginada, com filtros e reabertura |
 
 ## 4.4 Critérios de acessibilidade (WCAG 2.2, nível AA)
+
+Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2023) verificados no protótipo em 18/11/2026. A verificação automatizada com axe-core (RNF11, CT42) entra com o frontend definitivo.
+
 | Critério WCAG | Como é atendido |
 |---|---|
-| 1.1.1 Conteúdo não textual | Imagens com texto alternativo; mapa de calor descrito pelo nome da classe e pela confiança |
+| 1.1.1 Conteúdo não textual | O *canvas* do *patch* tem `role="img"` e rótulo atualizado com a classe sugerida e a confiança |
 | 1.4.1 Uso de cor | Classe sugerida e alertas também indicados por texto e ícone |
 | 1.4.3 Contraste mínimo (4,5:1) | Todos os tokens de texto atingem pelo menos 6,9:1 sobre o fundo (valores calculados pela fórmula de luminância relativa da WCAG) |
 | 1.4.11 Contraste de elementos não textuais (3:1) | Foco (7,8:1) e barras preenchidas atendem; campos e controles usam `--border-strong` (≥ 3,4:1). A borda decorativa `--border` (1,4:1) não é usada para identificar controles |
-| 2.1.1 Teclado | Todas as funções têm atalho ou foco: `←/→` opacidade, `+/−` zoom, `0` reset, `S` lado a lado, `G` galeria |
+| 2.1.1 Teclado | Todas as funções são acessíveis por teclado: botões focáveis e, com o foco no visualizador, `←/→` opacidade, `+/−` zoom, Shift+setas mover, `0` restaurar, `S` lado a lado |
+| 2.1.4 Atalhos de uma tecla | Os atalhos só funcionam com o foco no visualizador |
+| 2.5.7 Movimentos de arrastar | Mover a imagem também é possível pelos botões de seta, sem arrastar |
+| 1.4.13 Conteúdo em foco ou *hover* | Os *tooltips* aparecem no foco e no *hover* e fecham com Esc |
+| 4.1.3 Mensagens de status | A conclusão da análise é anunciada uma única vez numa região `role="status"`; o cronômetro não é lido pelo leitor de tela |
 | 2.4.7 Foco visível | Contorno *teal* de 2 px em todos os elementos focáveis |
 | 2.4.11 Foco não encoberto | O banner fixo não cobre o elemento focado |
 | 2.5.8 Tamanho do alvo (24 × 24 px) | Botões e controles com área clicável de pelo menos 24 px |
 | 3.3.1 Identificação de erros | Erros de envio explicam a causa e como corrigir |
 | 4.1.2 Nome, função e valor | Controle de opacidade com `aria-valuetext` ("Opacidade do mapa: 40%"); barras com rótulo textual |
-| 2.3.3 Animação por interação | Respeita a configuração de reduzir movimento |
+
+**Critério adicional (nível AAA):** 2.3.3 Animação por interação — o protótipo respeita a configuração de reduzir movimento.
 
 ## 4.5 Validação do protótipo com usuários
 
@@ -142,14 +151,16 @@ Fonte: elaborado pelo autor (2026).
    - responder no modo quiz;
    - reabrir uma análise do histórico.
    O botão do formulário só é liberado depois das 4 tarefas.
-3. No formulário, o participante informa o resultado de cada tarefa (sem dificuldade / com dificuldade / não conseguiu) e o que aconteceu, e responde ao SUS completo (10 itens) e a duas perguntas abertas.
+3. No formulário, o participante informa o resultado de cada tarefa (sem dificuldade / com dificuldade / não conseguiu) e o que aconteceu. Responde ainda a uma tarefa de diferenciação (estroma × músculo liso, com o critério usado), a itens de compreensão do mapa de calor e da confiança (verdadeiro ou falso), ao SUS completo (BROOKE, 1996) e a duas perguntas abertas.
 4. O protótipo não envia dados: o registro das tarefas fica só no navegador do participante.
 
 **Análise:**
 - Taxa de conclusão de cada tarefa (meta do RNF02: pelo menos 90% sem ajuda).
-- Escore SUS por participante e média, com o cálculo de Brooke (1996).
+- Escore SUS por participante, com média, desvio-padrão, mediana e IC 95%, calculado por Brooke (1996) e interpretado pela escala adjetiva de Bangor, Kortum e Miller (2009). A tradução dos itens para o português precisa ter fonte validada `[FONTE PENDENTE]`.
+- Acertos nos itens de compreensão (o mapa não indica o tumor; confiança não é certeza).
+- Resultados separados por aparelho (computador ou celular), já que a *workstation* foi projetada para telas largas.
 - Dificuldades relatadas, convertidas em itens do backlog.
 
-**Limitação:** sem observação direta, o teste depende do que o participante relata. Não se mede o tempo das tarefas nem se vê onde a pessoa hesitou.
+**Limitações:** sem observação direta, o teste depende do que o participante relata; não se mede o tempo das tarefas nem se vê onde a pessoa hesitou, e o critério "sem ajuda" do RNF02 só será medido na avaliação moderada. Esta aplicação é **formativa**, sobre um protótipo com dados simulados, e não substitui a avaliação final do RNF02 sobre o sistema funcional.
 
-**Situação em 18/11/2026:** protótipo com modo de teste e formulário de avaliação prontos; aplicação aos participantes em andamento. Os resultados (taxa de conclusão das tarefas e escore SUS) serão anexados a este documento ao fim da coleta.
+**Situação em 18/11/2026:** protocolo, protótipo com modo de teste e formulário prontos. **A aplicação ainda não começou**: ela depende do parecer escrito do orientador ou da coordenação sobre a necessidade de registro no CEP. Os resultados serão anexados a este documento ao fim da coleta.
