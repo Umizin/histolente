@@ -168,12 +168,12 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
         <button class="btn ghost" id="reset">Restaurar</button>
       </div>
       <div class="viewers" id="viewers">
-        <div class="viewer" id="v1" tabindex="0" aria-label="Visualizador do patch. Com o foco aqui: setas mudam a opacidade, + e − dão zoom, Shift+setas movem a imagem, 0 restaura, S alterna o lado a lado."><div class="empty" id="emptyState"><div><div style="font-size:28px">🔬</div><p>Envie um patch ou escolha uma amostra para começar.</p></div></div>
-          <div class="stage" id="st1" hidden><canvas id="c1patch" width="224" height="224" role="img" aria-label="Patch analisado"></canvas><canvas id="c1heat" width="224" height="224"></canvas></div>
-          <span class="vlabel" id="l1" hidden>Patch + Grad-CAM</span><span class="cross" id="x1"></span></div>
+        <div class="viewer" id="v1" tabindex="0" role="group" aria-label="Visualizador do patch. Com o foco aqui: setas mudam a opacidade, + e − dão zoom, Shift+setas movem a imagem, 0 restaura, S alterna o lado a lado."><div class="empty" id="emptyState"><div><div style="font-size:28px">🔬</div><p>Envie um patch ou escolha uma amostra para começar.</p></div></div>
+          <div class="stage" id="st1" hidden><canvas id="c1patch" width="224" height="224" role="img" aria-label="Patch analisado"></canvas><canvas id="c1heat" width="224" height="224" aria-hidden="true"></canvas></div>
+          <span class="vlabel" id="l1" hidden>Patch + Grad-CAM (simulado)</span><span class="cross" id="x1"></span></div>
         <div class="viewer" id="v2" hidden>
-          <div class="stage" id="st2"><canvas id="c2heat" width="224" height="224"></canvas></div>
-          <span class="vlabel">Grad-CAM</span><span class="cross" id="x2"></span></div>
+          <div class="stage" id="st2"><canvas id="c2heat" width="224" height="224" role="img" aria-label="Mapa de calor Grad-CAM simulado"></canvas></div>
+          <span class="vlabel">Grad-CAM (simulado no protótipo)</span><span class="cross" id="x2"></span></div>
       </div>
       <div class="slider">
         <label for="op">Opacidade do mapa</label>
@@ -222,7 +222,8 @@ tr.row{cursor:pointer}tr.row:hover td{background:var(--s2)}
     <h2 style="margin-top:18px">Limitações conhecidas</h2>
     <ul>
       <li>Treinado com lâminas de instituições alemãs, com cor padronizada (normalização de Macenko); não foi validado em lâminas brasileiras. Imagens de outros laboratórios, outras colorações ou fotos de celular podem ter desempenho pior.</li>
-      <li>Sempre escolhe uma das 9 classes, mesmo diante de tecido que não pertence a nenhuma delas (ex.: adenoma, inflamação).</li>
+      <li>Sempre escolhe uma das 9 classes, mesmo diante de tecido que não pertence a nenhuma delas (ex.: adenoma, mucosa de outro órgão, linfonodo).</li>
+      <li>Data de treino: [[a coletar após o treino]]. Não é dispositivo médico registrado; não usar em pacientes.</li>
       <li>Classifica apenas 9 tipos de tecido colorretal; não reconhece outros tecidos nem identifica estruturas individuais.</li>
       <li>O mapa Grad-CAM tem baixa resolução e indica influência na decisão, não localização de lesão.</li>
       <li>Uso exclusivamente educacional. Não tem validação clínica e não emite diagnóstico.</li>
@@ -241,9 +242,9 @@ const INFO = {
   LYM:["Linfócitos","Células pequenas, redondas e uniformes, com núcleo denso e escuro de contorno liso que ocupa quase toda a célula; citoplasma escasso; alta densidade.","Na necrose (DEB) os fragmentos nucleares são irregulares e de tamanhos variados."],
   MUC:["Muco","Material extracelular pálido, azul-acinzentado, frouxo e pouco celular; pode conter células soltas. Comum no adenocarcinoma mucinoso.","Pode lembrar edema do estroma ou fundo (BACK)."],
   MUS:["Músculo liso","Feixes compactos de células fusiformes com citoplasma eosinofílico e fibrilar; núcleos alongados de pontas rombas (\"em charuto\"); em corte transversal, núcleos redondos com halo claro.","Principal confusão com estroma (STR)."],
-  NORM:["Mucosa colônica normal","Criptas tubulares regulares e paralelas, ricas em células caliciformes; núcleos pequenos alinhados na base (polaridade preservada); lâmina própria entre as criptas.","Adenoma/displasia não é classe do modelo e pode ser sugerido como NORM ou TUM."],
-  STR:["Estroma associado ao câncer","Tecido conjuntivo desmoplásico com fibroblastos de núcleos finos, ondulados e afilados, dispersos em colágeno, às vezes frouxo ou mixoide; sem epitélio.","Pode lembrar músculo liso (MUS); compare a forma do núcleo e a matriz."],
-  TUM:["Epitélio de adenocarcinoma","Glândulas irregulares, fusionadas ou cribriformes; núcleos grandes, hipercromáticos, pleomórficos e estratificados, com perda de polaridade; mitoses; poucas células caliciformes.","Cripta normal cortada de viés pode parecer atípica."]
+  NORM:["Mucosa colônica normal","Criptas tubulares regulares e paralelas, ricas em células caliciformes; núcleos pequenos e basais (polaridade preservada); lâmina própria entre as criptas.","Adenoma/displasia não é classe do modelo e pode sair como NORM ou TUM."],
+  STR:["Estroma associado ao câncer","Tecido conjuntivo desmoplásico com fibroblastos de núcleos finos, ondulados e afilados, dispersos em colágeno, às vezes frouxo ou mixoide; sem epitélio.","Pode lembrar músculo liso (MUS); e estroma sozinho não prova câncer (fibrose comum pode ser sugerida como STR)."],
+  TUM:["Epitélio de adenocarcinoma","Glândulas irregulares, fusionadas ou cribriformes; núcleos grandes, hipercromáticos, pleomórficos e estratificados, com perda de polaridade; mitoses; poucas células caliciformes.","Cripta normal em corte tangencial e adenoma podem parecer TUM."]
 };
 const DIFF = {"MUS|STR":"Músculo liso: células com citoplasma próprio, eosinofílico e fibrilar, em feixes compactos; núcleos \"em charuto\", de pontas rombas. Estroma desmoplásico: fibroblastos com núcleos finos, ondulados e afilados, separados por colágeno extracelular, às vezes frouxo ou mixoide, com células inflamatórias. Em recortes pequenos a distinção pode ser incerta até para o especialista.",
   "NORM|TUM":"Mucosa normal: criptas regulares e paralelas, muitas caliciformes, núcleos pequenos na base. Tumor: glândulas irregulares, fusionadas ou cribriformes, núcleos grandes e estratificados, perda de polaridade, mitoses e poucas caliciformes; pode haver necrose \"suja\" na luz.",
@@ -318,21 +319,21 @@ function show(a){st.cur=a;const pr=a.probs,rank=CL.slice().sort((x,y)=>pr[y]-pr[
   paintHeat();if(a.ood)setOp(0);
   $("#c1patch").setAttribute("aria-label",`Patch analisado; classe sugerida ${top}, ${(pr[top]*100).toFixed(1)}%`);
   $("#srStatus").textContent=`Análise concluída: ${INFO[top][0]}, ${(pr[top]*100).toFixed(1)}%`+(a.ood?". Atenção: imagem fora do padrão.":"");
-  $("#res").innerHTML=`${a.ood?`<div class="alert err" role="alert">⚠ Esta imagem difere do padrão usado no treino do modelo (ex.: foto de celular ou outra coloração). O resultado pode não ser confiável. O mapa de calor foi ocultado; aumente a opacidade se quiser vê-lo.</div>`:""}${a.recorte?`<div class="alert">Foi analisado o recorte central de 224×224 px, sem reduzir a escala da imagem.</div>`:""}
-  <div class="result-top"><span class="cls">${top}</span><span class="name">${INFO[top][0]}</span></div>
+  $("#res").innerHTML=`${a.ood?`<div class="alert err" role="alert">⚠ Esta imagem difere do padrão usado no treino do modelo (ex.: foto de celular ou outra coloração). O resultado pode não ser confiável. <em>(Simulação: no protótipo, todo envio recebe este aviso; no sistema real, ele aparece só quando a imagem difere do padrão.)</em> O mapa de calor foi ocultado; aumente a opacidade se quiser vê-lo.</div>`:""}${a.recorte?`<div class="alert">Foi analisado o recorte central de 224×224 px, sem reduzir a escala da imagem.</div>`:""}
+  <div class="mono" style="color:var(--muted);font-size:12px">Padrão tecidual sugerido</div><div class="result-top"><span class="cls">${top}</span><span class="name">${INFO[top][0]}</span></div>
   <div class="mono" style="color:var(--muted);font-size:12px">classe sugerida · ${(pr[top]*100).toFixed(1)}%</div>
-  ${pr[top]<.6?`<div class="alert">⚠ Baixa confiança — interprete com cautela. ${rank[0]} e ${rank[1]} estão próximos: ${diffText(rank[0],rank[1])}</div>`:""}
+  ${pr[top]<.6?`<div class="alert">⚠ Baixa confiança — interprete com cautela. Segunda hipótese: ${rank[1]}. Compare: ${diffText(rank[0],rank[1])}</div>`:""}
   <ul class="bars">${rank.map(c=>`<li class="bar ${c===top?"top":""}"><span class="lab" tabindex="0" aria-describedby="t-${c}">${c}</span><div class="track"><div class="fill" style="transform:scaleX(${pr[c]})"></div></div><span class="pct">${(pr[c]*100).toFixed(1)}%</span>
     <div class="tip" role="tooltip" id="t-${c}"><b>${c} — ${INFO[c][0]}</b><br>${INFO[c][1]}<br><span style="color:var(--warn)">Atenção:</span> ${INFO[c][2]}</div></li>`).join("")}</ul>
   <p class="hint">Confiança = probabilidade estimada pelo modelo entre as 9 classes, não certeza. O modelo pode errar com confiança alta, sobretudo em imagens diferentes das de treino. Confira os critérios morfológicos.</p>
-  <div class="meta"><span>Modelo</span><b class="mono">resnet50-nct 0.1.0</b><span>Tempo</span><b class="mono">${a.ms} ms</b><span>Cache</span><b>${a.cache?"sim":"não"}</b>${a.truth?`<span>Rótulo de referência (dataset)</span><b class="mono">${a.truth}</b>`:""}</div>`}
+  <div class="meta"><span>Modelo</span><b class="mono">resnet50-nct 0.1.0</b><span>Tempo</span><b class="mono">${a.ms} ms</b><span>Cache</span><b>${a.cache?"sim":"não"}</b>${a.truth?`<span>Rótulo da ilustração</span><b class="mono">${a.truth}</b>`:""}</div>`}
 function legenda(){const f=$("#cmap").value==="viridis"?viridis:turbo;$("#legGrad").style.background=`linear-gradient(90deg,${[0,.25,.5,.75,1].map(t=>`rgb(${f(t).map(Math.round).join(",")})`).join(",")})`}
-function paintHeat(){legenda();if(!st.cur)return;const s=st.cur.seed*10+CL.indexOf(st.cur.cls),cm=$("#cmap").value,c=$("#contorno").checked;drawHeat($("#c1heat"),s,cm,c);drawHeat($("#c2heat"),s,cm,false);setOp(st.op)}
+function paintHeat(){legenda();if(!st.cur)return;const s=st.cur.seed*10+CL.indexOf(st.cur.cls),cm=$("#cmap").value,c=$("#contorno").checked;drawHeat($("#c1heat"),s,cm,c);if(st.cur.ood){$("#c2heat").getContext("2d").clearRect(0,0,224,224)}else drawHeat($("#c2heat"),s,cm,false);setOp(st.op)}
 $("#cmap").onchange=paintHeat;$("#contorno").onchange=paintHeat;legenda();
 function setOp(v){st.op=v;$("#c1heat").style.opacity=st.mode==="overlay"?v/100:0;$("#opv").textContent=v+"%";$("#op").value=v;$("#op").setAttribute("aria-valuetext",`Opacidade do mapa: ${v}%`)}
 $("#op").oninput=e=>setOp(+e.target.value);
 function setMode(m){st.mode=m;$("#mOverlay").setAttribute("aria-pressed",m==="overlay");$("#mSbs").setAttribute("aria-pressed",m==="sbs");
-  $("#viewers").classList.toggle("sbs",m==="sbs");$("#op").disabled=m==="sbs";$("#op").title=m==="sbs"?"A opacidade vale para o modo Sobreposição":"";$("#v2").hidden=m!=="sbs";$("#l1").textContent=m==="sbs"?"Patch":"Patch + Grad-CAM";setOp(st.op)}
+  $("#viewers").classList.toggle("sbs",m==="sbs");$("#op").disabled=m==="sbs";$("#op").title=m==="sbs"?"A opacidade vale para o modo Sobreposição":"";$("#v2").hidden=m!=="sbs";$("#l1").textContent=m==="sbs"?"Patch":"Patch + Grad-CAM (simulado)";setOp(st.op)}
 $("#mOverlay").onclick=()=>setMode("overlay");$("#mSbs").onclick=()=>setMode("sbs");
 function applyT(){const px=st.zoom>=4;["#st1","#st2"].forEach(s=>{const e=$(s);e.style.transform=`translate(${st.tx}px,${st.ty}px) scale(${st.zoom})`;e.classList.toggle("px",px)});$("#zoomLbl").textContent=Math.round(st.zoom*100)+"%"}
 function zoomAt(f,cx,cy){const nz=Math.min(8,Math.max(1,st.zoom*f));const k=nz/st.zoom;st.tx=cx-(cx-st.tx)*k;st.ty=cy-(cy-st.ty)*k;st.zoom=nz;if(nz===1){st.tx=st.ty=0}applyT()}

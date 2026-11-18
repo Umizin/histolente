@@ -1,5 +1,7 @@
 # Contratos de mensagens (v1.0)
 
+> **PENDENTE (Sprint 2, EN03b):** a versão 1.1 incluirá `model_version` e `crop_sha256` no `inference.request` (com `maxLength` de cerca de 300 KB para o recorte de 224 × 224), o evento `inference.started` e os campos `ood_score`, `ood_method` e `ood_threshold` no `inference.completed`, conforme `docs/projeto/01-arquitetura.md` §1.5.
+
 Fonte única dos formatos trocados entre o backend de orquestração e o serviço de inferência pelo RabbitMQ.
 
 | Arquivo | Fila | Quem publica | Quem consome |

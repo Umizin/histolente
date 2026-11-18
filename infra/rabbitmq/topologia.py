@@ -1,5 +1,9 @@
 """Topologia do RabbitMQ do HistoLente (EN02).
 
+PENDENTE (Sprint 2, docs/projeto/01-arquitetura.md §1.5 e SQ3): fila inference.request do tipo quorum com
+x-delivery-limit, filas de espera inference.request.retry.{1s,5s} e evento inference.started na mesma fila
+de eventos de inference.completed.
+
 Publicador (backend) e consumidor (serviço de inferência) chamam `declarar(canal)` ao iniciar.
 A declaração é idempotente: se as filas já existem com os mesmos argumentos, nada muda.
 

@@ -18,14 +18,14 @@ Fonte: elaborado pelo autor (2026).
 
 ## 1.2 Justificativa
 
-**Por que orientada a eventos entre os serviços:**
+**Por que serviços integrados por mensagens:**
 1. **Isolamento do modelo de IA (RNF06).** O serviço de inferência só conhece o contrato da mensagem. Não acessa banco, não conhece usuários e pode ser substituído ou reescrito sem afetar o restante.
 2. **Picos de uso em aula (RNF09).** A fila absorve dezenas de envios simultâneos, e o `prefetch` limita quantas imagens cada instância processa por vez, protegendo a memória da CPU ou GPU.
 3. **Resiliência (RNF05).** Mensagens duráveis, confirmação manual e fila de mensagens mortas garantem que nenhuma análise se perca silenciosamente.
 4. **Latência percebida baixa (RNF01).** A resposta do envio é imediata (202); o resultado chega por SSE assim que fica pronto, sem *polling*.
 
 **Por que hexagonal / Clean Architecture dentro dos serviços:**
-1. **Testabilidade.** Regras de negócio (RN01–RN07) e casos de uso são testados sem banco, fila ou rede, usando implementações falsas das portas.
+1. **Testabilidade.** Regras de negócio (RN01–RN09) e casos de uso são testados sem banco, fila ou rede, usando implementações falsas das portas.
 2. **Troca de tecnologia sem reescrever regras.** O PostgreSQL, o Redis ou o RabbitMQ ficam atrás de interfaces (`AnaliseRepository`, `CacheResultados`, `PublicadorJobs`); trocar um adaptador não toca o domínio.
 3. **Princípios SOLID na prática** (MARTIN, 2017).
    - Inversão de dependência: os casos de uso dependem de portas, não de implementações.
@@ -44,7 +44,7 @@ Fonte: elaborado pelo autor (2026).
 ## 1.3 Organização de pastas (alvo)
 
 ```
-apps/web/                         # Next.js — Apresentação (+ Orquestração via Route Handlers, ver ADR 0001)
+apps/web/                         # Next.js — Apresentação (+ Orquestração via Route Handlers; decisão a registrar em ADR na Sprint 2)
   src/app/                        # rotas (App Router) e Route Handlers (/api/...)
   src/components/workstation/     # componentes de interface
   src/server/

@@ -16,7 +16,7 @@ Estação de trabalho escura, densa e silenciosa, em que **a lâmina é a protag
 | Histórico | Lista com filtros e reabertura | RF06 |
 | Sobre o modelo | Versão, métricas e limitações | RF11 |
 
-> As imagens histológicas do protótipo são **ilustrações geradas por código**, não imagens reais do dataset. No MVP, a galeria usará *patches* do NCT-CRC-HE-100K.
+> As imagens histológicas do protótipo são **ilustrações geradas por código**, não imagens reais do dataset. No MVP, a galeria usará *patches* do CRC-VAL-HE-7K, que não foram usados no treino (RN09). O mapa de calor do protótipo também é simulado: os itens de compreensão da avaliação medem o conceito, não a qualidade do mapa.
 
 ### Telas do protótipo
 
@@ -125,7 +125,7 @@ Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2023) verificados no protóti
 | 1.1.1 Conteúdo não textual | O *canvas* do *patch* tem `role="img"` e rótulo atualizado com a classe sugerida e a confiança |
 | 1.4.1 Uso de cor | Classe sugerida e alertas também indicados por texto e ícone |
 | 1.4.3 Contraste mínimo (4,5:1) | Todos os tokens de texto atingem pelo menos 6,9:1 sobre o fundo (valores calculados pela fórmula de luminância relativa da WCAG) |
-| 1.4.11 Contraste de elementos não textuais (3:1) | Foco (7,8:1) e barras preenchidas atendem; campos e controles usam `--border-strong` (≥ 3,4:1). A borda decorativa `--border` (1,4:1) não é usada para identificar controles |
+| 1.4.11 Contraste de elementos não textuais (3:1) | Foco (7,8:1) atende; nas barras de confiança, o valor é sempre dado também em texto, e as barras são redundantes (a barra não sugerida tem 1,8:1 sobre a trilha e será clareada no frontend definitivo); campos e controles usam `--border-strong` (≥ 3,4:1). A borda decorativa `--border` (1,4:1) não é usada para identificar controles |
 | 2.1.1 Teclado | Todas as funções são acessíveis por teclado: botões focáveis e, com o foco no visualizador, `←/→` opacidade, `+/−` zoom, Shift+setas mover, `0` restaurar, `S` lado a lado |
 | 2.1.4 Atalhos de uma tecla | Os atalhos só funcionam com o foco no visualizador |
 | 2.5.7 Movimentos de arrastar | Mover a imagem também é possível pelos botões de seta, sem arrastar |
@@ -155,7 +155,8 @@ Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2023) verificados no protóti
 4. O protótipo não envia dados: o registro das tarefas fica só no navegador do participante.
 
 **Análise:**
-- Taxa de conclusão de cada tarefa (meta do RNF02: pelo menos 90% sem ajuda).
+- Taxa de conclusão autorrelatada por tarefa (indicador formativo; o critério "sem ajuda" do RNF02 só é medido na avaliação moderada).
+- Meta de 8 a 12 participantes, adequada a uma avaliação formativa; com número menor, os resultados são apresentados só de forma descritiva.
 - Escore SUS por participante, com média, desvio-padrão, mediana e IC 95%, calculado por Brooke (1996) e interpretado pela escala adjetiva de Bangor, Kortum e Miller (2009). A tradução dos itens para o português precisa ter fonte validada `[FONTE PENDENTE]`.
 - Acertos nos itens de compreensão (o mapa não indica o tumor; confiança não é certeza).
 - Resultados separados por aparelho (computador ou celular), já que a *workstation* foi projetada para telas largas.

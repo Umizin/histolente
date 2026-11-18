@@ -57,6 +57,10 @@ function criarFormularioAvaliacao() {
 
   form.addSectionHeaderItem().setTitle('Termo de Consentimento Livre e Esclarecido (TCLE)').setHelpText(textoTcle_());
   const aceite = form.addMultipleChoiceItem().setTitle('Você leu o termo acima e concorda em participar?').setRequired(true);
+  form.addCheckboxItem().setTitle('Transferência internacional (LGPD, art. 33, VIII)')
+    .setHelpText('As respostas ficam temporariamente em servidores do Google, que podem estar fora do Brasil.')
+    .setChoiceValues(['Concordo com o armazenamento temporário das respostas em servidores do Google']).setRequired(true);
+  form.addTextItem().setTitle('Palavra-código pessoal (opcional; serve só para você pedir a exclusão da sua resposta depois)');
 
   form.addPageBreakItem().setTitle('Perfil');
   form.addMultipleChoiceItem().setTitle('Você é:').setRequired(true)
@@ -80,7 +84,7 @@ function criarFormularioAvaliacao() {
   form.addGridItem().setTitle('Verdadeiro ou falso?')
     .setRows([
       'O mapa de calor mostra onde está o tumor.',
-      'Uma confiança de 86% significa que o resultado está 86% certo.',
+      'Uma confiança de 86% garante que este tecido é dessa classe.',
       'O modelo sempre escolhe uma das 9 classes, mesmo que a imagem não seja de nenhuma delas.',
       'A ferramenta pode ser usada para fazer o laudo de um paciente.',
     ])
@@ -101,7 +105,7 @@ function criarFormularioAvaliacao() {
     aceite.createChoice('Li o termo e CONCORDO em participar', FormApp.PageNavigationType.CONTINUE),
     aceite.createChoice('NÃO concordo em participar', FormApp.PageNavigationType.SUBMIT),
   ]);
-  form.setConfirmationMessage('Obrigado! Suas respostas foram registradas de forma anônima.');
+  form.setConfirmationMessage('Obrigado! Suas respostas foram registradas sem nome nem e-mail.');
 
   const planilha = SpreadsheetApp.create('Respostas — Avaliação do protótipo (HistoLente)');
   form.setDestination(FormApp.DestinationType.SPREADSHEET, planilha.getId());
@@ -120,12 +124,13 @@ function textoTcle_() {
     '',
     'OBJETIVO: avaliar se o protótipo da ferramenta é fácil de usar e útil para o estudo de patologia.',
     'O QUE VOCÊ FARÁ: usar o protótipo seguindo 4 tarefas (cerca de 10 minutos) e responder este formulário (cerca de 5 minutos). Não há gravação de tela, áudio ou vídeo, e o protótipo não envia nenhum dado.',
-    'RISCOS: mínimos — cansaço ou desconforto ao responder. Você pode deixar perguntas em branco e parar a qualquer momento, sem prejuízo.',
+    'JUSTIFICATIVA: faltam patologistas no Brasil e ferramentas que ajudem estudantes a reconhecer padrões histológicos; esta avaliação verifica se o protótipo é útil e compreensível para esse fim.',
+    'RISCOS: mínimos — cansaço ou desconforto ao responder, e uma possibilidade remota de reidentificação pelo cruzamento do perfil com o horário da resposta, minimizada pela divulgação apenas agregada e pela guarda local protegida. Você pode deixar perguntas em branco e parar a qualquer momento, sem prejuízo.',
     'BENEFÍCIOS: indiretos — contribuir para uma ferramenta de apoio ao ensino de Patologia.',
     'SIGILO: o formulário não coleta nome nem e-mail. As respostas são pseudonimizadas (identificadas apenas por códigos) e usadas só nesta pesquisa, conforme a LGPD (Lei nº 13.709/2018). Os resultados são divulgados de forma agregada.',
     'VOLUNTARIEDADE: a participação é voluntária e não afeta notas, avaliações ou vínculos com a instituição. Não há pagamento nem custos. O pesquisador é estudante e não avalia nenhum participante.',
     'RESSARCIMENTO E INDENIZAÇÃO: não há despesas previstas; caso ocorram, serão ressarcidas, e eventuais danos decorrentes da pesquisa serão indenizados nos termos da legislação vigente.',
-    'RETIRADA: como as respostas não são identificadas, não é possível excluí-las depois do envio; você pode interromper a qualquer momento antes de enviar.',
+    'RETIRADA: você pode retirar seu consentimento a qualquer momento, inclusive depois do envio. Para isso, crie no início do formulário uma palavra-código pessoal (que não seja seu nome nem sua data de nascimento) e informe-a ao pesquisador pelo contato abaixo; a resposta correspondente será eliminada.',
     'ARMAZENAMENTO: as respostas são coletadas pelo Google Forms (servidores que podem ficar fora do Brasil), exportadas para arquivo local protegido, apagadas do Google após a consolidação e eliminadas em ' + CONFIG.prazoGuarda + '.',
     'A ferramenta é educacional e não faz diagnóstico (Res. CFM nº 2.454/2026). As imagens do protótipo são ilustrações, não lâminas reais.',
     'CONTATO: ' + CONFIG.contatoPesquisador + '. Comitê de Ética em Pesquisa: ' + CONFIG.cep + '.',

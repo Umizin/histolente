@@ -8,6 +8,8 @@
 #   backend_net -> api <-> postgres            (o serviço de inferência NÃO entra aqui)
 #   mq_net      -> api <-> rabbitmq <-> redis <-> inferência
 # Os serviços api/web (HU01) e inference (EN04) entram neste arquivo quando forem implementados.
+# PENDENTE (Sprint 2, docs/projeto/01-arquitetura.md §1.5): o Redis sai de mq_net para uma rede
+# cache_net só com o backend; o serviço de inferência alcançará apenas o RabbitMQ.
 
 name: histolente
 

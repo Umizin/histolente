@@ -110,11 +110,12 @@ CREATE INDEX analyses_pending      ON analyses (status) WHERE status IN ('QUEUED
 -- Consentimentos -----------------------------------------------------------
 CREATE TABLE consents (
     id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id     uuid             REFERENCES users(id) ON DELETE SET NULL,  -- prova do consentimento sobrevive à exclusão da conta (anonimizada)
+    user_id     uuid             REFERENCES users(id) ON DELETE SET NULL,  -- vínculo direto some com a conta...
+    subject_ref char(64)         NOT NULL CHECK (subject_ref ~ '^[0-9a-f]{64}$'), -- ...mas o pseudônimo (HMAC-SHA256 do e-mail) prova o consentimento
     document    consent_document NOT NULL,
     version     text             NOT NULL,
     accepted_at timestamptz      NOT NULL DEFAULT now(),
-    UNIQUE (user_id, document, version)
+    UNIQUE (subject_ref, document, version)
 );
 
 -- Tentativas do quiz -------------------------------------------------------

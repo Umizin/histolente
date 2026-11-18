@@ -16,7 +16,7 @@ O sistema trata **dois grupos de dados**, com finalidades diferentes (BRASIL, 20
 | Histórico de análises e respostas do quiz | Estudo e acompanhamento do próprio usuário (RF05, RF16) | Art. 7º, I | Enquanto a conta existir; excluído junto com a conta |
 | Imagens enviadas | Análise solicitada pelo usuário | Art. 7º, I | Até a exclusão da análise; imagens sem análise associada são eliminadas por rotina diária |
 | Registros de acesso (logs) | Segurança e diagnóstico de falhas | Legítimo interesse (art. 7º, IX) | 90 dias; sem e-mail nem imagem (RNF04) |
-| Registro de consentimento | Prova do consentimento (art. 8º, §2º) | Cumprimento de obrigação (art. 7º, II) | Mantido anonimizado após a exclusão da conta, pelo prazo de guarda da pesquisa |
+| Registro de consentimento | Prova do consentimento, ônus do controlador (art. 8º, §2º) | Exercício regular de direitos (art. 7º, VI) | Mantido anonimizado após a exclusão da conta, pelo prazo de guarda da pesquisa |
 
 ### b) Participantes da pesquisa (elicitação, avaliação do protótipo, estudo de caso)
 | Dado | Finalidade | Base legal (LGPD) | Retenção |
@@ -24,14 +24,16 @@ O sistema trata **dois grupos de dados**, com finalidades diferentes (BRASIL, 20
 | Respostas dos formulários (sem nome nem e-mail; **pseudonimizadas**, porque data e hora e a amostra pequena tornam a reidentificação possível) | Elicitação e avaliação | Consentimento (art. 7º, I), registrado no TCLE | Prazo definido no TCLE e no parecer ético `[[definir]]`; depois, eliminação |
 | Contato voluntário para testar o protótipo | Convite para testes | Consentimento (art. 7º, I), em formulário separado e guardado em arquivo separado das respostas | Até o fim da pesquisa |
 
-**Operador e transferência internacional:** os formulários usam o Google Forms, cujos servidores podem ficar fora do Brasil (art. 33). Os dados são exportados para arquivo local protegido e apagados do Google após a consolidação, e o TCLE informa isso ao participante.
+**Operador e transferência internacional:** os formulários usam o Google Forms, cujos servidores podem ficar fora do Brasil (art. 33). A transferência apoia-se no consentimento específico e em destaque do titular (art. 33, VIII), colhido em item próprio do TCLE da avaliação do protótipo. Os dados são exportados para arquivo local protegido e apagados do Google após a consolidação. **O TCLE da elicitação (T5), já aplicado, não informava a transferência internacional, o prazo de guarda nem o ressarcimento**; essa limitação é declarada e será comunicada ao Comitê de Ética na consulta.
+
+**Encarregado (art. 41):** `[[definir com a coordenação]]`.
 
 **Imagens de pacientes:** os *patches* do NCT-CRC-HE-100K são públicos e não contêm identificação de pacientes (KATHER et al., 2018). Como a elicitação mostrou que a maioria enviaria fotos de microscópio, o sistema adota três barreiras:
 1. a área de envio orienta a enviar só o recorte de tecido e proíbe etiqueta da lâmina, número de exame ou nome (RN08);
 2. o termo de uso proíbe o envio de dados de pacientes;
 3. os metadados EXIF (inclusive localização) são removidos antes do armazenamento.
 
-**Direitos do titular (art. 18):** o usuário pode consultar, exportar os próprios dados (independentemente do CSV pedagógico do RF10) e excluir a conta. A exclusão remove análises, imagens e tentativas do quiz; o registro de consentimento é anonimizado e mantido como prova (`ON DELETE SET NULL` em `infra/db/schema.sql`).
+**Direitos do titular (art. 18):** o usuário pode consultar, exportar os próprios dados (independentemente do CSV pedagógico do RF10) e excluir a conta. A exclusão remove análises, imagens e tentativas do quiz; o registro de consentimento perde o vínculo direto com a conta (`ON DELETE SET NULL` em `infra/db/schema.sql`), mas mantém um pseudônimo do titular (`subject_ref`, *hash* do e-mail com chave secreta), o que permite comprovar o consentimento se o titular o contestar.
 
 ## 5.2 Autenticação
 - Login por e-mail e senha. Senha com **mínimo de 10 caracteres**, verificada contra uma lista de senhas comuns.

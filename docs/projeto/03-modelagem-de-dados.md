@@ -193,7 +193,8 @@ Implementado em PostgreSQL 16: [`infra/db/schema.sql`](../../infra/db/schema.sql
 | Coluna | Tipo | Nulo | Padrão | Restrições | Descrição |
 |---|---|---|---|---|---|
 | id | uuid | não | gen_random_uuid() | PK | Identificador |
-| user_id | uuid | sim | — | FK users, `ON DELETE SET NULL` | Quem aceitou; vira nulo se a conta for excluída, preservando a prova anonimizada do consentimento |
+| user_id | uuid | sim | — | FK users, `ON DELETE SET NULL` | Quem aceitou; vira nulo se a conta for excluída |
+| subject_ref | char(64) | não | — | hexadecimal; UNIQUE com documento e versão | Pseudônimo do titular (HMAC-SHA256 do e-mail com chave secreta), mantido para provar o consentimento |
 | document | consent_document | não | — | TERMS, TCLE | Documento aceito |
 | version | text | não | — | — | Versão do documento |
 | accepted_at | timestamptz | não | now() | — | Data e hora do aceite |

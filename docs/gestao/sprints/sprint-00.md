@@ -48,7 +48,7 @@
 | 8. Consolidação da elicitação | Sim | 4 respostas; RF17 → Must, RF15 → Should, novo RF18 |
 | 9. Pontos com o orientador | Parcial | Orientador aprovou o trabalho sem pedir mudanças; CEP, uso de IA e prazos continuam abertos |
 
-**Feedback do orientador:** gostou do trabalho e não pediu alterações. A priorização segue o que os estudantes indicaram no formulário.
+**Feedback do orientador:** gostou do trabalho e não pediu alterações. A priorização segue a regra da Seção 2 do documento de requisitos, que combina as lacunas do Pré-TCC, o resultado do formulário e os riscos técnicos.
 
 ## Retrospectiva — 16/11/2026
 - **O que funcionou bem:**

@@ -2,10 +2,10 @@
 
 **Projeto:** Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência Artificial: Uma Ferramenta de Apoio à Patologia Digital
 **Autor:** Paulo Victor Silva Gonçalves — Engenharia de Software, Universidade de Vassouras (UVS), Campus Maricá
-**Versão do documento:** 1.2 — 18/11/2026 (histórico de revisões ao final)
+**Versão do documento:** 1.3 — 18/11/2026 (histórico de revisões ao final)
 **Base:** Pré-TCC (set. 2026), análise do dataset NCT-CRC-HE-100K (KATHER et al., 2018), Resolução CFM nº 2.454/2026 (CONSELHO FEDERAL DE MEDICINA, 2026), LGPD (BRASIL, 2018) e decisões de arquitetura registradas no repositório do projeto.
 
-> **Situação da elicitação.** As técnicas documentais (análise de literatura, de normas e do dataset) e as sessões de ideação já foram aplicadas. A **entrevista estruturada escrita**, aplicada remotamente via Google Forms com TCLE integrado, recebeu **4 respostas** entre 11 e 12/11/2026 e foi consolidada na Seção 1.4. Com amostra pequena e sem professores, a T5 **não confirma** requisitos: ela não refutou as hipóteses de RF09, RF15 e RF16, motivou a elevação do RF17 para *Must* (com base numa pergunta factual sobre a origem das imagens) e originou o RF18. A observação de aula, a validação de conteúdo por especialista e a validação do protótipo estão planejadas. Continuam marcados como **"a validar"** os requisitos que o formulário não cobriu (RF10, RF12 e HU09) e o RF18, sugerido por um único participante.
+> **Situação da elicitação.** As técnicas documentais (análise de literatura, de normas e do dataset) e as sessões de ideação já foram aplicadas. A **entrevista estruturada escrita**, aplicada remotamente via Google Forms com TCLE integrado, recebeu **4 respostas** entre 11 e 12/11/2026 e foi consolidada na Seção 1.5. Com amostra pequena e sem professores, a T5 **não confirma** requisitos: ela não refutou as hipóteses de RF09, RF15 e RF16, motivou a elevação do RF17 para *Must* (com base numa pergunta factual sobre a origem das imagens) e originou o RF18. A observação de aula, a validação de conteúdo por especialista e a validação do protótipo estão planejadas. Continuam marcados como **"a validar"** os requisitos que o formulário não cobriu (RF10, RF12 e HU09) e o RF18, sugerido por um único participante.
 
 ---
 
@@ -29,7 +29,7 @@
 | T2 | **Análise do dataset público** (estrutura, classes, formato) | Aplicada (set./2026) | NCT-CRC-HE-100K (KATHER et al., 2018): 100.000 *patches* H&E de 224 × 224 px, 9 classes | Seção 1.7 e RF02 do Pré-TCC; quadro das 9 classes com nomes e critérios morfológicos (Seção 2, RF02 e RF03) | RF01, RF02, RF03 |
 | T3 | **Análise de normas e regulação** | Aplicada (set./2026) | Resolução CFM nº 2.454/2026; LGPD (Lei nº 13.709/2018) | Seções 1.6 e 2.6 do Pré-TCC | RF07, RF13, RNF04, RNF07 |
 | T4 | **Ideação do pesquisador** | Aplicada (set.–nov./2026) | Autor, com apoio de ferramenta de IA generativa (uso declarado na monografia, conforme a política da instituição). As saídas foram tratadas como **hipóteses de requisitos**, sujeitas à validação por usuários | Histórico de decisões do projeto (`docs/gestao/historico-do-projeto.md`) e histórico de commits | RF09, RF10, RF11, RF12, RF14, RNF09 (todos **a validar**) |
-| T5 | **Questionário online autoadministrado** (perguntas abertas + quadro de funcionalidades) | **Aplicada** (11–12/11/2026, n = 4) | 3 estudantes de Medicina e 1 profissional de laboratório; nenhum professor respondeu (amostra por conveniência) | Roteiro e formulário com TCLE (Apêndices do projeto: `docs/pesquisa/`); planilha de respostas pseudonimizadas, guardada fora do repositório; consolidação na Seção 1.4 | Validação dos RF "a validar"; priorização MoSCoW; novos requisitos |
+| T5 | **Questionário online autoadministrado** (perguntas abertas + quadro de funcionalidades) | **Aplicada** (11–12/11/2026, n = 4) | 3 estudantes de Medicina e 1 profissional de laboratório; nenhum professor respondeu (amostra por conveniência) | Roteiro e formulário com TCLE (repositório do projeto, `docs/pesquisa/`); planilha de respostas pseudonimizadas, guardada fora do repositório; consolidação na Seção 1.5 | Validação dos RF "a validar"; priorização MoSCoW; novos requisitos |
 | T6 | ~~Questionário separado~~ | Incorporado à T5 | — | O quadro de funcionalidades da T5 cumpre o papel de questionário fechado | — |
 | T7 | **Observação** de aula prática de Patologia | Planejada (sujeita à autorização do professor) | Turma de Patologia da UVS | Roteiro de observação e notas de campo — `[[A COLETAR]]` | RF01 (lote), RF09, RNF02, RNF08 |
 | T8 | **Prototipação** (protótipo navegável da *workstation*) | Protótipo construído (10/11/2026); validação com usuários planejada, condicionada ao parecer ético | Participantes da T5 e da T7 | Protótipo e capturas de tela no documento de Projeto; respostas da avaliação — `[[A COLETAR]]` | Refinamento de RF03, RF04 e RNF02 |
@@ -39,12 +39,16 @@
 A combinação segue a recomendação de Sommerville (2019): usar várias técnicas complementares, porque nenhuma técnica sozinha revela todos os requisitos. As técnicas documentais (T1–T3) definem o núcleo do problema e as restrições regulatórias. A ideação (T4) gera hipóteses de funcionalidades pedagógicas. As técnicas com usuários (T5–T8) validam essas hipóteses, priorizam o backlog e alimentam o ciclo de avaliação do Design Science Research.
 
 ### 1.3 Protocolo resumido das técnicas planejadas
-- **T5 — Questionário online autoadministrado** (também chamado no roteiro de entrevista estruturada escrita): formulário online de cerca de 10 minutos, sem gravação e sem coleta de nome ou e-mail. O TCLE é apresentado na primeira página, e só quem aceita acessa as perguntas. Há um desvio por perfil (estudante, professor, profissional de laboratório), 6 perguntas abertas (dificuldades, tecidos confundidos, uso pretendido, mapa de calor, origem das imagens, condições de confiança) e um quadro com 6 funcionalidades classificadas como Essencial, Útil ou Dispensável. As respostas abertas foram analisadas por análise temática dedutiva, orientada pelas perguntas (BRAUN; CLARKE, 2006); o quadro foi tabulado por frequência.
+- **T5 — Questionário online autoadministrado** (também chamado no roteiro de entrevista estruturada escrita): formulário online de cerca de 10 minutos, sem gravação e sem coleta de nome ou e-mail. O TCLE é apresentado na primeira página, e só quem aceita acessa as perguntas. Há um desvio por perfil (estudante, professor, profissional de laboratório), 6 perguntas abertas (dificuldades, tecidos confundidos, uso pretendido, mapa de calor, origem das imagens, condições de confiança) e um quadro com 6 funcionalidades classificadas como Essencial, Útil ou Dispensável. As respostas abertas foram sintetizadas por pergunta, com categorização dedutiva orientada pelo roteiro (inspirada na análise temática de Braun e Clarke, 2006); o quadro foi tabulado por frequência.
 - **T7 — Observação:** observação não participante de uma aula prática de 50 minutos. Registro de tarefas, dificuldades e recursos usados, sem identificação de alunos.
-- **Pré-requisito ético:** aceite do TCLE (T5, T7 e T8) e confirmação da necessidade de registro no CEP via Plataforma Brasil (Pré-TCC, Seção 2.6).
+- **Situação ética:** a T5 foi aplicada entre 11 e 12/11/2026, com aceite do TCLE, **antes de qualquer manifestação formal sobre a necessidade de registro no sistema CEP/Conep**. O enquadramento na hipótese de pesquisa de opinião com participantes não identificados (Res. CNS nº 510/2016, art. 1º, parágrafo único, I) será submetido à consulta do Comitê de Ética em Pesquisa da instituição, com o formulário tal como foi aplicado; a hipótese é enfraquecida pelo fato de os dados serem pseudonimizados, e não anônimos. Até essa manifestação, os dados da T5 são tratados como **exploratórios**, mantidos sob guarda, e nenhuma nova coleta é feita. Se o CEP entender necessário o registro, esses dados não serão usados na versão final, e nenhum requisito *Must* depende exclusivamente deles (critérios i e iii da Seção 2). As técnicas T7 a T9 só serão aplicadas após o parecer.
 - **Ajuste de população:** a inclusão de profissionais de laboratório amplia a população descrita no Pré-TCC (Seção 2.5, só professores e estudantes). As Seções 2.5 e 3.1 devem ser atualizadas na monografia.
 
-### 1.4 Consolidação das respostas da T5
+### 1.4 Relação com o processo de pesquisa (DSR)
+
+Este documento corresponde à atividade 2 (definição dos objetivos da solução) do processo de *Design Science Research* de Peffers et al. (2007). As técnicas documentais e a ideação derivam do problema identificado no Pré-TCC (atividade 1); as técnicas com usuários (T5, T7 a T9) geram hipóteses que só são validadas na atividade 5 (avaliação do artefato). A correspondência completa entre atividades DSR e *sprints* está no documento de metodologia do projeto (`docs/gestao/metodologia.md`).
+
+### 1.5 Consolidação das respostas da T5
 
 **Participantes:** 4 respostas, todas com aceite do TCLE, coletadas entre 11 e 12/11/2026.
 
@@ -60,7 +64,7 @@ A combinação segue a recomendação de Sommerville (2019): usar várias técni
 |---|---|---|---|---|---|
 | Confiança das 9 classes | 3 | 1 | 0 | Mantém *Must* | RF03 |
 | Mapa de calor com transparência e lado a lado | 1 | 3 | 0 | Mantém *Must* pelo critério (i) da Seção 2 (núcleo da lacuna 3 do Pré-TCC) | RF04 |
-| Critérios morfológicos e o que não confundir | **4** | 0 | 0 | Mantém *Must* (RF03); RF15 sobe de *Could* para *Should* (hipótese não refutada) | RF03, RF15 |
+| Critérios morfológicos e o que não confundir | **4** | 0 | 0 | Mantém *Must* (RF03). O item reunia RF03 e RF15, o que impede atribuir a frequência a cada um: **RF15 mantém *Could*** até a avaliação do artefato | RF03, RF15 |
 | Galeria com vários exemplos por classe | 2 | 2 | 0 | Mantém *Must* pelo critério (i) (RF01, Pré-TCC) | RF01 |
 | Quiz com erro explicado | 1 | 3 | 0 | Hipótese não refutada; mantém *Should* | RF09 |
 | Histórico e acompanhamento de progresso | 2 | 2 | 0 | RF06 mantém *Should*; RF16 não refutado e mantém *Could* (o item juntava as duas coisas) | RF06, RF16 |
@@ -69,9 +73,9 @@ A combinação segue a recomendação de Sommerville (2019): usar várias técni
 
 | Tema | Síntese | Participantes | Impacto nos requisitos |
 |---|---|---|---|
-| Dificuldades atuais | Tecidos parecidos entre si porque "todos se coram de forma parecida"; dificuldade de lembrar os tecidos normais; qualidade da lâmina atrapalha | 4 de 4 | Reforça RF03 (critérios morfológicos) e RF01 (galeria com vários exemplos); qualidade da lâmina reforça RF17 |
+| Dificuldades atuais | Tecidos parecidos entre si porque "todos se coram de forma parecida"; dificuldade de lembrar os tecidos normais; qualidade da lâmina atrapalha (citada por 1 estudante; o profissional de laboratório repetiu o exemplo dado no enunciado) | 4 de 4 | Compatível com RF03 (critérios morfológicos) e RF01 (galeria com vários exemplos) |
 | Tecidos mais confundidos | Músculo × estroma; mucosa normal × tumor; um participante citou tipos de leucemia, que estão fora do escopo | 3 de 4 | **Os pares citados coincidem com os exemplos dados no enunciado da pergunta**, o que impede tratá-los como evidência independente: o RF15 fica como hipótese não refutada, a ser avaliada com o artefato (taxa de acerto no quiz por par). A citação de leucemia mostra a necessidade de deixar claro o escopo (9 classes colorretais) |
-| Uso pretendido | Estudar e treinar, inclusive antes da prova prática, em que a imagem é projetada na tela; o profissional de laboratório citou agilizar o trabalho | 4 de 4 | Confirma o foco pedagógico (RF09, RF15); uso em projeção entra no RNF08; o uso na rotina laboratorial fica fora do escopo educacional |
+| Uso pretendido | Estudar e treinar, inclusive antes da prova prática, em que a imagem é projetada na tela; o profissional de laboratório citou agilizar o trabalho | 4 de 4 | É compatível com o foco pedagógico (RF09, RF15); uso em projeção entra no RNF08; o uso na rotina laboratorial fica fora do escopo educacional |
 | Mapa de calor | Todos responderam que ajudaria, principalmente quando a lâmina é ruim ou a estrutura é difícil de identificar | 4 de 4 | **Indica concepção equivocada do Grad-CAM e risco de viés de automação:** com lâmina ruim o modelo é menos confiável, e o mapa não localiza estruturas. Gera requisito de explicação na interface (RF03, RF04) e item de compreensão na avaliação do protótipo |
 | Origem das imagens | Foto do microscópio pelo celular (3 de 4), lâmina digitalizada (2 de 4), atlas ou slide (1 de 4) | 4 de 4 | **RF17 sobe para *Must*:** a maioria enviaria fotos de celular, diferentes das imagens de treino (risco R01) |
 | Condições de confiança | Não confundir estruturas; não deixar passar um tumor evidente; não errar áreas normais básicas; não indicar região errada de lesão; ser mais rápido que um aluno; identificar o tipo de material | 4 de 4 | Origina o RNF10 (desempenho mínimo do modelo, com sensibilidade de TUM e confusão NORM × TUM) e reforça o RNF01. "Não indicar região errada de lesão" **não pode ser atendido**: o Grad-CAM não localiza lesões e o *dataset* não tem anotação por pixel; isso é declarado na interface e nas limitações |
@@ -93,7 +97,7 @@ A combinação segue a recomendação de Sommerville (2019): usar várias técni
 Prioridade pelo método **MoSCoW**: **M** = *Must have* (obrigatório para o MVP); **S** = *Should have* (importante, mas não bloqueia o MVP); **C** = *Could have* (desejável); **W** = *Won't have* (fora do escopo desta versão).
 Os requisitos RF01–RF07 vêm do Pré-TCC. Os requisitos RF08–RF18 foram identificados depois e estão **propostos**.
 
-**Regra de priorização.** A prioridade combina dois critérios: (i) aderência às lacunas do Pré-TCC, que define o núcleo *Must* do artefato (classificar, explicar, mostrar a confiança, avisar sobre o caráter educacional); (ii) frequência de marcação "Essencial" na T5, que pode promover ou rebaixar itens **fora** desse núcleo. Requisitos *Must* pelo critério (i) não são rebaixados por baixa frequência na T5, dada a amostra reduzida.
+**Regra de priorização.** A prioridade combina dois critérios: (i) aderência às lacunas do Pré-TCC, que define o núcleo *Must* do artefato (classificar, explicar, mostrar a confiança, avisar sobre o caráter educacional); (ii) frequência de marcação "Essencial" na T5, que pode promover ou rebaixar itens **fora** desse núcleo. Um terceiro critério cobre riscos: (iii) requisitos que impedem o uso enganoso do artefato, ligados a um risco técnico registrado na matriz de riscos (ex.: R01, imagens fora do padrão), podem ser promovidos a *Must* independentemente da frequência na T5. Requisitos *Must* pelos critérios (i) ou (iii) não são rebaixados por baixa frequência na T5, dada a amostra reduzida. O RF17 é *Must* pelo critério (iii).
 
 | ID | Requisito | Prioridade | Origem | Critério de aceite |
 |---|---|---|---|---|
@@ -103,16 +107,16 @@ Os requisitos RF01–RF07 vêm do Pré-TCC. Os requisitos RF08–RF18 foram iden
 | RF04 | O sistema deve gerar e exibir o mapa de calor Grad-CAM sobreposto ao *patch*, com controle de opacidade e modo lado a lado. | **M** | T1 | Mapa de 224 × 224 px alinhado ao *patch*; opacidade de 0% a 100% (padrão 40%); modo lado a lado com zoom e deslocamento sincronizados; paleta padrão viridis (turbo como opção), sem tons de rosa ou roxo no topo da escala; legenda "baixa → alta influência"; modo contorno que não preenche a área; texto informando que o mapa tem resolução grosseira (≈ 7 × 7, ampliada) e não localiza lesões. |
 | RF05 | O sistema deve armazenar o histórico das imagens processadas e seus resultados, incluindo a versão do modelo utilizada. | **M** | T1 | Cada análise registra probabilidades, mapa, versão do modelo, data e tempos de processamento. |
 | RF06 | O sistema deve permitir ao usuário consultar e reabrir suas análises anteriores. | **S** | T1 | Lista paginada com filtros por classe, data e lote; reabrir uma análise reproduz a mesma visualização. |
-| RF07 | O sistema deve exibir, em todas as telas, aviso de que os resultados têm caráter educacional e de apoio à triagem e não substituem laudo médico. | **M** | T3 | Aviso presente em 100% das telas autenticadas; pode ser minimizado, mas não removido. |
+| RF07 | O sistema deve exibir, em todas as telas, aviso de que os resultados têm caráter exclusivamente educacional e não substituem o exame anatomopatológico nem o laudo. | **M** | T3 | Aviso presente em 100% das telas autenticadas; pode ser minimizado, mas não removido. |
 | RF08 *(proposto)* | O sistema deve autenticar usuários e controlar o acesso conforme o perfil (Estudante, Professor, Administrador). | **M** | T3 | Rotas protegidas exigem login; cada perfil acessa apenas as funções permitidas. |
-| RF09 *(proposto; confirmado na T5)* | O sistema deve oferecer um modo quiz, no qual o estudante escolhe a classe da amostra antes de ver a sugestão do modelo e recebe explicação em caso de erro. | **S** | T4, T5 | O rótulo verdadeiro e a sugestão do modelo só aparecem depois da resposta; em caso de erro, exibe os critérios morfológicos que diferenciam a classe escolhida da correta. |
+| RF09 *(proposto; hipótese não refutada na T5)* | O sistema deve oferecer um modo quiz, no qual o estudante escolhe a classe da amostra antes de ver a sugestão do modelo e recebe explicação em caso de erro. | **S** | T4, T5 | O rótulo verdadeiro e a sugestão do modelo só aparecem depois da resposta; em caso de erro, exibe os critérios morfológicos que diferenciam a classe escolhida da correta. |
 | RF10 *(proposto, a validar)* | O sistema deve permitir exportar o histórico de análises em formato CSV. | **C** | T4 | O arquivo CSV contém data, classe sugerida, confiança e versão do modelo de cada análise filtrada. |
 | RF11 *(proposto)* | O sistema deve exibir a versão do modelo em uso e suas limitações conhecidas. | **S** | T3, T4 | A tela "Sobre o modelo" mostra versão, data de treino, métricas de teste e limitações. |
 | RF12 *(proposto, a validar)* | O sistema deve permitir ao Administrador definir a versão ativa do modelo de classificação. | **C** | T4 | Trocar a versão ativa não exige recompilar o backend, e as novas análises registram a nova versão. |
 | RF13 *(proposto)* | O sistema deve registrar o aceite do termo de uso (e do TCLE, para participantes da pesquisa) antes do primeiro uso. | **M** | T3 | Sem aceite registrado, a análise não é liberada; o aceite guarda versão do termo e data. |
 | RF14 *(proposto)* | O sistema deve informar falhas no processamento e permitir o reenvio da análise. | **S** | T4 | Em caso de falha, o usuário recebe mensagem clara e um botão de reenvio, sem perder o *upload*. |
-| RF15 *(proposto; hipótese não refutada na T5)* | O sistema deve permitir comparar, lado a lado, amostras de duas classes frequentemente confundidas (ex.: STR × MUS, NORM × TUM, DEB × LYM). | **S** | T4, T5 | O usuário escolhe um par de classes e vê amostras da galeria lado a lado, com os critérios que as diferenciam. |
-| RF16 *(proposto; confirmado na T5)* | O sistema deve exibir ao estudante seu desempenho no modo quiz, por classe e ao longo do tempo. | **C** | T4, T5 | Painel com percentual de acertos por classe e evolução por sessão; dados visíveis apenas ao próprio estudante. |
+| RF15 *(proposto; hipótese não refutada na T5)* | O sistema deve permitir comparar, lado a lado, amostras de duas classes frequentemente confundidas (ex.: STR × MUS, NORM × TUM, DEB × LYM). | **C** | T4, T5 | O usuário escolhe um par de classes e vê amostras da galeria lado a lado, com os critérios que as diferenciam. |
+| RF16 *(proposto; hipótese não refutada na T5)* | O sistema deve exibir ao estudante seu desempenho no modo quiz, por classe e ao longo do tempo. | **C** | T4, T5 | Painel com percentual de acertos por classe e evolução por sessão; dados visíveis apenas ao próprio estudante. |
 | RF17 *(proposto)* | O sistema deve sinalizar como "fora do padrão" as imagens cujo escore de fora da distribuição exceda o limiar calibrado da versão do modelo (ex.: foto de celular, coloração diferente de H&E, pouco tecido, desfoque). | **M** | T1, T5 | **Método em duas camadas:** heurísticas de qualidade (fração de tecido, nitidez, estatísticas de cor H&E) e um escore do modelo (energia ou Mahalanobis nas ativações, com a probabilidade máxima como linha de base). **Limiar** fixado na validação para 95% de verdadeiros positivos nos dados do domínio, antes de usar o teste. **Aceite:** AUROC ≥ `[[definir]]` num conjunto rotulado de fotos de celular e outras colorações, e taxa de falso alarme no CRC-VAL-HE-7K ≤ 5%. O escore, o método e o limiar são gravados com a análise; o aviso aparece antes da classificação e o mapa Grad-CAM fica recolhido. |
 | RF18 *(proposto, a validar)* | O sistema deve oferecer o desafio "Encontre o intruso": o estudante recebe um conjunto de amostras e aponta a que pertence a outro tecido (ex.: um *patch* de tumor entre *patches* de mucosa normal). | **C** | T5 | Grade com 4 a 6 amostras, sendo uma de classe diferente; a resposta e os critérios diferenciais só aparecem após a escolha. |
 
@@ -152,7 +156,7 @@ Os requisitos RNF01–RNF06 vêm do Pré-TCC, agora com métricas verificáveis.
 |---|---|
 | RN01 | Formatos aceitos: PNG e JPEG, até 5 MB. Imagens maiores que 224 × 224 px **não são reduzidas** (isso alteraria o tamanho dos núcleos, que é informação diagnóstica): o sistema analisa um recorte central de 224 × 224 px na escala original e avisa o usuário. Imagens menores são recusadas com mensagem. |
 | RN02 | Um lote tem no máximo 50 imagens. |
-| RN03 | Um resultado é de **baixa confiança** quando a probabilidade da classe principal, **depois de calibrada** por *temperature scaling* na validação, é menor que 60% (limiar provisório, pré-registrado antes do uso do conjunto de teste). Nesses casos a interface exibe alerta. A utilidade do limiar é reportada no teste: acurácia dos resultados com e sem alerta. |
+| RN03 | Um resultado é de **baixa confiança** quando a probabilidade da classe principal, **depois de calibrada** por *temperature scaling* na validação, é menor que 60% (limiar provisório, fixado e registrado em *commit* datado antes da primeira execução sobre o conjunto de teste). Nesses casos a interface exibe alerta. A utilidade do limiar é reportada no teste: acurácia dos resultados com e sem alerta. |
 | RN04 | A interface nunca usa "diagnóstico", "laudo", "confirmado", "detecta câncer", "maligno", "benigno", "positivo", "negativo" ou "tumor encontrado" para descrever a saída do sistema. Menções em frases de negação no aviso ético (ex.: "não substitui laudo") são permitidas e listadas no teste. |
 | RN05 | Uma imagem idêntica, analisada pela mesma versão do modelo, reaproveita o resultado anterior (cache por hash SHA-256 da imagem mais a versão do modelo). |
 | RN06 | O Estudante acessa apenas o próprio histórico. |
@@ -204,7 +208,7 @@ Funcionalidade: Envio de patch para análise
 
 **HU02 — Analisar amostra da galeria** *(E3 · RF01, RF02 · M)*
 Como **estudante**, quero **analisar com um clique uma amostra de cada uma das 9 classes**, para **conhecer a ferramenta e os padrões teciduais mesmo sem ter imagens próprias**.
-*Critérios:* a galeria mostra 9 miniaturas identificadas e uma opção "aleatória"; um clique dispara a análise; a classe verdadeira aparece junto ao resultado.
+*Critérios:* a galeria mostra 9 miniaturas identificadas e uma opção "aleatória"; um clique dispara a análise; o rótulo de referência do *dataset* aparece junto ao resultado.
 
 **HU03 — Enviar lote para aula** *(E1 · RF01 · S)*
 Como **professor de Patologia**, quero **enviar até 50 patches de uma vez**, para **preparar o material de uma aula prática**.
@@ -267,7 +271,7 @@ Como **professor**, quero **que todas as telas exibam o aviso de que a ferrament
   Cenário: Aviso em todas as telas
     Dado que estou autenticado
     Quando navego para qualquer tela do sistema
-    Então vejo o aviso "Ferramenta educacional e de apoio à triagem. Não substitui laudo anatomopatológico."
+    Então vejo o aviso "Ferramenta educacional para estudo de padrões histológicos. Não substitui o exame anatomopatológico nem o laudo. A decisão clínica é sempre do médico."
     E o aviso pode ser minimizado, mas não removido
 ```
 
@@ -278,7 +282,7 @@ Como **estudante**, quero **escolher a classe de uma amostra antes de ver a resp
   Cenário: Resposta no quiz
     Dado que iniciei o modo quiz com uma amostra da galeria
     Quando seleciono a classe "STR"
-    Então vejo se acertei, a classe verdadeira e a sugestão do modelo
+    Então vejo se acertei, o rótulo de referência e a sugestão do modelo
     E antes da minha resposta nenhuma dessas informações estava visível
 
   Cenário: Erro explicado
@@ -295,7 +299,7 @@ Como **professor**, quero **ver a versão do modelo, suas métricas e limitaçõ
 **HU16 — Trocar versão do modelo** *(E6 · RF12 · C, a validar)*
 Como **administrador**, quero **definir a versão ativa do modelo**, para **atualizar o classificador sem interromper o sistema**.
 
-**HU17 — Aceitar termo de uso** *(E5 · RF13 · S)*
+**HU17 — Aceitar termo de uso** *(E5 · RF13 · M)*
 Como **participante da pesquisa**, quero **ler e aceitar o termo antes de usar a ferramenta**, para **saber como meus dados serão tratados**.
 
 **HU18 — Reenviar análise com falha** *(E1 · RF14 · S)*
@@ -304,7 +308,7 @@ Como **estudante**, quero **ser avisado quando uma análise falhar e poder reenv
 **HU19 — Acompanhar a análise em tempo real** *(E1 · RNF01 · M)*
 Como **estudante**, quero **ver o andamento da análise em tempo real**, para **saber que o sistema está processando minha imagem**.
 
-**HU20 — Comparar classes confundíveis** *(E3 · RF15 · S)*
+**HU20 — Comparar classes confundíveis** *(E3 · RF15 · C, a validar)*
 Como **estudante**, quero **ver lado a lado amostras de dois tecidos que costumo confundir**, para **aprender o que diferencia um do outro**.
 *Critérios:* pares pré-definidos (STR × MUS, NORM × TUM, DEB × LYM, MUC × BACK) e a opção de escolher qualquer par; os critérios diferenciais aparecem abaixo das imagens.
 
@@ -336,32 +340,32 @@ Estimativas em *story points* (sequência de Fibonacci), com sprints de duas sem
 | 3 | EN03 | Contrato JSON das mensagens entre backend e serviço de IA (versão 1) | — | M | 3 | S1 | Concluído (PR #40) |
 | 4 | EN04 | Serviço de IA: consumir a fila, classificar, gerar Grad-CAM e publicar o resultado | — | M | 8 | S2 | A fazer |
 | 5 | HU14 | Autenticar-se | E5 | M | 5 | S2 | A fazer |
-| 6 | HU01 | Enviar patch | E1 | M | 5 | S2 | A fazer |
-| 7 | HU19 | Acompanhar a análise em tempo real (SSE) | E1 | M | 5 | S2 | A fazer |
-| 8 | HU04 | Ver resultado e confiança | E1 | M | 5 | S2 | A fazer |
-| 9 | HU12 | Aviso ético permanente | E5 | M | 1 | S2 | A fazer |
-| 10 | HU07 | Sobrepor Grad-CAM com opacidade ajustável | E2 | M | 8 | S3 | A fazer |
-| 11 | HU02 | Analisar amostra da galeria | E3 | M | 3 | S3 | A fazer |
-| 12 | HU05 | Consultar morfologia das classes | E3 | M | 3 | S3 | A fazer |
-| 13 | HU22 | Ser avisado sobre imagem fora do padrão | E1 | M | 5 | S3 | A fazer |
-| 14 | HU10 | Consultar histórico | E4 | M | 5 | S3 | A fazer |
-| 15 | HU08 | Comparar lado a lado com zoom sincronizado | E2 | S | 8 | S4 | A fazer |
-| 16 | HU06 | Alerta de baixa confiança | E3 | S | 2 | S4 | A fazer |
-| 17 | HU18 | Reenviar análise com falha | E1 | S | 3 | S4 | A fazer |
-| 18 | HU17 | Aceitar termo de uso | E5 | S | 3 | S4 | A fazer |
+| 6 | HU17 | Aceitar termo de uso (pré-condição do envio) | E5 | M | 3 | S2 | A fazer |
+| 7 | HU01 | Enviar patch | E1 | M | 5 | S2 | A fazer |
+| 8 | HU19 | Acompanhar a análise em tempo real (SSE) | E1 | M | 5 | S2 | A fazer |
+| 9 | HU04 | Ver resultado e confiança | E1 | M | 5 | S2 | A fazer |
+| 10 | HU12 | Aviso ético permanente | E5 | M | 1 | S2 | A fazer |
+| 11 | HU07 | Sobrepor Grad-CAM com opacidade ajustável | E2 | M | 8 | S3 | A fazer |
+| 12 | HU02 | Analisar amostra da galeria | E3 | M | 3 | S3 | A fazer |
+| 13 | HU05 | Consultar morfologia das classes | E3 | M | 3 | S3 | A fazer |
+| 14 | HU22 | Ser avisado sobre imagem fora do padrão | E1 | M | 5 | S3 | A fazer |
+| 15 | HU10 | Consultar histórico | E4 | M | 5 | S3 | A fazer |
+| 16 | HU08 | Comparar lado a lado com zoom sincronizado | E2 | S | 8 | S4 | A fazer |
+| 17 | HU06 | Alerta de baixa confiança | E3 | S | 2 | S4 | A fazer |
+| 18 | HU18 | Reenviar análise com falha | E1 | S | 3 | S4 | A fazer |
 | 19 | HU15 | Conhecer o modelo e suas limitações | E5 | S | 2 | S4 | A fazer |
 | 20 | HU13 | Praticar em modo quiz (com erro explicado) | E3 | S | 5 | S5 | A fazer |
-| 21 | HU20 | Comparar classes confundíveis | E3 | S | 5 | S5 | A fazer |
-| 22 | HU03 | Enviar lote para aula | E1 | S | 8 | S5 | A fazer |
-| 23 | EN05 | Testes de carga e de longa duração (k6) | — | M | 5 | S5 | A fazer |
-| 24 | EN06 | Aplicação do SUS e das entrevistas de avaliação | — | M | 5 | S6 | A fazer |
+| 21 | HU03 | Enviar lote para aula | E1 | S | 8 | S5 | A fazer |
+| 22 | EN05 | Testes de carga e de longa duração (k6) | — | M | 5 | S5 | A fazer |
+| 23 | EN06 | Aplicação do SUS e das entrevistas de avaliação | — | M | 5 | S6 | A fazer |
+| 24 | HU20 | Comparar classes confundíveis | E3 | C | 5 | S6 | A fazer |
 | 25 | HU21 | Acompanhar meu progresso | E3 | C | 3 | S6 | A fazer |
-| 26 | HU23 | Encontrar a amostra fora do padrão | E3 | C | 5 | S6 | A fazer |
+| 26 | HU23 | Encontre o intruso | E3 | C | 5 | S6 | A fazer |
 | 27 | HU11 | Exportar histórico | E4 | C | 2 | S6 | A fazer |
 | 28 | HU09 | Grad-CAM para outra classe | E2 | C | 3 | S6 | A fazer |
 | 29 | HU16 | Trocar versão do modelo | E6 | C | 5 | S6 | A fazer |
 
-**Total:** 138 pontos em 6 sprints (S1 = 21, S2 = 29, S3 = 24, S4 = 18, S5 = 23, S6 = 23; média de 23 pontos por sprint). A velocidade real será recalibrada após a Sprint 1. Itens *Could* da S6 serão os primeiros a sair se faltar capacidade. **Revisado em 16/11/2026 após a consolidação da T5:** HU22 subiu para *Must* e foi antecipada para a S3; HU20 subiu para *Should* e foi antecipada para a S5; entrou a HU23.
+**Total:** 138 pontos em 6 sprints (S1 = 21, S2 = 32, S3 = 24, S4 = 15, S5 = 18, S6 = 28). A S2 ficou acima da média porque o aceite do termo (HU17) é pré-condição do envio; se a velocidade real não comportar, a HU19 passa para a S3. Os itens *Could* da S6 são os primeiros a sair se faltar capacidade. **Revisões:** em 16/11, HU22 subiu para *Must* (S3) e entrou a HU23; em 18/11, HU17 subiu para *Must* (S2) e HU20 voltou a *Could* (S6).
 
 **Definição de Pronto (DoD):** código revisado; testes automatizados do item passando; critérios de aceite verificados; aviso ético presente; documentação atualizada na seção correspondente da monografia.
 
@@ -411,7 +415,7 @@ Fonte: elaborado pelo autor (2026).
 
 **Fluxos alternativos**
 - **A1 — Resultado já existente (passo 3):** o sistema reutiliza o resultado, registra a nova análise como "reaproveitada do cache" e segue para o passo 7.
-- **A2 — Dimensão diferente de 224 × 224 (passo 2):** o sistema redimensiona a imagem, avisa o usuário e continua.
+- **A2 — Dimensão maior que 224 × 224 (passo 2):** o sistema analisa um recorte central de 224 × 224 px, sem reduzir a escala, avisa o usuário e continua (RN01). Imagens menores são recusadas (E1).
 - **A3 — Baixa confiança (passo 7):** o sistema exibe o alerta da RN03.
 - **A4 — Imagem fora do padrão (passo 7):** se a imagem parecer diferente do padrão do dataset (foto de celular, outra coloração, sem tecido), o sistema exibe o aviso do RF17 antes da classificação.
 
@@ -428,18 +432,18 @@ Fonte: elaborado pelo autor (2026).
 | **Atores** | Estudante |
 | **Requisitos** | RF01, RF02, RF09 |
 | **Pré-condições** | Usuário autenticado. |
-| **Pós-condições** | Análise registrada no histórico com a classe verdadeira da amostra. |
+| **Pós-condições** | Análise registrada no histórico com o rótulo de referência da amostra. |
 
 **Fluxo principal**
 1. O ator abre a galeria, que mostra 9 miniaturas (uma por classe) e a opção "aleatória".
 2. O ator seleciona uma amostra.
 3. O sistema executa os passos 3 a 6 do UC02 (inclui UC05).
-4. O sistema exibe o resultado (UC07) junto com a classe verdadeira da amostra.
+4. O sistema exibe o resultado (UC07) junto com o rótulo de referência da amostra.
 
 **Ponto de extensão — Modo quiz (UC09):**
-- No passo 2, se o ator ativou o modo quiz, o sistema oculta o nome da classe da amostra.
+- No passo 2, se o ator ativou o modo quiz, o sistema oculta o rótulo de referência da amostra.
 - Antes do passo 4, o sistema pede que o ator escolha uma classe entre as 9.
-- Após a resposta, o sistema exibe acerto ou erro, a classe verdadeira e a sugestão do modelo (RN07).
+- Após a resposta, o sistema exibe acerto ou erro, o rótulo de referência e a sugestão do modelo (RN07).
 
 **Fluxo de exceção:** E1 — falha no processamento, tratada como em UC02-E2.
 
@@ -514,7 +518,7 @@ Os casos de teste abaixo estão **especificados**; a execução é registrada em
 | CT17 | Aviso ético presente em todas as telas | E2E | Playwright |
 | CT18 | Termos proibidos (RN04) ausentes nos textos de resultado, exceto as negações listadas do aviso ético | Unidade | Vitest |
 | CT19 | Login e permissões por perfil | Integração | API |
-| CT20 | Quiz oculta a classe verdadeira até a resposta e explica o erro | Componente | Vitest |
+| CT20 | Quiz oculta o rótulo de referência até a resposta e explica o erro | Componente | Vitest |
 | CT21 | Exportação CSV com as colunas corretas | Integração | API |
 | CT22 | Tela "Sobre o modelo" exibe versão e limitações | E2E | Playwright |
 | CT23 | Trocar a versão ativa do modelo invalida o cache | Integração | API + Redis |
@@ -557,7 +561,7 @@ Os casos de teste abaixo estão **especificados**; a execução é registrada em
 | RF12 | T4 (a validar) | HU16 | UC12 | CT23 | Funcional |
 | RF13 | T3 | HU17 | UC01 | CT24 | Funcional |
 | RF14 | T4 | HU18 | UC02 | CT25 | Funcional |
-| RF15 | T4, T5 (hipótese não refutada) / Lacuna 2 | HU20 | UC14 | CT37 | Estudo de caso + SUS |
+| RF15 | T4, T5 (hipótese não refutada; *Could*) / Lacuna 2 | HU20 | UC14 | CT37 | Estudo de caso + SUS |
 | RF16 | T4, T5 / Lacuna 2 | HU21 | UC15 | CT38 | Estudo de caso |
 | RF17 | T1, T5 / Lacuna 1 | HU22 | UC02 | CT39 | Funcional + Desempenho do modelo |
 | RF18 | T5 (a validar) / Lacuna 2 | HU23 | UC09 | CT40 | Estudo de caso |
@@ -595,6 +599,7 @@ Os casos de teste abaixo estão **especificados**; a execução é registrada em
 |---|---|---|
 | 1.0 | 10/11/2026 | Primeira versão: técnicas, RF, RNF, histórias, UML e rastreabilidade |
 | 1.1 | 16/11/2026 | Consolidação da T5 (4 respostas); RF17 → *Must*, RF15 → *Should*, novo RF18; backlog reordenado |
+| 1.3 | 18/11/2026 | Segunda revisão interna: situação ética da T5 declarada, critério (iii) de priorização, RF15 volta a *Could*, HU17 → *Must* (S2), UC02-A2 alinhado à RN01, banner e "rótulo de referência" alinhados ao protótipo, relação com o DSR |
 | 1.2 | 18/11/2026 | Correções da revisão interna: vieses e limitações da T5, regra de priorização, RF17 especificado, RN01 sem redução de escala, RN03 calibrada, RN08 e RN09, RNF10 (qualidade do modelo) e RNF11 (acessibilidade), status do backlog e referências |
 
 ## Referências
@@ -618,6 +623,8 @@ KATHER, Jakob Nikolas et al. **100,000 histological images of human colorectal c
 LITJENS, Geert et al. A survey on deep learning in medical image analysis. **Medical Image Analysis**, v. 42, p. 60-88, dez. 2017. Disponível em: https://doi.org/10.1016/j.media.2017.07.005. Acesso em: 16 set. 2026.
 
 NIAZI, Muhammad Khalid Khan; PARWANI, Anil V.; GURCAN, Metin N. Digital pathology and artificial intelligence. **The Lancet Oncology**, v. 20, n. 5, p. e253-e261, maio 2019. Disponível em: https://doi.org/10.1016/S1470-2045(19)30154-8. Acesso em: 16 set. 2026.
+
+PEFFERS, Ken et al. A design science research methodology for information systems research. **Journal of Management Information Systems**, v. 24, n. 3, p. 45-77, 2007. Disponível em: https://doi.org/10.2753/MIS0742-1222240302.
 
 PRESSMAN, Roger S.; MAXIM, Bruce R. **Engenharia de software**: uma abordagem profissional. 8. ed. Porto Alegre: AMGH, 2016.
 
