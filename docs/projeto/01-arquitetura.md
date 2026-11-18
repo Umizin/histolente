@@ -10,6 +10,12 @@ A solução combina **dois níveis de decisão arquitetural**:
 | Dentro de cada serviço (micro) | **Arquitetura hexagonal** (portas e adaptadores), organizada em camadas no estilo **Clean Architecture**: `domain` → `application` → `infrastructure` / `interfaces` | Backend de orquestração e serviço de inferência |
 | Interface | **Componentes** React (Next.js App Router) com Server Components por padrão e componentes cliente apenas onde há interação | Frontend |
 
+**Figura 1 — Arquitetura da solução, com o fluxo numerado de uma análise**
+
+![Arquitetura](../monografia/figuras/arquitetura.svg){.paisagem}
+
+Fonte: elaborado pelo autor (2026).
+
 ## 1.2 Justificativa
 
 **Por que orientada a eventos entre os serviços:**
