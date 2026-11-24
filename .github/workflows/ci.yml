@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:16.6-alpine
         env:
           POSTGRES_PASSWORD: ci
         ports: ["5432:5432"]
@@ -36,23 +36,57 @@ jobs:
       - run: pip install -r packages/contracts/requirements-dev.txt
       - run: pytest -q packages/contracts
 
-  ambiente:
-    name: Ambiente Docker
+  web:
+    name: Aplicação web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.18.1"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  inferencia:
+    name: Serviço de inferência
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Sobe Postgres, Redis e RabbitMQ
+      - name: Monta a imagem
+        run: docker build -f services/inference/Dockerfile -t histolente-inference:ci .
+      - name: Testes (inclui o de arquitetura do RNF06)
+        run: >
+          docker run --rm -u 0 -v "$PWD:/repo:ro" -w /repo/services/inference histolente-inference:ci
+          sh -c "pip install -q --root-user-action=ignore -r requirements-dev.txt && python -m pytest -q -p no:cacheprovider"
+
+  ambiente:
+    name: Ambiente completo e teste de fumaça
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sobe infraestrutura, web, consumidor e inferência
         run: |
           cp infra/.env.example infra/.env
-          docker compose -f infra/docker-compose.yml up -d --wait
-      - name: Testes de ponta a ponta do ambiente
+          docker compose -f infra/docker-compose.yml --profile app up -d --build --wait
+      - name: Testes do ambiente
         run: docker compose -f infra/docker-compose.yml --profile teste run --rm verificador
+      - name: Teste de fumaça (cadastro, termo, análise, SSE, cache, isolamento)
+        run: >
+          docker compose -f infra/docker-compose.yml --profile teste run --rm -e WEB_URL=http://web:3000 verificador
+          sh -c "pip install -q --root-user-action=ignore pytest==8.3.3 && python -m pytest -q -s -p no:cacheprovider tests/fumaca"
       - name: Logs em caso de falha
         if: failure()
-        run: docker compose -f infra/docker-compose.yml logs --tail=200
+        run: docker compose -f infra/docker-compose.yml --profile app logs --tail=200
       - name: Derruba
         if: always()
-        run: docker compose -f infra/docker-compose.yml down -v
+        run: docker compose -f infra/docker-compose.yml --profile app down -v
 
   ml:
     name: Pipeline de ML

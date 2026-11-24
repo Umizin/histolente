@@ -73,13 +73,24 @@ def test_redis_pubsub() -> None:
 # ------------------------------------------------------------------ RabbitMQ
 @pytest.fixture()
 def canal():
+    """Canal com a topologia real declarada. Os testes usam filas próprias e temporárias ligadas às mesmas
+    exchanges, para não disputar mensagens com o serviço de inferência quando a aplicação está no ar."""
     con = pika.BlockingConnection(pika.URLParameters(os.environ["AMQP_URL"]))
     ch = con.channel()
     topologia.declarar(ch)
-    for f in (topologia.FILA_REQUEST, topologia.FILA_COMPLETED, topologia.FILA_DLQ):
-        ch.queue_purge(f)
     yield ch
     con.close()
+
+
+def _fila_de_teste(ch) -> tuple[str, str, str]:
+    """Fila exclusiva com o mesmo dead-letter da inference.request e a fila de DLQ correspondente."""
+    chave = f"teste.{uuid.uuid4().hex}"
+    fila = ch.queue_declare(queue="", exclusive=True, arguments={
+        "x-dead-letter-exchange": topologia.EXCHANGE_DLX, "x-dead-letter-routing-key": chave}).method.queue
+    ch.queue_bind(queue=fila, exchange=topologia.EXCHANGE, routing_key=chave)
+    dlq = ch.queue_declare(queue="", exclusive=True).method.queue
+    ch.queue_bind(queue=dlq, exchange=topologia.EXCHANGE_DLX, routing_key=chave)
+    return chave, fila, dlq
 
 
 def _pegar(ch, fila: str, tentativas: int = 20):
@@ -93,11 +104,12 @@ def _pegar(ch, fila: str, tentativas: int = 20):
 
 def test_rabbit_entrega_request_persistente(canal) -> None:
     job = str(uuid.uuid4())
+    chave, fila, _ = _fila_de_teste(canal)
     canal.basic_publish(
-        topologia.EXCHANGE, topologia.CHAVE_REQUEST, json.dumps({"job_id": job}).encode(),
+        topologia.EXCHANGE, chave, json.dumps({"job_id": job}).encode(),
         pika.BasicProperties(delivery_mode=2, content_type="application/json"),
     )
-    m, props, corpo = _pegar(canal, topologia.FILA_REQUEST)
+    m, props, corpo = _pegar(canal, fila)
     assert m is not None and json.loads(corpo)["job_id"] == job
     assert props.delivery_mode == 2
     canal.basic_ack(m.delivery_tag)
@@ -105,12 +117,13 @@ def test_rabbit_entrega_request_persistente(canal) -> None:
 
 def test_rabbit_mensagem_rejeitada_vai_para_dlq(canal) -> None:
     job = str(uuid.uuid4())
-    canal.basic_publish(topologia.EXCHANGE, topologia.CHAVE_REQUEST, json.dumps({"job_id": job}).encode(),
+    chave, fila, dlq = _fila_de_teste(canal)
+    canal.basic_publish(topologia.EXCHANGE, chave, json.dumps({"job_id": job}).encode(),
                         pika.BasicProperties(delivery_mode=2))
-    m, _, _ = _pegar(canal, topologia.FILA_REQUEST)
+    m, _, _ = _pegar(canal, fila)
     assert m is not None
     canal.basic_nack(m.delivery_tag, requeue=False)  # falhou de vez (após MAX_TENTATIVAS)
-    m2, _, corpo = _pegar(canal, topologia.FILA_DLQ)
+    m2, _, corpo = _pegar(canal, dlq)
     assert m2 is not None and json.loads(corpo)["job_id"] == job
     canal.basic_ack(m2.delivery_tag)
 

@@ -4,12 +4,13 @@
 #   docker compose -f infra/docker-compose.yml up -d --wait
 #   docker compose -f infra/docker-compose.yml --profile teste run --rm verificador
 #
+#   docker compose -f infra/docker-compose.yml --profile app up -d --build --wait   # sobe também web, consumidor e inferência
+#
 # Redes (RNF06):
-#   backend_net -> api <-> postgres            (o serviço de inferência NÃO entra aqui)
-#   mq_net      -> api <-> rabbitmq <-> redis <-> inferência
-# Os serviços api/web (HU01) e inference (EN04) entram neste arquivo quando forem implementados.
-# PENDENTE (Sprint 2, docs/projeto/01-arquitetura.md §1.5): o Redis sai de mq_net para uma rede
-# cache_net só com o backend; o serviço de inferência alcançará apenas o RabbitMQ.
+#   backend_net -> web/consumidor <-> postgres   (o serviço de inferência NÃO entra aqui)
+#   cache_net   -> web/consumidor <-> redis      (idem)
+#   mq_net      -> web/consumidor <-> rabbitmq <-> inferência
+# O serviço de inferência só alcança o RabbitMQ: não tem credencial nem rota para o banco ou o Redis.
 
 name: histolente
 
@@ -45,7 +46,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-    networks: [mq_net]
+    networks: [cache_net]
     mem_limit: 320m
 
   rabbitmq:
@@ -84,12 +85,76 @@ services:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
       rabbitmq: { condition: service_healthy }
-    networks: [backend_net, mq_net]
+    networks: [frontend_net, backend_net, cache_net, mq_net]
+
+  # ---- aplicação (perfil "app") ----
+  web:
+    profiles: [app]
+    build: ../apps/web
+    image: ${WEB_IMAGE:-histolente-web:local}
+    restart: unless-stopped
+    environment: &ambiente_web
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      AMQP_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+      SUBJECT_PEPPER: ${SUBJECT_PEPPER}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      MODEL_DIR: /models
+      STORAGE_DIR: /data
+    volumes:
+      - appdata:/data
+      - ../ml/models:/models:ro          # a web lê só o model card; nunca carrega o .pt
+    ports:
+      - "${WEB_PORT:-127.0.0.1:3000}:3000"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    networks: [frontend_net, backend_net, cache_net, mq_net]
+    mem_limit: 512m
+
+  consumidor:
+    profiles: [app]
+    build: ../apps/web                    # mesma imagem da web (cache do build é reaproveitado)
+    image: ${WEB_IMAGE:-histolente-web:local}
+    restart: unless-stopped
+    command: ["node", "consumer.mjs"]
+    environment: *ambiente_web
+    volumes:
+      - appdata:/data
+    healthcheck:
+      disable: true
+    depends_on:
+      web: { condition: service_healthy }
+    networks: [backend_net, cache_net, mq_net]
+    mem_limit: 256m
+
+  inference:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: services/inference/Dockerfile
+    image: ${INFERENCE_IMAGE:-histolente-inference:local}
+    restart: unless-stopped
+    environment:                          # RNF06: nenhuma variável de banco ou de Redis
+      AMQP_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+      MODEL_DIR: /models
+      PREFETCH: ${INFERENCE_PREFETCH:-1}
+      TORCH_THREADS: ${TORCH_THREADS:-4}
+    volumes:
+      - ../ml/models:/models:ro
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+    networks: [mq_net]
+    mem_limit: 2g
 
 networks:
+  frontend_net:
   backend_net:
+  cache_net:
   mq_net:
 
 volumes:
   pgdata:
   rabbitdata:
+  appdata:
