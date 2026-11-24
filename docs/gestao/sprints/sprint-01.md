@@ -29,6 +29,26 @@
 
 ---
 
+## Acompanhamento — 24/11/2026
+
+Com EN01, EN02 e EN03 adiantados, itens da Sprint 2 foram puxados para montar o MVP antes da entrega de Gestão/Desenvolvimento (28/11). Mudança de escopo registrada aqui e no quadro (campo Sprint).
+
+| Issue | Item | Pontos | Situação | PR |
+|---|---|---|---|---|
+| EN04 | Serviço de inferência | 8 | Em andamento (falta p95 no hardware de referência e modelos gerados dos contratos) | #48 |
+| HU14 | Autenticar-se | 5 | Pronto | #48 |
+| HU17 | Aceitar termo de uso | 3 | Pronto | #48 |
+| HU01 | Enviar patch | 5 | Pronto | #48 |
+| HU19 | Acompanhar a análise em tempo real (SSE) | 5 | Pronto | #48 |
+| HU04 | Ver resultado e confiança | 5 | Pronto | #48 |
+| HU12 | Aviso ético permanente | 1 | Pronto | #48 |
+| HU02, HU06, HU08, HU22 | Galeria, baixa confiança, lado a lado, imagem fora do padrão | — | Em revisão | #50 |
+| — | CI/CD: publicação no GHCR e composição de produção | — | Em revisão | #49 |
+
+Bug encontrado no teste manual: mensagem fora do contrato travava o serviço de inferência (sem ack com prefetch=1). Corrigido no #48, com teste.
+
+---
+
 ## Sprint Review — `[[data]]`
 
 | Item | Concluído? | Observação |

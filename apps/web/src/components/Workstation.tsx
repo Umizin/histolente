@@ -184,6 +184,10 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
             ))}
           </div>
         )}
+        {amostras.length > 0 && (
+          <button type="button" className="btn ghost" style={{ marginTop: 8, width: "100%" }}
+            onClick={() => { const s = amostras[Math.floor(Math.random() * amostras.length)]; if (s) enviarAmostra(s.id); }}>Amostra aleatória</button>
+        )}
         <p className="hint">Amostras do CRC-VAL-HE-7K (Kather et al., 2018), CC BY 4.0. O rótulo aparece depois do resultado.</p>
       </aside>
 
@@ -226,7 +230,7 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
         {a && top1 && (
           <>
             {ood ? (
-              <div className="alert" role="alert">Esta imagem parece diferente das usadas no treino (pouco tecido, outra coloração ou ampliação). A sugestão abaixo não é confiável e o mapa foi ocultado.</div>
+              <div className="alert" role="alert">Esta imagem difere do padrão usado no treino do modelo; o resultado pode não ser confiável. (Pouco tecido, outra coloração ou outra ampliação.) O mapa foi ocultado.</div>
             ) : null}
             {(a.original.width !== 224 || a.original.height !== 224) && (
               <p className="hint" role="note" style={{ marginTop: 0 }}>Imagem de {a.original.width}×{a.original.height} px: foi analisado o recorte central de 224×224 px, sem reduzir a escala.</p>
@@ -235,7 +239,7 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
             <div className="result-top"><span className="cls">{top1[0]}</span><span className="name">{INFO[top1[0]].nome}</span><span className="mono">{pct(top1[1])}</span></div>
             {baixa && top2 && (
               <div className="alert" role="note">
-                <div>Confiança baixa. <strong>Segunda hipótese: {top2[0]}</strong> ({pct(top2[1])}).<br /><small>{diferenca(top1[0] as Classe, top2[0] as Classe)}</small></div>
+                <div><strong>Baixa confiança — interprete com cautela.</strong> Segunda hipótese: <strong>{top2[0]}</strong> ({pct(top2[1])}).<br /><small>{diferenca(top1[0] as Classe, top2[0] as Classe)}</small></div>
               </div>
             )}
             <ul className="bars">
