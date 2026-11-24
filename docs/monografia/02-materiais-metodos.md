@@ -32,7 +32,7 @@ Os participantes de todas as etapas com pessoas registram consentimento por Term
 - **Linguagem de programação:** Python (serviço de inferência e treinamento) e TypeScript (interface e orquestração).
 - **Framework de aprendizado profundo:** PyTorch.
 - **Framework de API de inferência:** FastAPI.
-- **Frontend:** Next.js (App Router, TypeScript), Tailwind CSS e shadcn/ui.
+- **Frontend:** Next.js (App Router, TypeScript) e Node.js 20; PostgreSQL 16, Redis 7 e RabbitMQ 3.13 orquestrados com Docker Compose.
 - **Banco de dados:** PostgreSQL.
 - **Mensageria:** RabbitMQ.
 - **Cache:** Redis.

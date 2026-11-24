@@ -44,7 +44,7 @@ Fonte: elaborado pelo autor (2026).
 ## 1.3 Organização de pastas (alvo)
 
 ```
-apps/web/                         # Next.js — Apresentação (+ Orquestração via Route Handlers; decisão a registrar em ADR na Sprint 2)
+apps/web/                         # Next.js — Apresentação + Orquestração via Route Handlers (ADR 0001)
   src/app/                        # rotas (App Router) e Route Handlers (/api/...)
   src/components/workstation/     # componentes de interface
   src/server/
@@ -61,17 +61,17 @@ infra/                            # docker-compose.yml, db/schema.sql
 
 ## 1.4 Registro de decisões
 
-As decisões principais e suas alternativas estão no Quadro 5 da monografia (Seção 4.4). Os registros formais de decisão (ADRs) serão escritos em `docs/adr/` na Sprint 2, junto com a implementação. A decisão em aberto é onde roda o consumidor de resultados: rotas de API do Next.js não mantêm um processo de longa duração, então a proposta é **um segundo processo Node** com o mesmo código da aplicação web (outro ponto de entrada no Docker Compose), dedicado a consumir `inference.completed`.
+As decisões principais e suas alternativas estão no Quadro 5 da monografia (Seção 4.4). Os registros formais estão em `docs/adr/`: orquestração nos route handlers do Next.js (ADR 0001), consumidor de resultados como segundo processo Node com a mesma imagem da web (ADR 0002), estilos em CSS próprio no MVP (ADR 0003) e ajustes de mensageria adiados (ADR 0004).
 
 ## 1.5 Ajustes de projeto após a revisão interna (18/11/2026)
 
-| Ponto | Decisão | Motivo |
-|---|---|---|
-| Versão do modelo | O backend envia a versão desejada no `inference.request`; o serviço recusa versões que não tem e devolve versão e SHA-256 do modelo que rodou | O serviço de inferência não acessa o banco (RNF06), então não poderia saber qual versão está ativa |
-| Estado "processando" | Novo evento `inference.started`, publicado ao receber o job | Sem ele, o estado `PROCESSING` nunca seria atingido |
-| Novas tentativas | Filas de espera com tempo de vida (1 s, 5 s, 25 s); na última, o serviço publica `FAILED`; rotina do backend fecha análises paradas | O RabbitMQ não gera eventos de falha; sem isso a análise ficaria presa |
-| Entrega por SSE | Um canal por usuário, assinando antes de ler o estado | Evita perder eventos e o limite de 6 conexões por origem do HTTP/1.1 num lote de 50 |
-| Redes | Redis em rede própria com o backend (`cache_net`); o serviço de inferência só alcança o RabbitMQ | Um serviço comprometido não consegue alterar o cache de resultados |
-| Tamanho da mensagem | O backend extrai o recorte central de 224 × 224 px e publica só ele | Mensagens pequenas no broker e proteção contra imagens descomunais |
+| Ponto | Decisão | Motivo | Situação (24/11) |
+|---|---|---|---|
+| Versão do modelo | O backend envia a versão desejada no `inference.request`; o serviço recusa versões que não tem e devolve versão e SHA-256 do modelo que rodou | O serviço de inferência não acessa o banco (RNF06), então não poderia saber qual versão está ativa | Contrato v1.1 (ADR 0004) |
+| Estado "processando" | Novo evento `inference.started`, publicado ao receber o job | Sem ele, o estado `PROCESSING` nunca seria atingido | Contrato v1.1 (ADR 0004) |
+| Novas tentativas | Filas de espera com tempo de vida (1 s, 5 s, 25 s); na última, o serviço publica `FAILED`; rotina do backend fecha análises paradas | O RabbitMQ não gera eventos de falha; sem isso a análise ficaria presa | Parcial: 3 tentativas por republicação, depois `FAILED` e DLQ |
+| Entrega por SSE | Um canal por usuário, assinando antes de ler o estado | Evita perder eventos e o limite de 6 conexões por origem do HTTP/1.1 num lote de 50 | Implementado |
+| Redes | Redis em rede própria com o backend (`cache_net`); o serviço de inferência só alcança o RabbitMQ | Um serviço comprometido não consegue alterar o cache de resultados | Implementado |
+| Tamanho da mensagem | O backend extrai o recorte central de 224 × 224 px e publica só ele | Mensagens pequenas no broker e proteção contra imagens descomunais | Implementado |
 
-Esses ajustes serão implementados na Sprint 2 (EN04 e HU01).
+Os itens marcados como contrato v1.1 ficam para depois do MVP (ADR 0004).
