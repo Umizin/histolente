@@ -39,9 +39,13 @@ def listar_imagens(raiz: Path) -> list[tuple[str, str]]:
     return itens
 
 
-def dividir_estratificado(itens: list[tuple[str, str]], frac_validacao: float, semente: int
+def dividir_estratificado(itens: list[tuple[str, str]], frac_validacao: float, semente: int,
+                          max_por_classe: int | None = None
                           ) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
-    """Divide mantendo a proporção de cada classe. Determinístico para a mesma semente."""
+    """Divide mantendo a proporção de cada classe. Determinístico para a mesma semente.
+
+    `max_por_classe` limita quantas imagens de cada classe entram (antes da divisão), para treinos
+    preliminares em CPU; com ele, as classes ficam balanceadas."""
     por_classe: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for it in itens:
         por_classe[it[1]].append(it)
@@ -51,6 +55,8 @@ def dividir_estratificado(itens: list[tuple[str, str]], frac_validacao: float, s
     for classe in CLASSES:
         grupo = sorted(por_classe[classe])
         rng.shuffle(grupo)
+        if max_por_classe is not None:
+            grupo = grupo[:max_por_classe]
         n_val = max(1, round(len(grupo) * frac_validacao))
         val += grupo[:n_val]
         treino += grupo[n_val:]

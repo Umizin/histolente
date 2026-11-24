@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { CLASSES, INFO, LIMIAR_BAIXA_CONFIANCA, diferenca, ehClasse, type Classe } from "@/lib/classes";
 import { colorir, gradiente, type Paleta } from "@/lib/cores";
+import { pct } from "@/lib/formato";
 
 type Analise = {
   id: string; status: "QUEUED" | "PROCESSING" | "DONE" | "FAILED"; predictedClass: string | null;
@@ -13,7 +14,6 @@ type Analise = {
 type Amostra = { id: string; url: string };
 type Estado = { fase: "vazio" } | { fase: "enviando" } | { fase: "fila"; id: string; desde: number } | { fase: "pronto"; a: Analise } | { fase: "erro"; msg: string };
 
-const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 
 export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean }) {
   const [estado, setEstado] = useState<Estado>({ fase: "vazio" });

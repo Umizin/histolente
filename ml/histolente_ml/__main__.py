@@ -27,6 +27,7 @@ def main() -> None:
     d.add_argument("--saida", default="ml/splits")
     d.add_argument("--frac-val", type=float, default=0.15)
     d.add_argument("--semente", type=int, default=42)
+    d.add_argument("--max-por-classe", type=int, default=None, help="subamostra para treino preliminar em CPU")
 
     t = sub.add_parser("treinar")
     t.add_argument("--raiz", required=True)
@@ -70,7 +71,7 @@ def main() -> None:
 
     if args.cmd == "dividir":
         itens = listar_imagens(Path(args.raiz))
-        tr, val = dividir_estratificado(itens, args.frac_val, args.semente)
+        tr, val = dividir_estratificado(itens, args.frac_val, args.semente, args.max_por_classe)
         salvar_csv(tr, Path(args.saida) / "treino.csv")
         salvar_csv(val, Path(args.saida) / "validacao.csv")
         print(json.dumps({"treino": dict(Counter(c for _, c in tr)), "validacao": dict(Counter(c for _, c in val))}, indent=2))

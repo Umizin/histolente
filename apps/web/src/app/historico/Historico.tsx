@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CLASSES, INFO, ehClasse } from "@/lib/classes";
+import { pct } from "@/lib/formato";
 
 type Item = { id: string; status: string; predictedClass: string | null; probabilities: Record<string, number> | null; createdAt: string; cacheHit: boolean; outOfDistribution: boolean; model: { version: string } };
 
@@ -39,7 +40,7 @@ export function Historico() {
               <tr key={i.id} className="row" onClick={() => { location.href = `/?analise=${i.id}`; }}>
                 <td className="mono">{new Date(i.createdAt).toLocaleString("pt-BR")}</td>
                 <td>{i.predictedClass && ehClasse(i.predictedClass) ? <><span className="chip">{i.predictedClass}</span> {INFO[i.predictedClass].nome}</> : "–"}</td>
-                <td className="mono">{i.predictedClass && i.probabilities ? `${((i.probabilities[i.predictedClass] ?? 0) * 100).toFixed(1)}%` : "–"}</td>
+                <td className="mono">{i.predictedClass && i.probabilities ? pct(i.probabilities[i.predictedClass] ?? 0) : "–"}</td>
                 <td className="mono">{i.model.version}</td>
                 <td>{({ QUEUED: "na fila", PROCESSING: "processando", DONE: i.outOfDistribution ? "concluída · fora do padrão" : "concluída", FAILED: "falhou" } as Record<string, string>)[i.status]}{i.cacheHit ? " · cache" : ""}</td>
               </tr>
