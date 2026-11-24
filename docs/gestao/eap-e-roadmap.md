@@ -62,6 +62,6 @@ Sprints de duas semanas, começando em 10/11/2026. As datas a partir da Sprint 3
 | S6 | `[[a definir]]` | Validação com usuários e itens opcionais | EN06, HU20, HU21, HU23, HU11, HU09, HU16 | 28 |
 
 **Marcos:**
-- fim da S2: MVP com o fluxo central (enviar, classificar, ver resultado);
+- fim da S2: MVP com o fluxo central (enviar, classificar, ver resultado). *Antecipado: entregue em 24/11/2026, ainda na S1, com itens das S2 a S4 (ver `sprints/sprint-01.md`);*
 - fim da S4: versão completa para os testes de usabilidade;
 - fim da S6: validação concluída e capítulo de Resultados.
