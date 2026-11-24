@@ -38,3 +38,13 @@ describe("Mapa de calor", () => {
     expect(px[7]).toBe(255);
   });
 });
+
+import { pct } from "./formato";
+describe("Formato dos percentuais", () => {
+  it("não mostra 100% nem 0% exatos e usa vírgula", () => {
+    expect(pct(1)).toBe("> 99,9%");
+    expect(pct(0.00001)).toBe("< 0,1%");
+    expect(pct(0.945)).toBe("94,5%");
+    expect(pct(0)).toBe("0,0%");
+  });
+});
