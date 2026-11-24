@@ -44,6 +44,12 @@ async def declarar_topologia(canal: aio_pika.abc.AbstractChannel) -> aio_pika.ab
     return ex
 
 
+def mensagem_valida(req: object) -> bool:
+    """Campos mínimos de inference.request v1.0 para processar e responder."""
+    return (isinstance(req, dict) and req.get("schema_version") == "1.0"
+            and all(isinstance(req.get(k), str) and req.get(k) for k in ("job_id", "analysis_id", "image_b64")))
+
+
 class Consumidor:
     def __init__(self, cfg: Config, clf: Classificador) -> None:
         self.cfg, self.clf = cfg, clf
@@ -81,9 +87,14 @@ class Consumidor:
         try:
             req = json.loads(msg.body)
         except json.JSONDecodeError:
-            log.error("mensagem inválida descartada para a DLQ")
+            req = None
+        if not mensagem_valida(req):
+            # Sem job_id/analysis_id não há a quem responder: vai direto para a DLQ (nunca fica sem ack,
+            # o que travaria o consumidor com prefetch baixo).
+            log.error("mensagem fora do contrato descartada para a DLQ")
             await msg.reject(requeue=False)
             return
+        assert isinstance(req, dict)
         tentativa = int((msg.headers or {}).get("x-tentativa", 1))
         try:
             imagem = base64.b64decode(str(req["image_b64"]))

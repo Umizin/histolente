@@ -77,3 +77,11 @@ def test_rnf06_servico_nao_conhece_banco() -> None:
     base = Path(__file__).resolve().parents[1]
     for arq in [*base.glob("app/*.py"), base / "requirements.txt", base / "Dockerfile"]:
         assert not proibido.search(arq.read_text(encoding="utf-8")), arq.name
+
+
+def test_mensagem_fora_do_contrato_e_reconhecida() -> None:
+    from app.consumidor import mensagem_valida
+    assert not mensagem_valida({"job_id": "x"})                      # sem analysis_id: iria travar o consumidor
+    assert not mensagem_valida(None)
+    assert not mensagem_valida({"schema_version": "1.0", "job_id": "a", "analysis_id": "b", "image_b64": 3})
+    assert mensagem_valida({"schema_version": "1.0", "job_id": "a", "analysis_id": "b", "image_b64": "AA=="})
