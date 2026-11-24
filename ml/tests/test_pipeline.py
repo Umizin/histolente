@@ -196,3 +196,13 @@ def test_cli_dividir(dataset: Path, tmp_path: Path) -> None:
                        cwd=raiz_ml, capture_output=True, text=True, check=True)
     assert json.loads(r.stdout)["validacao"]["TUM"] >= 1
     assert (tmp_path / "treino.csv").exists()
+
+
+def test_subamostra_por_classe_balanceia_e_e_deterministica() -> None:
+    from histolente_ml.dados import dividir_estratificado
+    itens = [(f"{c}/{i}.tif", c) for c in CLASSES for i in range(50 if c != "ADI" else 10)]
+    tr, val = dividir_estratificado(itens, 0.2, 7, max_por_classe=20)
+    assert sum(1 for _, c in tr + val if c == "TUM") == 20
+    assert sum(1 for _, c in tr + val if c == "ADI") == 10
+    assert (tr, val) == dividir_estratificado(itens, 0.2, 7, max_por_classe=20)
+    assert not {p for p, _ in tr} & {p for p, _ in val}
