@@ -44,7 +44,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     original = Buffer.from(await arq.arrayBuffer());
   }
   const mime = tipoReal(original);
-  if (!mime) return erro(415, "UNSUPPORTED_TYPE", "Formato não aceito. Envie PNG ou JPEG.");
+  if (!mime) return erro(415, "UNSUPPORTED_TYPE", "Formato não suportado. Envie PNG ou JPEG.");
 
   let recorte: Buffer, largura: number, altura: number;
   try {

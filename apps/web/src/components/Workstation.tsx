@@ -8,6 +8,7 @@ type Analise = {
   probabilities: Record<string, number> | null; outOfDistribution: boolean; cacheHit: boolean;
   workerMs: number | null; e2eMs: number | null; error: string | null; groundTruth: string | null;
   model: { name: string; version: string; sha256: string }; hasHeatmap: boolean;
+  original: { width: number; height: number };
 };
 type Amostra = { id: string; url: string };
 type Estado = { fase: "vazio" } | { fase: "enviando" } | { fase: "fila"; id: string; desde: number } | { fase: "pronto"; a: Analise } | { fase: "erro"; msg: string };
@@ -81,7 +82,7 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
 
   const enviarArquivo = (f: File | undefined | null) => {
     if (!f) return;
-    if (!["image/png", "image/jpeg"].includes(f.type)) { setEstado({ fase: "erro", msg: "Formato não aceito. Envie PNG ou JPEG." }); return; }
+    if (!["image/png", "image/jpeg"].includes(f.type)) { setEstado({ fase: "erro", msg: "Formato não suportado. Envie PNG ou JPEG." }); return; }
     if (f.size > 5 * 1024 * 1024) { setEstado({ fase: "erro", msg: "A imagem passa de 5 MB." }); return; }
     const d = new FormData(); d.append("imagem", f); void enviar(d);
   };
@@ -227,6 +228,9 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
             {ood ? (
               <div className="alert" role="alert">Esta imagem parece diferente das usadas no treino (pouco tecido, outra coloração ou ampliação). A sugestão abaixo não é confiável e o mapa foi ocultado.</div>
             ) : null}
+            {(a.original.width !== 224 || a.original.height !== 224) && (
+              <p className="hint" role="note" style={{ marginTop: 0 }}>Imagem de {a.original.width}×{a.original.height} px: foi analisado o recorte central de 224×224 px, sem reduzir a escala.</p>
+            )}
             <p style={{ margin: "0 0 2px", color: "var(--muted)", fontSize: 12 }}>Padrão tecidual sugerido</p>
             <div className="result-top"><span className="cls">{top1[0]}</span><span className="name">{INFO[top1[0]].nome}</span><span className="mono">{pct(top1[1])}</span></div>
             {baixa && top2 && (
