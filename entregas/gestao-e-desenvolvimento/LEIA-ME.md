@@ -6,7 +6,7 @@
 |---|---|
 | Documento da entrega | `HistoLente-Gestao-e-Desenvolvimento.pdf` (nesta pasta) |
 | Aplicação publicada | https://189-24-15-186.sslip.io |
-| Repositório | https://github.com/Umizin/histolente (privado; acesso por convite) |
+| Repositório | https://github.com/Umizin/histolente (público) |
 | Quadro de tarefas | https://github.com/users/Umizin/projects/1 |
 | Pull requests | https://github.com/Umizin/histolente/pulls?q=is%3Apr |
 | CI/CD | https://github.com/Umizin/histolente/actions |
