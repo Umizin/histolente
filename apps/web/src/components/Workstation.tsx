@@ -5,11 +5,13 @@ import { colorir, gradiente, type Paleta } from "@/lib/cores";
 import { pct } from "@/lib/formato";
 import { CircleAlert, CircleCheck, CircleX, Columns2, ImageUp, Layers, RotateCcw, ScanSearch, ShieldAlert, Shuffle, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
 import { Escala } from "./Escala";
+import { LeituraMapa } from "./LeituraMapa";
+import type { ResumoMapa } from "@/lib/leitura-mapa";
 
 type Analise = {
   id: string; status: "QUEUED" | "PROCESSING" | "DONE" | "FAILED"; predictedClass: string | null;
   probabilities: Record<string, number> | null; outOfDistribution: boolean; oodReasons: string[];
-  colorAdjusted: { predictedClass: string; probability: number } | null; cacheHit: boolean;
+  colorAdjusted: { predictedClass: string; probability: number } | null; gradcamSummary: ResumoMapa | null; cacheHit: boolean;
   workerMs: number | null; e2eMs: number | null; error: string | null; groundTruth: string | null;
   model: { name: string; version: string; sha256: string }; hasHeatmap: boolean;
   original: { width: number; height: number };
@@ -238,7 +240,11 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
             <div className="legenda"><span>menor</span><i style={{ background: gradiente(paleta) }} /><span>maior influência</span></div>
           </div>
         </div>
-        <p className="hint">O mapa mostra as regiões que mais influenciaram o modelo, não a localização de lesão. O recorte de 224×224 px tem cerca de 112 µm de lado (0,5 µm por pixel).</p>
+        {a && top1 && ehClasse(top1[0]) ? (
+          <LeituraMapa classe={top1[0]} resumo={a.gradcamSummary} oculto={ood} />
+        ) : (
+          <p className="hint">O mapa mostra as regiões que mais influenciaram o modelo, não a localização de lesão. O recorte de 224×224 px tem cerca de 112 µm de lado (0,5 µm por pixel).</p>
+        )}
       </section>
 
       <aside className="panel" aria-live="polite">

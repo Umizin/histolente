@@ -20,6 +20,7 @@ from PIL import Image
 
 from histolente_ml import CLASSES
 from histolente_ml.cor import ReferenciaCor, coloracao_fora_do_padrao, preparar
+from histolente_ml.explicacao import resumir_mapa
 from histolente_ml.dados import TAMANHO, transformacao_avaliacao
 from histolente_ml.exportar import sha256_arquivo
 from histolente_ml.gradcam import GradCAM
@@ -106,6 +107,7 @@ class Classificador:
             ("baixa_confianca", float(p.max()) < LIMIAR_MSP),
             ("coloracao", ajustada is not None),
         ) if sim]
+        resumo = resumir_mapa(mapa.numpy(), np.asarray(img), self.ref_cor)  # o que há na região destacada
         buf = io.BytesIO()
         Image.fromarray((mapa.numpy() * 255).astype(np.uint8), mode="L").save(buf, format="PNG")
         t3 = time.perf_counter()
@@ -121,6 +123,7 @@ class Classificador:
                 "heatmap_png_b64": base64.b64encode(buf.getvalue()).decode(),
                 "colormap": "gray",
                 "resolution": [TAMANHO, TAMANHO],
+                "summary": resumo,
             },
             "timings_ms": {
                 "preprocess": round((t1 - t0) * 1000, 2),

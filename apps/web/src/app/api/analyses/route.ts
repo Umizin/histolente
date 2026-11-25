@@ -14,7 +14,7 @@ const LIMITE_POR_MINUTO = 30;
 
 type Resultado = {
   predicted_class: string; probabilities: Record<string, number>; out_of_distribution: boolean;
-  ood_reasons?: string[]; color_adjusted?: { predicted_class: string; probability: number } | null; heatmap_storage_key: string; worker_ms: number;
+  ood_reasons?: string[]; color_adjusted?: { predicted_class: string; probability: number } | null; gradcam_summary?: unknown; heatmap_storage_key: string; worker_ms: number;
 };
 
 /** RF01/RF02: recebe o patch (upload ou amostra da galeria), responde do cache ou enfileira. */
@@ -76,11 +76,12 @@ export async function POST(req: Request): Promise<NextResponse> {
     const c = JSON.parse(emCache) as Resultado;
     const r = await db().query(
       `INSERT INTO analyses (user_id, image_id, model_version_id, status, predicted_class, probabilities, heatmap_storage_key,
-                             gradcam_target_class, cache_hit, out_of_distribution, ood_reasons, color_adjusted,
+                             gradcam_target_class, cache_hit, out_of_distribution, ood_reasons, color_adjusted, gradcam_summary,
                              worker_ms, e2e_ms, completed_at)
-       VALUES ($1, $2, $3, 'DONE', $4, $5, $6, $4, true, $7, $8, $9, 0, $10, now()) RETURNING id`,
+       VALUES ($1, $2, $3, 'DONE', $4, $5, $6, $4, true, $7, $8, $9, $10, 0, $11, now()) RETURNING id`,
       [u.id, imageId, modelo.id, c.predicted_class, JSON.stringify(c.probabilities), c.heatmap_storage_key, c.out_of_distribution,
-       c.ood_reasons ?? [], c.color_adjusted ? JSON.stringify(c.color_adjusted) : null, Date.now() - inicio]);
+       c.ood_reasons ?? [], c.color_adjusted ? JSON.stringify(c.color_adjusted) : null,
+       c.gradcam_summary ? JSON.stringify(c.gradcam_summary) : null, Date.now() - inicio]);
     return NextResponse.json({ analysisId: r.rows[0].id, status: "DONE", result: await buscarAnalise(r.rows[0].id, u.id) });
   }
 

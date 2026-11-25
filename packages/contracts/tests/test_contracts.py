@@ -153,3 +153,15 @@ def test_cor_ajustada_traz_classe_e_probabilidade() -> None:
     assert erros(DONE, msg) == []
     msg["color_adjusted"] = {"predicted_class": "XYZ", "probability": 0.775}
     assert erros(DONE, msg)
+
+
+def test_resumo_do_mapa_e_opcional_e_validado() -> None:
+    msg = carregar("exemplos/completed-done.json")
+    msg["gradcam"]["summary"] = {"hot_fraction": 0.22, "centroid": [0.6, 0.4], "background_hot": 0.05,
+                                 "background_rest": 0.1, "hematoxylin_ratio": 1.7, "eosin_ratio": None}
+    assert erros(DONE, msg) == []
+    msg["gradcam"]["summary"] = None
+    assert erros(DONE, msg) == []
+    msg["gradcam"]["summary"] = {"hot_fraction": 1.5, "centroid": [0.6, 0.4], "background_hot": 0.05,
+                                 "background_rest": 0.1, "hematoxylin_ratio": 1.7, "eosin_ratio": None}
+    assert erros(DONE, msg)

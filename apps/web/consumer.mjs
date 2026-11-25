@@ -11,7 +11,7 @@ for (const [k, v] of Object.entries({ DATABASE_URL, REDIS_URL, AMQP_URL })) if (
 
 const CLASSES = ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"];
 const CACHE_TTL_S = 7 * 24 * 3600;
-const PREPARO = "cor1"; // igual a PREPARO em src/lib/modelo.ts
+const PREPARO = "cor2"; // igual a PREPARO em src/lib/modelo.ts
 const MOTIVOS = ["pouco_tecido", "baixa_confianca", "coloracao"];
 const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 4 });
 const redis = new Redis(REDIS_URL);
@@ -52,19 +52,21 @@ async function processar(m) {
       await writeFile(path.join(STORAGE_DIR, chave), Buffer.from(m.gradcam.heatmap_png_b64, "base64"));
       const e2e = Math.max(0, Date.now() - alvo.created_at.getTime());
       const motivos = Array.isArray(m.ood_reasons) ? m.ood_reasons.filter((x) => MOTIVOS.includes(x)) : [];
+      const s = m.gradcam.summary;
+      const resumo = s && typeof s.hot_fraction === "number" && Array.isArray(s.centroid) ? s : null;
       const corAjustada = m.color_adjusted && CLASSES.includes(m.color_adjusted.predicted_class)
         && typeof m.color_adjusted.probability === "number"
         ? { predicted_class: m.color_adjusted.predicted_class, probability: m.color_adjusted.probability } : null;
       await cli.query(
         `UPDATE analyses SET status = 'DONE', predicted_class = $2, probabilities = $3, heatmap_storage_key = $4,
                 gradcam_target_class = $5, out_of_distribution = $6, ood_method = $7, worker_ms = $8, e2e_ms = $9,
-                model_version_id = $10, ood_reasons = $11, color_adjusted = $12, completed_at = now() WHERE id = $1`,
+                model_version_id = $10, ood_reasons = $11, color_adjusted = $12, gradcam_summary = $13, completed_at = now() WHERE id = $1`,
         [alvo.id, m.predicted_class, JSON.stringify(m.probabilities), chave, m.gradcam.target_class ?? m.predicted_class,
          Boolean(m.out_of_distribution), "tecido+msp+cor", Math.round(m.timings_ms?.total_worker ?? 0), e2e, mv,
-         motivos, corAjustada && JSON.stringify(corAjustada)]);
+         motivos, corAjustada && JSON.stringify(corAjustada), resumo && JSON.stringify(resumo)]);
       await redis.set(`cache:sha256:${alvo.sha256}:${m.model.version}:${PREPARO}:pred`, JSON.stringify({
         predicted_class: m.predicted_class, probabilities: m.probabilities, out_of_distribution: Boolean(m.out_of_distribution),
-        ood_reasons: motivos, color_adjusted: corAjustada,
+        ood_reasons: motivos, color_adjusted: corAjustada, gradcam_summary: resumo,
         heatmap_storage_key: chave, worker_ms: Math.round(m.timings_ms?.total_worker ?? 0),
       }), "EX", CACHE_TTL_S);
     }

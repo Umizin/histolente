@@ -64,6 +64,20 @@
           "type": "array",
           "prefixItems": [{ "const": 224 }, { "const": 224 }],
           "items": false
+        },
+        "summary": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["hot_fraction", "centroid", "background_hot", "background_rest", "hematoxylin_ratio", "eosin_ratio"],
+          "description": "Medidas da região de maior influência (mapa ≥ 50% do máximo): fração do recorte, centro (x, y em 0–1), fração de pixels claros dentro e fora dela e razão das concentrações médias de hematoxilina e eosina (região / restante). null quando o mapa é constante. Opcional na v1.0.",
+          "properties": {
+            "hot_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+            "centroid": { "type": "array", "prefixItems": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "number", "minimum": 0, "maximum": 1 }], "items": false, "minItems": 2 },
+            "background_hot": { "type": "number", "minimum": 0, "maximum": 1 },
+            "background_rest": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "hematoxylin_ratio": { "type": ["number", "null"], "minimum": 0 },
+            "eosin_ratio": { "type": ["number", "null"], "minimum": 0 }
+          }
         }
       }
     },

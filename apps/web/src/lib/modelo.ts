@@ -47,5 +47,5 @@ export function modeloAtivo(): Promise<VersaoModelo> {
 /** RN05: a chave inclui a versão do modelo e a classe-alvo do Grad-CAM. */
 /** Versão do pré-processamento do serviço de inferência. Mudou o preparo, muda a chave e o cache antigo deixa de valer.
  *  Manter igual a PREPARO em consumer.mjs. */
-export const PREPARO = "cor1";
+export const PREPARO = "cor2";
 export const chaveCache = (hash: string, versao: string, alvo = "pred"): string => `cache:sha256:${hash}:${versao}:${PREPARO}:${alvo}`;

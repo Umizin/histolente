@@ -20,6 +20,7 @@ O MVP cobre o fluxo central da ferramenta: o estudante entra, aceita o termo de 
 | HU10 — Histórico | RF05, RF06 | Parcial: filtro por classe e paginação; faltam filtros por data e lote |
 | HU13 — Modo quiz | RF01, RF03 | Pronto (adiantado da Sprint 5) |
 | — Alerta de coloração fora do padrão | RF17, risco R01 | Pronto (ADR 0005; Seção 5.1) |
+| — "Como ler este mapa": onde está a influência e o que há na região (hematoxilina, eosina, espaço claro), medido na imagem, com os limites do Grad-CAM | RF04 | Pronto |
 
 ## 2. Arquitetura implementada
 

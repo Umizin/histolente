@@ -20,6 +20,7 @@ Fonte única dos formatos trocados entre o backend de orquestração e o serviç
 
 **Histórico:**
 - 25/11/2026: campos opcionais `ood_reasons` (`pouco_tecido`, `baixa_confianca`, `coloracao`) e `color_adjusted` (sugestão para a imagem com a cor normalizada, só informativa) no `inference.completed`. Mensagens sem eles continuam válidas, então `schema_version` segue `1.0`; o número 1.1 fica reservado para o pacote do ADR 0004.
+- 25/11/2026: campo opcional `gradcam.summary`, com as medidas da região de maior influência do mapa (leitura "Como ler este mapa"); `schema_version` segue `1.0` pelo mesmo motivo.
 
 **Testes:**
 ```

@@ -57,7 +57,8 @@ Mudança de escopo, registrada também no quadro:
 |---|---|---|
 | — | Alerta de coloração fora do padrão, com limiar por classe, e sugestão com a cor ajustada só informativa (ADR 0005). Normalizar a cor de todas as imagens foi testado e descartado: a acurácia no CRC-VAL-HE-7K caiu de 96,6 % para 93,2 % | Pronto (#53) |
 | HU13 | Praticar em modo quiz (antecipada da Sprint 5): banco de 45 imagens do CRC-VAL-HE-7K, correção no servidor e explicação "por que não é" | Pronto (#53) |
-| — | Identidade visual "Platina" (ADR 0006): fontes, ícones, barra de escala em µm no visualizador, tema claro para projetor, contrastes revisados | Em revisão |
+| — | Identidade visual "Platina" (ADR 0006): fontes, ícones, barra de escala em µm no visualizador, tema claro para projetor, contrastes revisados | Pronto (#55) |
+| — | "Como ler este mapa": descrição medida da região de maior influência do Grad-CAM (posição, área, hematoxilina, eosina e espaço claro), sem afirmar o raciocínio do modelo | Em revisão |
 
 ---
 
