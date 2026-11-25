@@ -37,7 +37,7 @@ O passo de implantação só roda quando o repositório tem os segredos `DEPLOY_
 | Item | Valor |
 |---|---|
 | **Aplicação** | **https://189-24-15-186.sslip.io** |
-| **Repositório** | **https://github.com/Umizin/histolente** (privado; acesso por convite) |
+| **Repositório** | **https://github.com/Umizin/histolente** (público) |
 | Quadro de tarefas | https://github.com/users/Umizin/projects/1 |
 | Execuções da CI/CD | https://github.com/Umizin/histolente/actions |
 | Servidor | VPS Hostinger KVM 2, data center no Brasil: 2 vCPU, 8 GB de RAM, Ubuntu 26.04 LTS, sem GPU |

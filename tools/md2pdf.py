@@ -313,7 +313,7 @@ def projeto() -> None:
     sumario = ("<h1 class='semquebra'>Sumário</h1><ol>" + "".join(
         f"<li>{t}</li>" for t in ("Arquitetura de software", "Modelagem estrutural e comportamental", "Modelagem de dados",
                                   "Design de interface (UX/UI)", "Segurança e LGPD", "Referências")) + "</ol>"
-               "<p>Repositório: https://github.com/Umizin/histolente (privado; acesso mediante convite).</p>")
+               "<p>Repositório: https://github.com/Umizin/histolente (público).</p>")
     sub = ("Projeto: Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência "
            "Artificial: Uma Ferramenta de Apoio à Patologia Digital — ferramenta HistoLente")
     imprimir(_html("Projeto de Software", CSS_PROJETO, capa("PROJETO DE SOFTWARE (DESIGN)", sub) + sumario + "\n".join(partes)),
@@ -330,7 +330,7 @@ def gestao() -> None:
     partes = [md_para_html((pasta / f).read_text(encoding="utf-8"), (pasta / f).parent, Path(f).stem) for f, _ in ordem]
     sumario = ("<h1 class='semquebra'>Sumário</h1><ol>" + "".join(f"<li>{t}</li>" for _, t in ordem) + "</ol>"
                "<p>Aplicação: https://189-24-15-186.sslip.io. "
-               "Repositório: https://github.com/Umizin/histolente (privado; acesso mediante convite). "
+               "Repositório: https://github.com/Umizin/histolente (público). "
                "Quadro: https://github.com/users/Umizin/projects/1.</p>")
     mapa = md_para_html((pasta / "mapa-da-entrega.md").read_text(encoding="utf-8"), pasta, "mapa-da-entrega")
     sub = ("Projeto: Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência "

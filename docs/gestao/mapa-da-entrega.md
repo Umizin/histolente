@@ -17,6 +17,6 @@ Onde cada item do roteiro da entrega de Gestão e Desenvolvimento está neste do
 | **5. Desenvolvimento do MVP:** boas práticas (Clean Code, SOLID, padrões de projeto) | Cap. 7, Seção 5 (organização em camadas, SOLID, padrões, testes e dívida técnica declarada) | ADRs em `docs/adr/` |
 | **6. CI/CD** (pipeline automatizado de build, testes e deploy) | Cap. 8, Seção 1 | https://github.com/Umizin/histolente/actions |
 | **7. Deploy:** aplicação publicada | Cap. 8, Seção 2: **https://189-24-15-186.sslip.io** | `infra/docker-compose.prod.yml` |
-| **7. Deploy:** link do repositório | **https://github.com/Umizin/histolente** (privado; acesso por convite) | — |
+| **7. Deploy:** link do repositório | **https://github.com/Umizin/histolente** (público) | — |
 
 O capítulo 9 traz o histórico do projeto desde o Pré-TCC.

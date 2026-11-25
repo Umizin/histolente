@@ -20,7 +20,7 @@
 - Com um desenvolvedor e entrega contínua, essa estrutura só adiciona *merges* sem benefício.
 - Branches curtas a partir da `main`, integradas por *pull request*, mantêm o histórico rastreável e são o padrão do trunk-based.
 
-**Proteção da `main`:** em repositório privado, o GitHub só permite regras de proteção de branch no plano Pro, que estudantes conseguem de graça pelo GitHub Student Developer Pack. Enquanto o Pro não estiver ativo, a regra "nada entra na `main` sem PR" é seguida por disciplina. A partir da Sprint 1, todo trabalho de código entra por PR.
+**Proteção da `main`:** enquanto o repositório era privado, o plano gratuito do GitHub não permitia regras de proteção de branch, e a regra "nada entra na `main` sem PR" era seguida por disciplina. Desde 25/11/2026 o repositório é público e a `main` está protegida: só recebe mudanças por *pull request*, com os sete jobs da CI obrigatoriamente verdes, sem *force push* nem exclusão, com histórico linear e sem exceção para administradores.
 
 ## 3. Padrão de commits: Conventional Commits
 
