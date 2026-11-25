@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { CLASSES, INFO, ehClasse } from "@/lib/classes";
 import { pct } from "@/lib/formato";
+import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 
 type Item = { id: string; status: string; predictedClass: string | null; probabilities: Record<string, number> | null; createdAt: string; cacheHit: boolean; outOfDistribution: boolean; model: { version: string } };
 
@@ -24,34 +25,36 @@ export function Historico() {
   };
 
   return (
-    <section className="panel">
-      <h2>Histórico de análises</h2>
+    <section className="largura">
+      <h1 className="pagina-titulo">Histórico de análises</h1>
+      <div className="panel">
       <div className="filtros">
         <label>Classe sugerida <select value={classe} onChange={(e) => { setClasse(e.target.value); setPagina(1); }}>
-          <option value="">todas</option>{CLASSES.map((c) => <option key={c} value={c}>{c} · {INFO[c].nome}</option>)}
+          <option value="">todas</option>{CLASSES.map((c) => <option key={c} value={c}>{c}, {INFO[c].nome.toLowerCase()}</option>)}
         </select></label>
-        <button type="button" className="btn ghost" onClick={csv} disabled={!dados?.items.length}>Exportar CSV (página)</button>
+        <button type="button" className="btn ghost" onClick={csv} disabled={!dados?.items.length}><Download className="ico" aria-hidden="true" />Exportar CSV desta página</button>
       </div>
-      {!dados ? <div className="skeleton" style={{ height: 120 }} /> : dados.items.length === 0 ? <p className="hint">Nenhuma análise encontrada.</p> : (
+      {!dados ? <div className="skeleton" style={{ height: 120 }} /> : dados.items.length === 0 ? <p className="hint">Nenhuma análise encontrada. As análises que você fizer aparecem aqui.</p> : (
         <table>
           <thead><tr><th>Data</th><th>Sugestão</th><th>Confiança</th><th>Modelo</th><th>Situação</th></tr></thead>
           <tbody>
             {dados.items.map((i) => (
               <tr key={i.id} className="row" onClick={() => { location.href = `/?analise=${i.id}`; }}>
-                <td className="mono">{new Date(i.createdAt).toLocaleString("pt-BR")}</td>
-                <td>{i.predictedClass && ehClasse(i.predictedClass) ? <><span className="chip">{i.predictedClass}</span> {INFO[i.predictedClass].nome}</> : "–"}</td>
-                <td className="mono">{i.predictedClass && i.probabilities ? pct(i.probabilities[i.predictedClass] ?? 0) : "–"}</td>
-                <td className="mono">{i.model.version}</td>
-                <td>{({ QUEUED: "na fila", PROCESSING: "processando", DONE: i.outOfDistribution ? "concluída · fora do padrão" : "concluída", FAILED: "falhou" } as Record<string, string>)[i.status]}{i.cacheHit ? " · cache" : ""}</td>
+                <td className="num">{new Date(i.createdAt).toLocaleString("pt-BR")}</td>
+                <td>{i.predictedClass && ehClasse(i.predictedClass) ? <><span className="chip">{i.predictedClass}</span>{INFO[i.predictedClass].nome}</> : "–"}</td>
+                <td className="num">{i.predictedClass && i.probabilities ? pct(i.probabilities[i.predictedClass] ?? 0) : "–"}</td>
+                <td className="num">{i.model.version}</td>
+                <td>{({ QUEUED: "na fila", PROCESSING: "processando", DONE: i.outOfDistribution ? "concluída, fora do padrão" : "concluída", FAILED: "falhou" } as Record<string, string>)[i.status]}{i.cacheHit ? " (cache)" : ""}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
       <div className="paginas">
-        <button type="button" className="btn ghost" disabled={pagina <= 1} onClick={() => setPagina(pagina - 1)}>Anterior</button>
+        <button type="button" className="btn ghost" disabled={pagina <= 1} onClick={() => setPagina(pagina - 1)}><ChevronLeft className="ico" aria-hidden="true" />Anterior</button>
         <span>Página {pagina} de {paginas}</span>
-        <button type="button" className="btn ghost" disabled={pagina >= paginas} onClick={() => setPagina(pagina + 1)}>Próxima</button>
+        <button type="button" className="btn ghost" disabled={pagina >= paginas} onClick={() => setPagina(pagina + 1)}>Próxima<ChevronRight className="ico" aria-hidden="true" /></button>
+      </div>
       </div>
     </section>
   );

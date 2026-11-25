@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type Poin
 import { CLASSES, INFO, LIMIAR_BAIXA_CONFIANCA, diferenca, ehClasse, type Classe } from "@/lib/classes";
 import { colorir, gradiente, type Paleta } from "@/lib/cores";
 import { pct } from "@/lib/formato";
+import { CircleAlert, CircleCheck, CircleX, Columns2, ImageUp, Layers, RotateCcw, ScanSearch, ShieldAlert, Shuffle, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
+import { Escala } from "./Escala";
 
 type Analise = {
   id: string; status: "QUEUED" | "PROCESSING" | "DONE" | "FAILED"; predictedClass: string | null;
@@ -162,10 +164,13 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
           <img src={`/api/analyses/${a.id}/image`} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", imageRendering: vista.z >= 4 ? "pixelated" : "auto" }} />
           {comMapa && !ood && <canvas ref={(c) => { telas.current[i] = c; }} style={{ opacity: opacidade / 100 }} />}
         </div>
+      ) : estado.fase === "enviando" || estado.fase === "fila" ? (
+        <div className="skeleton" style={{ position: "absolute", inset: 0 }} />
       ) : (
-        <div className="empty">{estado.fase === "enviando" || estado.fase === "fila" ? <div className="skeleton" style={{ position: "absolute", inset: 0 }} /> : "Envie um recorte ou escolha uma amostra da galeria."}</div>
+        <div className="empty"><ScanSearch className="ico" aria-hidden="true" /><span>Envie um recorte ou escolha uma amostra da galeria.</span></div>
       )}
-      <span className="vlabel">{rotulo}</span>
+      {a && <span className="vlabel">{rotulo}</span>}
+      {a && <Escala z={vista.z} />}
     </div>
   );
 
@@ -176,88 +181,104 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
         <label className={`drop${arrastando ? " over" : ""}`}
           onDragOver={(e) => { e.preventDefault(); setArrastando(true); }} onDragLeave={() => setArrastando(false)}
           onDrop={(e) => { e.preventDefault(); setArrastando(false); enviarArquivo(e.dataTransfer.files[0]); }}>
-          <strong>Arraste um recorte H&amp;E</strong><br />ou clique para escolher · Ctrl+V cola<br /><small>PNG ou JPEG, até 5 MB, mínimo 224×224 px</small>
+          <ImageUp className="ico" aria-hidden="true" />
+          <strong>Arraste um recorte H&amp;E</strong>
+          <span>ou clique para escolher; Ctrl+V também funciona</span>
+          <small>PNG ou JPEG, até 5 MB, mínimo 224×224 px</small>
           <input ref={arquivo} type="file" accept="image/png,image/jpeg" className="sr-only" onChange={(e) => { enviarArquivo(e.target.files?.[0]); e.target.value = ""; }} />
         </label>
-        <small className="aviso-envio">Não envie imagens com dados de paciente (nome, etiqueta, prontuário).</small>
-        <h2 style={{ marginTop: 16 }}>Galeria de amostras</h2>
-        {amostras.length === 0 ? <p className="hint">Galeria indisponível.</p> : (
-          <div className="thumbs">
-            {amostras.map((s, i) => (
-              <button key={s.id} type="button" className="thumb" onClick={() => enviarAmostra(s.id)} aria-label={`Analisar amostra ${i + 1}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.url} alt="" style={{ display: "block", width: "100%" }} /><span>#{i + 1}</span>
-              </button>
-            ))}
-          </div>
-        )}
-        {amostras.length > 0 && (
-          <button type="button" className="btn ghost" style={{ marginTop: 8, width: "100%" }}
-            onClick={() => { const s = amostras[Math.floor(Math.random() * amostras.length)]; if (s) enviarAmostra(s.id); }}>Amostra aleatória</button>
-        )}
-        <p className="hint">Amostras do CRC-VAL-HE-7K (Kather et al., 2018), CC BY 4.0. O rótulo aparece depois do resultado.</p>
+        <p className="aviso-envio"><ShieldAlert className="ico" aria-hidden="true" /><span>Não envie imagens com dados de paciente (nome, etiqueta, prontuário).</span></p>
+
+        <div className="secao">
+          <h2>Galeria de amostras</h2>
+          <p className="hint" style={{ marginBottom: 10 }}>O rótulo de cada amostra só aparece depois do resultado.</p>
+          {amostras.length === 0 ? <p className="hint">Galeria indisponível.</p> : (
+            <div className="thumbs">
+              {amostras.map((s, i) => (
+                <button key={s.id} type="button" className="thumb" onClick={() => enviarAmostra(s.id)} aria-label={`Analisar amostra ${i + 1} da galeria`} title="Analisar esta amostra">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={s.url} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+          {amostras.length > 0 && (
+            <button type="button" className="btn ghost" style={{ marginTop: 10, width: "100%" }}
+              onClick={() => { const s = amostras[Math.floor(Math.random() * amostras.length)]; if (s) enviarAmostra(s.id); }}>
+              <Shuffle className="ico" aria-hidden="true" />Amostra aleatória
+            </button>
+          )}
+          <p className="hint">CRC-VAL-HE-7K (Kather et al., 2018), licença CC BY 4.0.</p>
+        </div>
       </aside>
 
       <section className="panel" aria-label="Visualizador">
         <div className="toolbar">
           <div className="seg" role="group" aria-label="Modo de visualização">
-            <button type="button" aria-pressed={!lado} onClick={() => setLado(false)}>Sobreposição</button>
-            <button type="button" aria-pressed={lado} onClick={() => setLado(true)}>Lado a lado</button>
+            <button type="button" aria-pressed={!lado} onClick={() => setLado(false)}><Layers className="ico" aria-hidden="true" />Sobreposição</button>
+            <button type="button" aria-pressed={lado} onClick={() => setLado(true)}><Columns2 className="ico" aria-hidden="true" />Lado a lado</button>
           </div>
-          <button type="button" className="btn ghost zoom-btn" onClick={() => zoom(0.8)} aria-label="Diminuir zoom">−</button>
-          <span className="mono" aria-live="polite">{Math.round(vista.z * 100)}%</span>
-          <button type="button" className="btn ghost zoom-btn" onClick={() => zoom(1.25)} aria-label="Aumentar zoom">+</button>
-          <button type="button" className="btn ghost" onClick={() => setVista({ z: 1, x: 0, y: 0 })}>Recentralizar</button>
+          <div className="zoom" role="group" aria-label="Zoom">
+            <button type="button" onClick={() => zoom(0.8)} aria-label="Diminuir zoom"><ZoomOut className="ico" /></button>
+            <span className="num" aria-live="polite">{Math.round(vista.z * 100)}%</span>
+            <button type="button" onClick={() => zoom(1.25)} aria-label="Aumentar zoom"><ZoomIn className="ico" /></button>
+            <button type="button" onClick={() => setVista({ z: 1, x: 0, y: 0 })} aria-label="Recentralizar" title="Recentralizar (0)"><RotateCcw className="ico" /></button>
+          </div>
         </div>
         <div className={`viewers${lado ? " sbs" : ""}`}>
-          {lado ? [viewer(0, "Recorte", false), viewer(1, "Recorte + mapa", true)] : viewer(0, "Recorte + mapa", true)}
+          {lado ? [viewer(0, "Recorte", false), viewer(1, "Recorte com mapa", true)] : viewer(0, "Recorte com mapa", true)}
         </div>
-        <div className="slider">
+        <div className="controles">
           <label htmlFor="op">Intensidade do mapa</label>
           <input id="op" type="range" min={0} max={100} value={opacidade} onChange={(e) => setOpacidade(Number(e.target.value))} disabled={ood} />
-          <span className="mono">{opacidade}%</span>
+          <span className="num" style={{ minWidth: 40, textAlign: "right" }}>{opacidade}%</span>
+          <div className="linha">
+            <label>Paleta <select value={paleta} onChange={(e) => setPaleta(e.target.value as Paleta)}><option value="viridis">viridis</option><option value="turbo">turbo</option></select></label>
+            <label><input type="checkbox" checked={contorno} onChange={(e) => setContorno(e.target.checked)} /> Só contorno</label>
+            <div className="legenda"><span>menor</span><i style={{ background: gradiente(paleta) }} /><span>maior influência</span></div>
+          </div>
         </div>
-        <div className="toolbar" style={{ marginTop: 8 }}>
-          <label>Paleta <select value={paleta} onChange={(e) => setPaleta(e.target.value as Paleta)}><option value="viridis">viridis</option><option value="turbo">turbo</option></select></label>
-          <label><input type="checkbox" checked={contorno} onChange={(e) => setContorno(e.target.checked)} /> Só contorno</label>
-        </div>
-        <div className="legenda"><span>menor</span><i style={{ background: gradiente(paleta) }} /><span>maior influência na sugestão</span></div>
-        <p className="hint">O mapa mostra as regiões que mais influenciaram o modelo, não a localização de lesão. Recorte de 224×224 px ≈ 112 µm de lado (0,5 µm/px).</p>
+        <p className="hint">O mapa mostra as regiões que mais influenciaram o modelo, não a localização de lesão. O recorte de 224×224 px tem cerca de 112 µm de lado (0,5 µm por pixel).</p>
       </section>
 
       <aside className="panel" aria-live="polite">
         <h2>Resultado</h2>
-        {estado.fase === "vazio" && <p className="hint">Nenhuma análise ainda. Comece pela galeria se for o primeiro acesso.</p>}
+        {estado.fase === "vazio" && <p className="hint" style={{ marginTop: 0 }}>Nenhuma análise ainda. No primeiro acesso, comece por uma amostra da galeria.</p>}
         {(estado.fase === "enviando" || estado.fase === "fila") && (
-          <div role="status"><p>{estado.fase === "enviando" ? "Enviando…" : "Analisando…"} <span className="mono">{(decorrido / 1000).toFixed(1)} s</span></p><div className="skeleton" style={{ height: 120, borderRadius: 6 }} /></div>
+          <div role="status">
+            <p className="status-fila"><span>{estado.fase === "enviando" ? "Enviando…" : "Analisando…"}</span><span className="num">{(decorrido / 1000).toFixed(1)} s</span></p>
+            <div className="skeleton" style={{ height: 140, borderRadius: 10 }} />
+          </div>
         )}
         {estado.fase === "erro" && (
-          <div className="alert err" role="alert"><span>{estado.msg}</span> <button type="button" className="btn ghost" onClick={() => arquivo.current?.click()}>Escolher outra</button></div>
+          <div className="alert err" role="alert"><CircleAlert className="ico" aria-hidden="true" /><div>{estado.msg}<div style={{ marginTop: 8 }}><button type="button" className="btn ghost" onClick={() => arquivo.current?.click()}>Escolher outra imagem</button></div></div></div>
         )}
         {a && top1 && (
           <>
-            {ood ? (
+            {ood && (
               <div className="alert" role="alert">
+                <TriangleAlert className="ico" aria-hidden="true" />
                 <div>
                   <strong>Esta imagem difere do padrão usado no treino do modelo; o resultado pode não ser confiável.</strong>
                   {a.oodReasons.length > 0 ? (
-                    <ul style={{ margin: "4px 0 0", paddingLeft: 18 }}>{a.oodReasons.map((m) => <li key={m}>{MOTIVOS[m] ?? m}.</li>)}</ul>
+                    <ul>{a.oodReasons.map((m) => <li key={m}>{MOTIVOS[m] ?? m}.</li>)}</ul>
                   ) : <> (Pouco tecido, outra coloração ou outra ampliação.)</>}
                   {a.colorAdjusted && ehClasse(a.colorAdjusted.predictedClass) && (
-                    <p style={{ margin: "4px 0" }}>Com a cor ajustada ao padrão do treino (Macenko), a sugestão seria <strong>{a.colorAdjusted.predictedClass}</strong> ({INFO[a.colorAdjusted.predictedClass].nome}, {pct(a.colorAdjusted.probability)}). Se as duas sugestões diferem, nenhuma delas é confiável.</p>
+                    <p>Com a cor ajustada ao padrão do treino (Macenko), a sugestão seria <strong>{a.colorAdjusted.predictedClass}</strong> ({INFO[a.colorAdjusted.predictedClass].nome}, {pct(a.colorAdjusted.probability)}). Se as duas sugestões diferem, nenhuma delas é confiável.</p>
                   )}
-                  <small>O mapa foi ocultado.</small>
+                  <p>O mapa foi ocultado.</p>
                 </div>
               </div>
-            ) : null}
-            {(a.original.width !== 224 || a.original.height !== 224) && (
-              <p className="hint" role="note" style={{ marginTop: 0 }}>Imagem de {a.original.width}×{a.original.height} px: foi analisado o recorte central de 224×224 px, sem reduzir a escala.</p>
             )}
-            <p style={{ margin: "0 0 2px", color: "var(--muted)", fontSize: 12 }}>Padrão tecidual sugerido</p>
-            <div className="result-top"><span className="cls">{top1[0]}</span><span className="name">{INFO[top1[0]].nome}</span><span className="mono">{pct(top1[1])}</span></div>
+            <div className="prancha">
+              <span className="rot">Padrão tecidual sugerido</span>
+              <h3>{INFO[top1[0]].nome}</h3>
+              <div className="linha"><span className="sigla">{top1[0]}</span><span className="conf num">{pct(top1[1])}</span></div>
+            </div>
             {baixa && top2 && (
               <div className="alert" role="note">
-                <div><strong>Baixa confiança — interprete com cautela.</strong> Segunda hipótese: <strong>{top2[0]}</strong> ({pct(top2[1])}).<br /><small>{diferenca(top1[0] as Classe, top2[0] as Classe)}</small></div>
+                <TriangleAlert className="ico" aria-hidden="true" />
+                <div><strong>Baixa confiança: interprete com cautela.</strong> Segunda hipótese: <strong>{top2[0]}</strong> ({pct(top2[1])}).<p>{diferenca(top1[0] as Classe, top2[0] as Classe)}</p></div>
               </div>
             )}
             <ul className="bars">
@@ -270,18 +291,22 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
                 </li>
               ))}
             </ul>
+            {(a.original.width !== 224 || a.original.height !== 224) && (
+              <p className="hint" role="note">Imagem de {a.original.width}×{a.original.height} px: foi analisado o recorte central de 224×224 px, sem reduzir a escala.</p>
+            )}
             {a.groundTruth && ehClasse(a.groundTruth) && (
-              <p className={a.groundTruth === top1[0] ? "ok" : "bad"} style={{ marginTop: 10 }}>
-                Rótulo da amostra: <strong>{a.groundTruth}</strong> ({INFO[a.groundTruth].nome}){a.groundTruth === top1[0] ? " · coincide com a sugestão" : " · diferente da sugestão"}
+              <p className={`revelado ${a.groundTruth === top1[0] ? "ok" : "bad"}`}>
+                {a.groundTruth === top1[0] ? <CircleCheck className="ico" aria-hidden="true" /> : <CircleX className="ico" aria-hidden="true" />}
+                <span>Rótulo da amostra: <strong>{a.groundTruth}</strong> ({INFO[a.groundTruth].nome}), {a.groundTruth === top1[0] ? "igual à sugestão" : "diferente da sugestão"}.</span>
               </p>
             )}
             <div className="meta">
-              <span>Modelo</span><b className="mono">{a.model.name} {a.model.version}</b>
+              <span>Modelo</span><b>{a.model.name} {a.model.version}</b>
               <span>Hash</span><b className="mono" title={a.model.sha256}>{a.model.sha256.slice(0, 12)}…</b>
-              <span>Tempo</span><b className="mono">{a.e2eMs ?? "–"} ms{a.workerMs ? ` (modelo ${a.workerMs} ms)` : ""}</b>
+              <span>Tempo</span><b className="num">{a.e2eMs ?? "–"} ms{a.workerMs ? ` (modelo ${a.workerMs} ms)` : ""}</b>
               <span>Cache</span><b>{a.cacheHit ? "sim" : "não"}</b>
             </div>
-            {modeloPreliminar && <div className="alert" role="note" style={{ marginTop: 10 }}>Modelo de demonstração sem treino: as sugestões são aleatórias e servem só para testar o fluxo.</div>}
+            {modeloPreliminar && <div className="alert" role="note" style={{ marginTop: 12 }}><TriangleAlert className="ico" aria-hidden="true" /><span>Modelo de demonstração sem treino: as sugestões são aleatórias e servem só para testar o fluxo.</span></div>}
           </>
         )}
       </aside>

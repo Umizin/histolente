@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { TriangleAlert } from "lucide-react";
 
 /** RF07: aviso fixo em todas as telas. Pode ser minimizado, nunca removido. */
 export function EthicsBanner() {
@@ -10,10 +11,10 @@ export function EthicsBanner() {
   };
   return (
     <div className={`banner${min ? " min" : ""}`} role="note" aria-label="Aviso sobre o uso da ferramenta" data-testid="ethics-banner">
-      <span aria-hidden="true">⚠</span>
+      <TriangleAlert className="ico" aria-hidden="true" />
       <span className="txt">
         <span className="full">Ferramenta educacional para estudo de padrões histológicos. Não substitui o exame anatomopatológico nem o laudo. A decisão clínica é sempre do médico (Res. CFM nº 2.454/2026).</span>
-        <span className="mini">Não substitui laudo · decisão do médico</span>
+        <span className="mini">Não substitui o laudo; a decisão clínica é do médico.</span>
       </span>
       <button type="button" onClick={alternar} aria-expanded={!min}>{min ? "Mostrar aviso" : "Minimizar"}</button>
     </div>

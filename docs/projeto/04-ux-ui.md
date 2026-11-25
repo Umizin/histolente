@@ -71,20 +71,25 @@ Fonte: elaborado pelo autor (2026).
 
 ## 4.3 Guia de estilo
 
+Revisado em 25/11/2026 na implementação do MVP (identidade "Platina", ADR 0006). O protótipo da Seção 4.2 mantém a identidade anterior. O vocabulário visual vem do microscópio e do atlas de histologia: o visualizador é a platina, com barra de escala em micrômetros, e o resultado é escrito como a legenda de uma prancha.
+
 ### Cores
-| Token | Valor | Uso | Contraste sobre `--bg` |
-|---|---|---|---|
-| `--bg` | `#090D16` | Fundo da aplicação | — |
-| `--surface-1` | `#0F1420` | Painéis | — |
-| `--surface-2` | `#161C2B` | Cards, popovers | — |
-| `--border` | `#232A3B` | Divisórias decorativas (não identificam controles sozinhas) | 1,4:1 |
-| `--border-strong` | `#64708A` | Borda de campos e controles interativos | 3,9:1 ✅ (3,4:1 sobre `--surface-2`) |
-| `--text` | `#E6E9EF` | Texto principal | 16,0:1 ✅ |
-| `--text-muted` | `#94A0B8` | Texto secundário | 7,4:1 ✅ |
-| `--accent` | `#14B8A6` | Ação primária, foco, classe sugerida | 7,8:1 ✅ |
-| `--accent-2` | `#10B981` | Sucesso, conclusão | 7,7:1 ✅ |
-| `--warn` | `#F59E0B` | Aviso ético, baixa confiança | 9,0:1 ✅ |
-| `--danger` | `#F97316` | Erro (laranja; nunca vermelho) | 6,9:1 ✅ |
+Contrastes calculados pela fórmula de luminância relativa da WCAG; o menor valor entre o fundo e os painéis.
+
+| Token | Tema escuro (padrão) | Tema claro (projetor) | Uso | Contraste mínimo (escuro / claro) |
+|---|---|---|---|---|
+| `--bg` | `#0D1517` | `#E9EFEE` | Fundo (estativa) | — |
+| `--s1` | `#142024` | `#FFFFFF` | Painéis (platina) | — |
+| `--s2` | `#1B2A2F` | `#F2F6F5` | Controles, cartões (lamínula) | — |
+| `--border` | `#26363C` | `#D2DCDA` | Divisórias decorativas (não identificam controles) | 1,2:1 / 1,2:1 |
+| `--border-strong` | `#667E86` | `#768885` | Borda de campos e grupos de controles | 3,4:1 ✅ / 3,2:1 ✅ |
+| `--text` | `#E3ECEA` | `#0F1F22` | Texto principal | 12,3:1 ✅ / 14,6:1 ✅ |
+| `--muted` | `#9AAFAB` | `#4A605C` | Texto secundário | 6,4:1 ✅ / 5,8:1 ✅ |
+| `--accent` | `#2BC3AE` | `#0A7266` | Ação primária, foco, classe sugerida | 6,7:1 ✅ / 5,0:1 ✅ |
+| `--accent2` | `#43C98E` | `#147A4E` | Acerto | 7,0:1 ✅ / 4,6:1 ✅ |
+| `--warn` | `#E9B44C` | `#8A5E00` | Aviso ético, baixa confiança, imagem fora do padrão | 7,8:1 ✅ / 4,9:1 ✅ |
+| `--danger` | `#F08A3C` | `#A94A12` | Erro (laranja; nunca vermelho) | 5,9:1 ✅ / 4,9:1 ✅ |
+| `--stage` | `#060A0B` | `#060A0B` | Fundo do visualizador (escuro nos dois temas) | — |
 
 **Regras de cor:**
 - Nunca usar vermelho, rosa ou roxo como cor de interface, para não confundir com a coloração H&E.
@@ -94,22 +99,25 @@ Fonte: elaborado pelo autor (2026).
 ### Tipografia
 | Uso | Fonte | Tamanho / peso |
 |---|---|---|
-| Interface | Inter | 14 px (corpo), 12 px (secundário), 16–20 px semibold (títulos) |
-| Números, percentuais, latências, *hashes* | JetBrains Mono | 13 px, `tabular-nums` |
+| Interface, números e percentuais | Instrument Sans | 15 px (corpo), 13 px (secundário), 15 px semibold (títulos de painel); números com `tabular-nums` |
+| Nome da classe sugerida e títulos de página | Source Serif 4 | 27–40 px, peso 500 |
+| *Hashes* | monoespaçada do sistema | 13 px |
+
+As fontes são servidas pelo próprio site (`next/font`); o navegador não faz requisição a serviços externos. Rótulos em caixa normal (sem caixa alta). Ícones da biblioteca Lucide, sem emoji.
 
 ### Espaçamento, formas e movimento
 - Grade de 4 px; espaçamentos de 8, 12, 16 e 24 px.
-- Raio de 8 px em cards e 6 px em campos.
-- Bordas de 1 px; sem sombras pesadas.
+- Raio de 12 px em painéis, 8–10 px em controles e 4 px no visualizador (a lâmina tem cantos quase retos).
+- Bordas de 1 px; sombra suave só nos painéis.
 - Animações de 150 a 250 ms, desativadas quando o usuário configurou o sistema para reduzir movimento (`prefers-reduced-motion`).
 - A imagem histológica nunca é animada.
 
 ### Componentes
 | Componente | Comportamento-chave |
 |---|---|
-| Banner ético | Fixo no topo: "Ferramenta educacional para estudo de padrões histológicos. Não substitui o exame anatomopatológico nem o laudo. A decisão clínica é sempre do médico". Minimizado, mantém "Não substitui laudo · decisão do médico"; nunca é removido (RF07; CONSELHO FEDERAL DE MEDICINA, 2026) |
+| Banner ético | Fixo no topo: "Ferramenta educacional para estudo de padrões histológicos. Não substitui o exame anatomopatológico nem o laudo. A decisão clínica é sempre do médico". Minimizado, mantém "Não substitui o laudo; a decisão clínica é do médico."; nunca é removido (RF07; CONSELHO FEDERAL DE MEDICINA, 2026) |
 | Área de envio | Arrastar e soltar, clique ou Ctrl+V; valida antes de enviar; orienta a enviar só o recorte de tecido, sem etiqueta ou dados de paciente (RN08); imagens maiores que 224 × 224 px são analisadas por recorte central, sem redução de escala (RN01) |
-| Visualizador | Zoom de 1× a 8× com roda do mouse, botões + e − ou teclado; mover arrastando, pelos botões de seta ou com Shift+setas; tecla `0` restaura. Texto fixo sobre a escala (224 × 224 px ≈ 112 × 112 µm) e a resolução do mapa (≈ 7 × 7, ampliada) |
+| Visualizador | Zoom de 1× a 8× com roda do mouse, botões + e − ou teclado; mover arrastando, pelos botões de seta ou com Shift+setas; tecla `0` restaura. Barra de escala em µm que acompanha o zoom (224 × 224 px ≈ 112 × 112 µm) e texto sobre a resolução do mapa (≈ 7 × 7, ampliada) |
 | Controle de opacidade | 0–100% (padrão 40%); setas do teclado mudam de 5 em 5% |
 | Barras de confiança | 9 barras ordenadas; classe sugerida em *teal*; *tooltip* morfológico (fecha com Esc); texto fixo: "Confiança = probabilidade estimada pelo modelo entre as 9 classes, não certeza" |
 | Alerta de baixa confiança | Âmbar, com ícone e texto, mostrando os critérios que diferenciam as duas classes mais prováveis (RN03) |
@@ -131,7 +139,7 @@ Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2024) verificados no protóti
 | 2.5.7 Movimentos de arrastar | Mover a imagem também é possível pelos botões de seta, sem arrastar |
 | 1.4.13 Conteúdo em foco ou *hover* | Os *tooltips* aparecem no foco e no *hover* e fecham com Esc |
 | 4.1.3 Mensagens de status | A conclusão da análise é anunciada uma única vez numa região `role="status"`; o cronômetro não é lido pelo leitor de tela |
-| 2.4.7 Foco visível | Contorno *teal* de 2 px em todos os elementos focáveis |
+| 2.4.7 Foco visível | Contorno de 2 px na cor de acento em todos os elementos focáveis |
 | 2.4.11 Foco não encoberto | O banner fixo não cobre o elemento focado |
 | 2.5.8 Tamanho do alvo (24 × 24 px) | Botões e controles com área clicável de pelo menos 24 px |
 | 3.3.1 Identificação de erros | Erros de envio explicam a causa e como corrigir |
