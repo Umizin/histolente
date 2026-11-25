@@ -1,7 +1,7 @@
 # Sprint 0 — Base do projeto e design
 
 **Período:** 10/11/2026 a 16/11/2026 (planejada até 23/11; encerrada antes porque a meta foi atingida)
-**Participantes:** Paulo Victor Silva Gonçalves (PO, SM e desenvolvimento); orientador(a) `[[nome]]` na Review, se disponível.
+**Participantes:** Paulo Victor Silva Gonçalves (PO, SM e desenvolvimento); orientador Tiago Castro na Review, se disponível.
 
 ---
 

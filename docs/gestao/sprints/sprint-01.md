@@ -63,15 +63,12 @@ Mudança de escopo, registrada também no quadro:
 
 ---
 
-## Sprint Review — `[[data]]`
+## Sprint Review — 29/11/2026 (prevista para o último dia da sprint)
 
-| Item | Concluído? | Observação |
-|---|---|---|
-| | | |
+A Review acontece no último dia da sprint, depois desta entrega. A situação de cada item até 25/11 está nos acompanhamentos acima e na coluna Status do backlog (documento de requisitos, Seção 4.3).
 
-## Retrospectiva — `[[data]]`
-- **O que funcionou bem:**
-- **O que pode melhorar:**
-- **Ações:**
+## Retrospectiva — 29/11/2026 (prevista para o último dia da sprint)
 
-**Velocidade:** `[[pontos concluídos]]` de 21 planejados.
+Registrada nesta ata depois da reunião.
+
+**Velocidade:** apurada na Review. Até 25/11, os itens concluídos somam 63 pontos, contra 21 planejados (escopo ampliado; ver os acompanhamentos acima).
