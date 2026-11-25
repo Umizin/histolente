@@ -2,7 +2,7 @@
 
 **Pesquisa:** Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com IA: uma ferramenta de apoio à Patologia Digital
 **Pesquisador:** Paulo Victor Silva Gonçalves — Engenharia de Software, UVS Maricá
-**Formato:** escrito e remoto, sem gravação, aplicado via Google Forms. O formulário completo (TCLE, aceite, perfis e perguntas) é criado automaticamente pelo script `docs/pesquisa/criar-formulario-elicitacao.gs`.
+**Formato:** escrito e remoto, sem gravação, aplicado via Google Forms. O formulário completo (TCLE, aceite, perfis e perguntas) é criado automaticamente por um script do Google Apps Script mantido pelo autor (fora do repositório).
 **Tempo de resposta:** cerca de 10 minutos · **7 perguntas abertas + 1 quadro de funcionalidades**
 
 **Perfis de participante:**

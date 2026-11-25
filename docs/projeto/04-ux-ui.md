@@ -152,7 +152,7 @@ Critérios da WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2024) verificados no protóti
 **Formato:** teste de usabilidade **remoto e não moderado**. Os participantes moram em outro município, por isso não há sessão presencial nem gravação.
 
 **Protocolo:**
-1. O participante recebe dois links: o protótipo em modo de teste (`index.html?teste`) e o formulário de avaliação. O formulário é gerado por `docs/pesquisa/criar-formulario-avaliacao-prototipo.gs` e contém o TCLE.
+1. O participante recebe dois links: o protótipo em modo de teste (`index.html?teste`) e o formulário de avaliação. O formulário é gerado por um script do Google Apps Script mantido pelo autor (fora do repositório) e contém o TCLE.
 2. No protótipo, um painel mostra as 4 tarefas, que o participante marca ao concluir:
    - analisar uma amostra rápida;
    - ajustar a opacidade, usar o lado a lado e o zoom;

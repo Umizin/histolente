@@ -16,7 +16,14 @@ permissions:
 
 jobs:
   imagens:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    # Repositório público: só publica o que veio de push na main DESTE repositório. Sem isso, um pull request
+    # de fork com uma branch chamada "main" dispararia o CD com os segredos e o código de quem abriu o PR.
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     strategy:
       matrix:

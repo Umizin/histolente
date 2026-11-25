@@ -497,7 +497,7 @@ Status: `[ ]` pendente · `[x]` corrigido (registrar onde).
 ### Geração de documentos (`tools/`)
 - `python3 -I tools/diagramas.py` → regenera `docs/engenharia-requisitos/casos-de-uso.svg` e `docs/monografia/figuras/arquitetura.svg`.
 - `python3 -I tools/mermaid_svg.py` → converte os blocos Mermaid de `docs/projeto/*.md` em SVG (`docs/projeto/figuras/`), usando o Chrome headless com Mermaid 11.4.1.
-- `python3 -I tools/md2pdf.py monografia|requisitos|projeto|gestao|todos` → gera `docs/monografia/monografia-versao-trabalho.pdf` (capítulos `docs/monografia/NN-*.md`, em ordem) e `docs/engenharia-requisitos/artefatos-engenharia-requisitos.pdf`; o alvo `gestao` também copia o PDF para `entregas/gestao-e-desenvolvimento/`. Usa o Chrome headless; sem dependências externas.
+- `python3 -I tools/md2pdf.py monografia|requisitos|projeto|gestao|todos` → gera `docs/monografia/monografia-versao-trabalho.pdf` (capítulos `docs/monografia/NN-*.md`, em ordem) e `docs/engenharia-requisitos/artefatos-engenharia-requisitos.pdf`; o alvo `gestao` também copia o PDF para `entregas/gestao-e-desenvolvimento/` (pasta ignorada pelo Git; o material vai pelo AVA). Usa o Chrome headless; sem dependências externas.
 - Os apêndices da monografia (`95-apendices.md`) usam `@@incluir arquivo.md | Título da seção@@` para puxar o conteúdo do documento de requisitos e do roteiro — **fonte única**: edite o original, não a cópia.
 
 ## 8. Regras para o Claude neste repositório
