@@ -331,37 +331,37 @@ Como **estudante**, quero **receber um conjunto de amostras e apontar qual delas
 
 ### 4.3 Product Backlog inicial
 
-Estimativas em *story points* (sequência de Fibonacci), com sprints de duas semanas. Os itens EN são **habilitadores técnicos**: não têm valor direto para o usuário, mas sustentam as histórias. Situação em 18/11/2026: EN03 concluído; EN01 e EN02 em andamento (ver coluna Status).
+Estimativas em *story points* (sequência de Fibonacci), com sprints de duas semanas. Os itens EN são **habilitadores técnicos**: não têm valor direto para o usuário, mas sustentam as histórias. Situação em 25/11/2026 na coluna Status; a coluna Sprint planejada mostra o plano original (o replanejamento está no documento de gestão, EAP e roadmap).
 
 | Ordem | ID | Item | Épico | MoSCoW | Pontos | Sprint planejada | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | EN01 | Pipeline de treino e avaliação do modelo (separação treino/validação, teste no CRC-VAL-HE-7K, métricas scikit-learn) | — | M | 13 | S1 | Em andamento: código e testes prontos (PR #42); falta o treino real |
-| 2 | EN02 | Ambiente Docker Compose (Postgres, Redis, RabbitMQ, web, serviço de IA) | — | M | 5 | S1 | Em andamento: infraestrutura pronta (PR #41); web e serviço de IA entram com HU01 e EN04 |
-| 3 | EN03 | Contrato JSON das mensagens entre backend e serviço de IA (versão 1) | — | M | 3 | S1 | Concluído (PR #40) |
-| 4 | EN04 | Serviço de IA: consumir a fila, classificar, gerar Grad-CAM e publicar o resultado | — | M | 8 | S2 | A fazer |
-| 5 | HU14 | Autenticar-se | E5 | M | 5 | S2 | A fazer |
-| 6 | HU17 | Aceitar termo de uso (pré-condição do envio) | E5 | M | 3 | S2 | A fazer |
-| 7 | HU01 | Enviar patch | E1 | M | 5 | S2 | A fazer |
-| 8 | HU19 | Acompanhar a análise em tempo real (SSE) | E1 | M | 5 | S2 | A fazer |
-| 9 | HU04 | Ver resultado e confiança | E1 | M | 5 | S2 | A fazer |
-| 10 | HU12 | Aviso ético permanente | E5 | M | 1 | S2 | A fazer |
-| 11 | HU07 | Sobrepor Grad-CAM com opacidade ajustável | E2 | M | 8 | S3 | A fazer |
-| 12 | HU02 | Analisar amostra da galeria | E3 | M | 3 | S3 | A fazer |
-| 13 | HU05 | Consultar morfologia das classes | E3 | M | 3 | S3 | A fazer |
-| 14 | HU22 | Ser avisado sobre imagem fora do padrão | E1 | M | 5 | S3 | A fazer |
-| 15 | HU10 | Consultar histórico | E4 | M | 5 | S3 | A fazer |
-| 16 | HU08 | Comparar lado a lado com zoom sincronizado | E2 | S | 8 | S4 | A fazer |
-| 17 | HU06 | Alerta de baixa confiança | E3 | S | 2 | S4 | A fazer |
+| 1 | EN01 | Pipeline de treino e avaliação do modelo (separação treino/validação, teste no CRC-VAL-HE-7K, métricas scikit-learn) | — | M | 13 | S1 | Em andamento: pipeline (#42) e modelo preliminar 0.1.0 (#51); falta o treino completo |
+| 2 | EN02 | Ambiente Docker Compose (Postgres, Redis, RabbitMQ, web, serviço de IA) | — | M | 5 | S1 | Concluído (#41, #48, #52) |
+| 3 | EN03 | Contrato JSON das mensagens entre backend e serviço de IA (versão 1) | — | M | 3 | S1 | Concluído (#40) |
+| 4 | EN04 | Serviço de IA: consumir a fila, classificar, gerar Grad-CAM e publicar o resultado | — | M | 8 | S2 | Em andamento: serviço pronto (#48, #53, #57); faltam o teste com GPU e os tipos gerados dos contratos |
+| 5 | HU14 | Autenticar-se | E5 | M | 5 | S2 | Concluído (#48) |
+| 6 | HU17 | Aceitar termo de uso (pré-condição do envio) | E5 | M | 3 | S2 | Concluído (#48) |
+| 7 | HU01 | Enviar patch | E1 | M | 5 | S2 | Concluído (#48) |
+| 8 | HU19 | Acompanhar a análise em tempo real (SSE) | E1 | M | 5 | S2 | Concluído (#48) |
+| 9 | HU04 | Ver resultado e confiança | E1 | M | 5 | S2 | Concluído (#48) |
+| 10 | HU12 | Aviso ético permanente | E5 | M | 1 | S2 | Concluído (#48) |
+| 11 | HU07 | Sobrepor Grad-CAM com opacidade ajustável | E2 | M | 8 | S3 | Concluído (#48, #57) |
+| 12 | HU02 | Analisar amostra da galeria | E3 | M | 3 | S3 | Concluído (#50) |
+| 13 | HU05 | Consultar morfologia das classes | E3 | M | 3 | S3 | Em andamento: critérios nas dicas e no quiz (#48, #50); falta a revisão de docente |
+| 14 | HU22 | Ser avisado sobre imagem fora do padrão | E1 | M | 5 | S3 | Concluído (#50, #53) |
+| 15 | HU10 | Consultar histórico | E4 | M | 5 | S3 | Em andamento: lista paginada, filtro por classe e reabertura (#48); faltam filtros por data e lote |
+| 16 | HU08 | Comparar lado a lado com zoom sincronizado | E2 | S | 8 | S4 | Concluído (#50) |
+| 17 | HU06 | Alerta de baixa confiança | E3 | S | 2 | S4 | Concluído (#50) |
 | 18 | HU18 | Reenviar análise com falha | E1 | S | 3 | S4 | A fazer |
-| 19 | HU15 | Conhecer o modelo e suas limitações | E5 | S | 2 | S4 | A fazer |
-| 20 | HU13 | Praticar em modo quiz (com erro explicado) | E3 | S | 5 | S5 | A fazer |
+| 19 | HU15 | Conhecer o modelo e suas limitações | E5 | S | 2 | S4 | Em andamento: página Sobre com a versão do modelo (#48) |
+| 20 | HU13 | Praticar em modo quiz (com erro explicado) | E3 | S | 5 | S5 | Concluído (#53) |
 | 21 | HU03 | Enviar lote para aula | E1 | S | 8 | S5 | A fazer |
 | 22 | EN05 | Testes de carga e de longa duração (k6) | — | M | 5 | S5 | A fazer |
 | 23 | EN06 | Aplicação do SUS e das entrevistas de avaliação | — | M | 5 | S6 | A fazer |
 | 24 | HU20 | Comparar classes confundíveis | E3 | C | 5 | S6 | A fazer |
 | 25 | HU21 | Acompanhar meu progresso | E3 | C | 3 | S6 | A fazer |
 | 26 | HU23 | Encontre o intruso | E3 | C | 5 | S6 | A fazer |
-| 27 | HU11 | Exportar histórico | E4 | C | 2 | S6 | A fazer |
+| 27 | HU11 | Exportar histórico | E4 | C | 2 | S6 | Em andamento: exportação CSV da página (#48) |
 | 28 | HU09 | Grad-CAM para outra classe | E2 | C | 3 | S6 | A fazer |
 | 29 | HU16 | Trocar versão do modelo | E6 | C | 5 | S6 | A fazer |
 

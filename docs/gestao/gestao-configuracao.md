@@ -55,38 +55,6 @@ Toda referência a requisito usa o ID do documento de requisitos (RF, RNF, HU, U
 - **Campos:** Sprint, Pontos, Prioridade (MoSCoW), Épico, Requisito.
 - Cada história do backlog vira uma *issue*, com os critérios de aceite como checklist. O PR fecha a issue (`Closes #N`).
 
-## 6. Integração e entrega contínuas (CI/CD)
+## 6. Integração e entrega contínuas
 
-**CI** (`.github/workflows/ci.yml`, em todo PR e na `main`):
-
-| Job | O que verifica |
-|---|---|
-| Schema do banco | `infra/db/schema.sql` aplica sem erro no PostgreSQL 16.6 |
-| Contratos de mensagens | exemplos e casos inválidos contra os JSON Schemas de `packages/contracts` |
-| Aplicação web | verificação de tipos (TypeScript estrito), testes unitários (Vitest) e build de produção |
-| Serviço de inferência | build da imagem e testes, incluindo o teste de arquitetura do RNF06 (nenhum driver ou variável de banco) |
-| Ambiente completo e teste de fumaça | sobe a pilha inteira com Docker Compose e percorre o fluxo principal pela API: cadastro, termo, validações, análise com aviso por SSE, cache e isolamento entre usuários |
-| Pipeline de ML | testes de dados, modelos, Grad-CAM e exportação |
-| Ferramentas de documentação | scripts de geração de diagramas e PDFs |
-
-**CD** (`.github/workflows/cd.yml`): quando a CI passa na `main`, as imagens `histolente-web` e `histolente-inference` são publicadas no GitHub Container Registry com as etiquetas `latest` e o SHA do commit. A etiqueta pelo SHA permite voltar a uma versão anterior.
-
-**Implantação** (`infra/docker-compose.prod.yml`): a mesma composição do desenvolvimento, trocando o build local pelas imagens do GHCR. O Watchtower consulta o registro a cada 5 minutos e reinicia só os serviços da aplicação quando há imagem nova; banco, Redis e RabbitMQ não são tocados. A publicação na internet é feita por Cloudflare Tunnel, sem abrir porta no roteador:
-
-```
-docker login ghcr.io -u <usuario>                    # token com read:packages
-# endereço fixo (TUNNEL_TOKEN no infra/.env, criado no painel da Cloudflare):
-docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile app --profile publicar up -d --wait
-# ou endereço temporário *.trycloudflare.com, sem conta:
-docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile app --profile publicar-rapido up -d --wait
-docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml logs tunel-rapido | grep trycloudflare
-```
-
-Num servidor com IP público (como a VPS da demonstração), o perfil `publicar-vps` sobe o Caddy nas portas 80 e 443, com HTTPS automático para o domínio em `DOMINIO`:
-
-```
-docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile app --profile publicar-vps up -d --wait
-docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile atualizar up -d   # Watchtower
-```
-
-Fluxo completo: commit → PR → CI verde → merge na `main` → CD publica a imagem → Watchtower atualiza o servidor.
+O pipeline de build, testes e implantação está no capítulo "Integração e entrega contínuas (CI/CD) e deploy".

@@ -122,8 +122,12 @@ services:
     environment: *ambiente_web
     volumes:
       - appdata:/data
-    healthcheck:
-      disable: true
+    healthcheck:   # o consumidor grava /tmp/consumidor-vivo a cada 10 s enquanto está conectado à fila
+      test: ["CMD", "node", "-e", "const t=+require('fs').readFileSync('/tmp/consumidor-vivo','utf8');process.exit(Date.now()-t<45000?0:1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     depends_on:
       web: { condition: service_healthy }
     networks: [backend_net, cache_net, mq_net]

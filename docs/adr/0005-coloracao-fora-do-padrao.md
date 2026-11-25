@@ -27,7 +27,7 @@ Normalizar de novo imagens que já estão no padrão distorce as que têm um cor
 4. A referência (vetores, concentrações e limiares) é calculada só com imagens de treino (`python -m histolente_ml referencia-cor`, 300 por classe da lista `ml/splits-preliminar/treino.csv`, semente 42) e fica em `ml/histolente_ml/referencia_cor.json`. O conjunto de teste não foi usado para escolher limiares.
 
 ## Consequências
-- As métricas do modelo no conjunto de teste não mudam (Seção 5 do documento de MVP).
+- As métricas do modelo no conjunto de teste não mudam (Seção 6 do documento de MVP).
 - O alerta de coloração aparece em 4,6 % das imagens do CRC-VAL-HE-7K (331 de 7.180; 117 delas DEB, porque a coloração das DEB do teste difere das de treino; nenhuma LYM). Nas imagens marcadas, a sugestão original acertou 89,1 % (contra 96,6 % no conjunto todo) e a da cor ajustada, 46,5 %. O alerta aponta imagens mais difíceis; a sugestão com a cor ajustada serve para mostrar que a cor influencia o modelo, não como resposta melhor. Relatório em `ml/reports/r18-preliminar-cor/`.
 - Cada análise com tecido faz uma passagem a mais pelo modelo (a da imagem normalizada).
 - O contrato ganhou dois campos opcionais (`ood_reasons` e `color_adjusted`) sem mudar a versão 1.0; o banco ganhou as colunas correspondentes (`infra/db/migracoes/2026-11-25-cor.sql`).

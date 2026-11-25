@@ -1,7 +1,8 @@
 name: CD
 
-# Publica as imagens no GitHub Container Registry depois que a CI passa na main.
-# No servidor, o Watchtower (infra/docker-compose.prod.yml) baixa a imagem nova e reinicia o serviço.
+# Depois que a CI passa na main: publica as imagens no GitHub Container Registry (job imagens) e atualiza o
+# servidor da demonstração (job implantar). A implantação só roda quando o repositório tem os segredos
+# DEPLOY_SSH_KEY e DEPLOY_KNOWN_HOSTS e a variável DEPLOY_HOST (ver docs/gestao/cicd-e-deploy.md).
 on:
   workflow_run:
     workflows: [CI]
@@ -49,3 +50,58 @@ jobs:
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha,scope=${{ matrix.nome }}
           cache-to: type=gha,mode=max,scope=${{ matrix.nome }}
+
+  implantar:
+    needs: imagens
+    runs-on: ubuntu-latest
+    concurrency: implantacao        # uma implantação por vez
+    env:
+      HOST: ${{ vars.DEPLOY_HOST }}
+      URL: ${{ vars.DEPLOY_URL }}
+      CONFIGURADO: ${{ secrets.DEPLOY_SSH_KEY != '' && vars.DEPLOY_HOST != '' }}
+    steps:
+      - name: Implantação configurada?
+        run: |
+          if [ "$CONFIGURADO" != "true" ]; then
+            echo "::notice::Segredos de implantação ausentes; o servidor não foi atualizado."
+          fi
+      - uses: actions/checkout@v4
+        if: env.CONFIGURADO == 'true'
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Chave SSH de implantação
+        if: env.CONFIGURADO == 'true'
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/implantacao && chmod 600 ~/.ssh/implantacao
+          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+      - name: Copia a composição (sem o .env, que fica só no servidor)
+        if: env.CONFIGURADO == 'true'
+        run: |
+          tar -czf - infra/docker-compose.yml infra/docker-compose.prod.yml infra/caddy infra/db \
+            | ssh -i ~/.ssh/implantacao root@"$HOST" 'tar -xzf - -C /opt/histolente'
+      - name: Baixa as imagens, aplica as migrações e reinicia a aplicação
+        if: env.CONFIGURADO == 'true'
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}   # temporário: expira quando o job termina
+        run: |
+          { printf 'TOKEN=%q\nUSUARIO=%q\n' "$TOKEN" "${{ github.actor }}"; cat <<'REMOTO'
+          set -euo pipefail
+          cd /opt/histolente
+          C="docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile app --profile publicar-vps"
+          echo "$TOKEN" | docker login ghcr.io -u "$USUARIO" --password-stdin
+          $C pull web consumidor inference < /dev/null
+          docker logout ghcr.io < /dev/null
+          for f in infra/db/migracoes/*.sql; do   # migrações idempotentes (IF NOT EXISTS)
+            docker compose -f infra/docker-compose.yml exec -T postgres sh -c 'psql -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < "$f"
+          done
+          $C up -d --wait < /dev/null
+          docker image prune -f < /dev/null > /dev/null
+          REMOTO
+          } | ssh -i ~/.ssh/implantacao root@"$HOST" 'bash -s'
+      - name: Confere o site publicado
+        if: env.CONFIGURADO == 'true'
+        run: |
+          for i in $(seq 1 10); do curl -fsS "$URL/api/healthz" && break; sleep 6; done
+          curl -fsS "$URL/api/model"
+          curl -fsS -o /dev/null -w "login %{http_code}\n" "$URL/login"

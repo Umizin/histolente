@@ -6,7 +6,7 @@ O MVP cobre o fluxo central da ferramenta: o estudante entra, aceita o termo de 
 
 | Item do backlog | Requisito | Situação |
 |---|---|---|
-| EN01 — Pipeline de treino e avaliação | RNF10 | Pronto; modelo preliminar treinado (Seção 5) |
+| EN01 — Pipeline de treino e avaliação | RNF10 | Pronto; modelo preliminar treinado (Seção 6) |
 | EN02 — Docker Compose com todos os serviços | RNF03, RNF06 | Pronto |
 | EN03 — Contratos das mensagens | RNF06 | Pronto |
 | EN04 — Serviço de inferência | RF02, RF04, RNF01 | Pronto; falta medir o p95 no hardware de referência |
@@ -19,7 +19,7 @@ O MVP cobre o fluxo central da ferramenta: o estudante entra, aceita o termo de 
 | HU02, HU06, HU08, HU22 — galeria, baixa confiança, lado a lado, imagem fora do padrão | RF01, RF03, RF04, RF17 | Prontos (adiantados da Sprint 3 e 4) |
 | HU10 — Histórico | RF05, RF06 | Parcial: filtro por classe e paginação; faltam filtros por data e lote |
 | HU13 — Modo quiz | RF01, RF03 | Pronto (adiantado da Sprint 5) |
-| — Alerta de coloração fora do padrão | RF17, risco R01 | Pronto (ADR 0005; Seção 5.1) |
+| — Alerta de coloração fora do padrão | RF17, risco R01 | Pronto (ADR 0005; Seção 6.1) |
 | — "Como ler este mapa": onde está a influência e o que há na região (hematoxilina, eosina, espaço claro), medido na imagem, com os limites do Grad-CAM | RF04 | Pronto |
 
 ## 2. Arquitetura implementada
@@ -107,7 +107,48 @@ Fonte: elaborado pelo autor (2026).
 
 Fonte: elaborado pelo autor (2026), com imagem de Kather et al. (2018).
 
-## 5. Modelo preliminar (versão 0.1.0)
+## 5. Qualidade do código
+
+O código segue as convenções do projeto (`CLAUDE.md`, Seção 4): TypeScript estrito (`strict` e `noUncheckedIndexedAccess`), Python com *type hints*, validação de toda entrada externa na fronteira (Zod nas rotas da API, JSON Schema e validação explícita nas mensagens), configuração só por variáveis de ambiente validadas no início e nenhum segredo no repositório.
+
+**Organização (separação de responsabilidades).** Cada serviço separa domínio, aplicação e infraestrutura, e as dependências apontam para dentro:
+
+| Serviço | Domínio e regras (sem E/S) | Infraestrutura (E/S) | Interface |
+|---|---|---|---|
+| Web e orquestração | `lib/classes.ts` (classes, critérios, limiares), `lib/imagem.ts` (tipo real do arquivo, recorte), `lib/leitura-mapa.ts`, `lib/formato.ts` | `lib/infra.ts` (PostgreSQL, Redis, RabbitMQ), `lib/armazenamento.ts`, `consumer.mjs` | rotas em `app/api/`, telas em `app/` e `components/` |
+| Inferência | `histolente_ml` (pré-processamento, Grad-CAM, cor e leitura do mapa, compartilhados com o treino) e `app/modelo.py` | `app/consumidor.py` (AMQP) | `app/main.py` (saúde, prontidão, versão do modelo) |
+
+O pré-processamento é um só, no pacote `histolente_ml`, usado pelo treino e pelo serviço: não existem duas versões que possam divergir.
+
+**SOLID, onde se aplica:**
+- *Responsabilidade única:* funções pequenas e puras para regras testáveis (`tipoReal`, `pct`, `onde`/`conteudo` da leitura do mapa, `estimar_manchas`, `resumir_mapa`); o componente `Escala` só desenha a barra de escala.
+- *Inversão de dependência:* o `Consumidor` recebe o `Classificador` pelo construtor e não sabe como o modelo funciona; o `Classificador` não conhece filas. Os testes do serviço usam o classificador sem RabbitMQ.
+- *Aberto/fechado:* backbones novos entram no registro `BACKBONES` (`histolente_ml/modelos.py`) sem mudar quem cria o modelo; motivos de alerta e paletas são tabelas, não condicionais espalhadas.
+
+**Padrões de projeto e de integração:**
+
+| Padrão | Onde |
+|---|---|
+| Fábrica (*Factory*) | `criar(backbone)` em `histolente_ml/modelos.py` |
+| Estratégia (*Strategy*) | paleta do mapa escolhida em `colorir` (`lib/cores.ts`) |
+| Adaptador (*Adapter*) | `lib/infra.ts` isola os clientes de banco, cache e fila; instâncias únicas por processo |
+| Observador (*Observer*) | ganchos do PyTorch no Grad-CAM (`gradcam.py`); SSE no navegador |
+| *Publish/Subscribe* | canal Redis `user:{id}` avisa o navegador do resultado |
+| *Message Queue* e *Dead Letter Channel* | filas `inference.request` e `inference.completed`; mensagens inválidas ou com 3 falhas vão para `inference.dlq` |
+| Receptor idempotente | o consumidor ignora `job_id` repetido (atualização condicional ao estado `QUEUED`) |
+| *Cache-Aside* | resultado em cache por SHA-256 da imagem + versão do modelo + versão do pré-processamento |
+
+**Clean Code:** nomes do domínio em português (`Classificador`, `recorte_central`, `fora_do_padrao`); limiares como constantes nomeadas (`LIMIAR_BAIXA_CONFIANCA`, `LIMIAR_TECIDO`, `MAX_BYTES`); erros tratados na fronteira com mensagem para o usuário; comentários só onde explicam o porquê. As decisões de arquitetura ficam em ADRs (`docs/adr/0001` a `0006`).
+
+**Testes:** 88 testes automatizados (22 de contrato, 36 de ML, 9 do serviço de inferência, 14 da web, 7 do ambiente) e o teste de fumaça de ponta a ponta, todos na CI.
+
+**O que ainda não segue o padrão** (dívida técnica registrada):
+- `components/Workstation.tsx` tem cerca de 320 linhas e junta envio, visualizador e resultado; o próximo passo é dividi-lo em componentes menores.
+- A rota `POST /api/analyses` concentra validação, cache, persistência e publicação; a lógica pode ir para um caso de uso separado.
+- Os tipos Zod e Pydantic ainda não são gerados a partir dos JSON Schemas (EN04).
+- *Lint* (ESLint e ruff) e `mypy --strict` ainda não rodam na CI.
+
+## 6. Modelo preliminar (versão 0.1.0)
 
 Para o MVP funcionar com um modelo real antes do treino completo, foi treinada uma ResNet-18 pré-treinada na ImageNet, em CPU, com uma subamostra balanceada do NCT-CRC-HE-100K: 800 imagens por classe, divididas em 680 para treino e 120 para validação (semente 42; listas em `ml/splits-preliminar/`). Foram 4 épocas, em cerca de 45 minutos. A avaliação usou o CRC-VAL-HE-7K inteiro (7.180 imagens), que vem de pacientes diferentes dos do treino e não foi usado em nenhuma decisão de treino.
 
@@ -131,7 +172,7 @@ Fonte: elaborado pelo autor (2026), com dados de Kather et al. (2018).
 
 O ponto fraco é o estroma (STR): só 68,9 % são reconhecidos, e 23 % vão para músculo liso (MUS). É a confusão que a interface já explica no texto de diferenças entre classes. Ela é o foco do treino completo, com o conjunto inteiro e mais épocas, no Google Colab. A acurácia de validação (98,6 %) fica acima da de teste porque treino e validação vêm das mesmas lâminas. Por isso os números que valem são os do conjunto de teste.
 
-### 5.1 Imagens com outra coloração
+### 6.1 Imagens com outra coloração
 
 No primeiro teste da demonstração, um recorte de mucosa colônica tirado de um atlas, mais pálido e lilás que as imagens do dataset, recebeu a sugestão BACK com 99,1 %, e o alerta de imagem fora do padrão não disparou, porque havia bastante tecido e a confiança era alta. O experimento com essa imagem mostrou que a causa é a coloração, não a escala. O NCT-CRC-HE-100K foi todo normalizado pelo método de Macenko, e o modelo nunca viu uma coloração assim.
 
@@ -145,7 +186,7 @@ Três políticas foram comparadas no CRC-VAL-HE-7K (ADR 0005):
 
 Normalizar piorou o modelo nas imagens do próprio dataset. Por isso, a decisão foi **não trocar o resultado**: a sugestão continua sendo a da imagem original, e a coloração é verificada à parte. Quando os vetores de hematoxilina e eosina da imagem se afastam dos de treino mais do que o limite observado no treino para a classe sugerida, a análise recebe o alerta de coloração, e a tela mostra também a sugestão para a imagem com a cor ajustada (Figura 7). No caso do atlas, a sugestão original é BACK e a da cor ajustada é TUM; quando as duas diferem, a tela avisa que nenhuma é confiável.
 
-Com essa regra, as métricas da Seção 5 não mudam, porque o resultado é o da imagem original. No CRC-VAL-HE-7K, o alerta aparece em 4,6 % das imagens (331 de 7.180), 117 delas DEB, cuja coloração no conjunto de teste difere da do treino. Nas imagens marcadas, a sugestão original acerta 89,1 % (contra 96,6 % no conjunto todo) e a da cor ajustada só 46,5 %. O alerta aponta imagens mais difíceis; a sugestão com a cor ajustada serve para mostrar ao estudante que a cor influencia o modelo, não como resposta melhor.
+Com essa regra, as métricas da Seção 6 não mudam, porque o resultado é o da imagem original. No CRC-VAL-HE-7K, o alerta aparece em 4,6 % das imagens (331 de 7.180), 117 delas DEB, cuja coloração no conjunto de teste difere da do treino. Nas imagens marcadas, a sugestão original acerta 89,1 % (contra 96,6 % no conjunto todo) e a da cor ajustada só 46,5 %. O alerta aponta imagens mais difíceis; a sugestão com a cor ajustada serve para mostrar ao estudante que a cor influencia o modelo, não como resposta melhor.
 
 **Figura 7 — Recorte de atlas com coloração fora do padrão: alerta e sugestão com a cor ajustada**
 
@@ -153,28 +194,15 @@ Com essa regra, as métricas da Seção 5 não mudam, porque o resultado é o da
 
 Fonte: elaborado pelo autor (2026).
 
-## 6. Implantação
+## 7. Implantação
 
-Fluxo: commit → pull request → CI → merge na `main` → CD publica as imagens no GitHub Container Registry → Watchtower atualiza o servidor. Detalhes e comandos na Seção 6 de `gestao-configuracao.md`.
+A aplicação está publicada em **https://189-24-15-186.sslip.io**. O servidor, o pipeline e o processo de atualização estão no capítulo "Integração e entrega contínuas (CI/CD) e deploy".
 
-**Endereço de demonstração:** https://189-24-15-186.sslip.io
-
-| Item | Configuração |
-|---|---|
-| Servidor | VPS Hostinger KVM 2, data center no Brasil: 2 vCPU, 8 GB de RAM, Ubuntu 26.04 LTS, sem GPU |
-| Publicação | Caddy 2.8 nas portas 80 e 443, com certificado HTTPS automático (Let's Encrypt); HTTP redireciona para HTTPS |
-| Endereço | `sslip.io` resolve o nome para o IP do servidor, sem registro de domínio |
-| Segurança | firewall só com as portas 22, 80 e 443; SSH só por chave; banco, Redis e RabbitMQ sem porta exposta; senhas geradas no próprio servidor |
-| Aplicação | os mesmos seis contêineres do desenvolvimento, com as imagens do GHCR e o modelo 0.1.0 (SHA-256 conferido depois da cópia) |
-| Atualização | na primeira implantação as imagens foram copiadas da máquina de desenvolvimento (mesmo commit da `main`); a atualização automática pelo Watchtower entra quando o servidor tiver um token só de leitura do GHCR |
-
-Implantação em 25/11/2026. O teste de fumaça, rodado de fora contra o endereço público, passou, com 340 ms do envio ao evento SSE.
-
-## 7. Limitações conhecidas
+## 8. Limitações conhecidas
 
 - O estado `PROCESSING` e a versão do modelo no pedido ficam para o contrato v1.1 (ADR 0004).
 - Envio em lote, modo quiz, reenvio de análise com falha e Grad-CAM de outra classe estão nas sprints seguintes.
 - Os textos morfológicos das classes ainda precisam da revisão de um docente de Patologia (HU05).
-- O modelo preliminar não substitui o treino completo previsto; os números da Seção 5 não são o resultado final do trabalho.
-- O modelo é sensível à coloração (Seção 5.1). O alerta reduz o risco, mas não o elimina: imagens de outros laboratórios e de atlas podem receber sugestões erradas com confiança alta. O treino completo vai incluir aumento de dados de cor.
+- O modelo preliminar não substitui o treino completo previsto; os números da Seção 6 não são o resultado final do trabalho.
+- O modelo é sensível à coloração (Seção 6.1). O alerta reduz o risco, mas não o elimina: imagens de outros laboratórios e de atlas podem receber sugestões erradas com confiança alta. O treino completo vai incluir aumento de dados de cor.
 - Adenoma e displasia não são classes do dataset; podem aparecer como NORM ou TUM.
