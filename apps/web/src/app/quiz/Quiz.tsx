@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CircleCheck, CircleX, Microscope } from "lucide-react";
+import { Escala } from "@/components/Escala";
 import { CLASSES, INFO, type Classe } from "@/lib/classes";
 
 type Amostra = { id: string; url: string; total: number };
@@ -45,6 +47,9 @@ export function Quiz() {
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.ctrlKey || e.metaKey || e.altKey) return;
+      // WCAG 2.1.4: atalho de uma tecla só vale com o foco na própria página do quiz (ou em nenhum controle)
+      const foco = document.activeElement;
+      if (foco && foco !== document.body && !foco.closest(".quiz")) return;
       const n = Number(e.key);
       if (!correcao && n >= 1 && n <= 9) { e.preventDefault(); void responder(CLASSES[n - 1]!); }
     };
@@ -66,27 +71,31 @@ export function Quiz() {
   return (
     <div className="quiz">
       <section className="panel quiz-img" aria-label="Amostra">
-        {amostra ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={amostra.url} alt="Recorte de lâmina H&E de 224 × 224 px para classificar" width={224} height={224} />
-        ) : <div className="skeleton" style={{ aspectRatio: "1", borderRadius: 6 }} />}
-        <p className="hint">Recorte de 224 × 224 px do CRC-VAL-HE-7K (Kather et al., 2018), ampliado na tela.</p>
+        <div className="viewer">
+          {amostra ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={amostra.url} alt="Recorte de lâmina H&E de 224 × 224 px para classificar" width={224} height={224} />
+          ) : <div className="skeleton" style={{ position: "absolute", inset: 0 }} />}
+          {amostra && <Escala />}
+        </div>
+        <p className="hint">Recorte de 224 × 224 px (cerca de 112 µm de lado) do CRC-VAL-HE-7K (Kather et al., 2018).</p>
       </section>
 
       <section className="panel" aria-label="Pergunta">
         <div className="quiz-topo">
-          <h2 style={{ margin: 0 }}>Que tecido é este?</h2>
-          <span className="mono" aria-live="polite">Acertos: {placar.acertos} de {placar.total}</span>
+          <h1>Que tecido é este?</h1>
+          <span className="placar" aria-live="polite">Acertos: <b>{placar.acertos}</b> de <b>{placar.total}</b></span>
         </div>
-        <p style={{ color: "var(--muted)", margin: "6px 0 0" }}>Escolha uma classe (ou tecle de 1 a 9). A resposta e a sugestão do modelo só aparecem depois.</p>
+        <p className="hint" style={{ marginTop: 6 }}>Escolha uma classe ou use as teclas de 1 a 9. A resposta e a sugestão do modelo só aparecem depois.</p>
 
         <div className="opcoes" role="group" aria-label="Classes">
           {CLASSES.map((c, i) => {
             const estado = correcao ? (c === correcao.classe ? "certa" : c === escolha ? "errada" : "") : c === escolha ? "marcada" : "";
             return (
               <button key={c} type="button" className={`opcao ${estado}`} onClick={() => void responder(c)} disabled={!!escolha || !amostra}
-                      aria-pressed={c === escolha}>
-                <span className="mono">{i + 1} · {c}</span>
+                      aria-pressed={c === escolha} aria-keyshortcuts={String(i + 1)}>
+                <kbd>{i + 1}</kbd>
+                <span className="s">{c}</span>
                 <small>{INFO[c].nome}</small>
               </button>
             );
@@ -97,18 +106,19 @@ export function Quiz() {
 
         {correcao && (
           <div className="correcao" aria-live="polite">
-            <p className={correcao.correta ? "ok" : "bad"} style={{ fontWeight: 600, margin: "0 0 6px" }}>
-              {correcao.correta ? "Acertou." : "Não foi dessa vez."} Rótulo de referência: <span className="mono">{correcao.classe}</span> · {correcao.nome}
+            <p className={`veredito ${correcao.correta ? "ok" : "bad"}`}>
+              {correcao.correta ? <CircleCheck className="ico" aria-hidden="true" /> : <CircleX className="ico" aria-hidden="true" />}
+              {correcao.correta ? "Acertou." : "Não foi dessa vez."} Rótulo de referência: {correcao.classe}, {correcao.nome.toLowerCase()}.
             </p>
             {!correcao.correta && correcao.explicacao && escolha && (
-              <p style={{ margin: "0 0 6px" }}><strong>Por que não é {escolha}?</strong> {correcao.explicacao}</p>
+              <p><strong>Por que não é {escolha}?</strong> {correcao.explicacao}</p>
             )}
-            <p style={{ margin: "0 0 6px" }}><strong>Critérios de {correcao.classe}:</strong> {correcao.criterios}</p>
+            <p><strong>Critérios de {correcao.classe}:</strong> {correcao.criterios}</p>
             <p className="hint" style={{ marginTop: 0 }}><em>Atenção:</em> {correcao.atencao}</p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div className="acoes">
               <button ref={proximoBtn} type="button" className="btn" onClick={() => void proxima()}>Próxima amostra</button>
               <button type="button" className="btn ghost" onClick={() => void verAnalise()} disabled={abrindo}>
-                {abrindo ? "Abrindo…" : "Ver análise do modelo"}
+                <Microscope className="ico" aria-hidden="true" />{abrindo ? "Abrindo…" : "Ver análise do modelo"}
               </button>
             </div>
           </div>

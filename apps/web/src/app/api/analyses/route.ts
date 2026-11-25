@@ -64,7 +64,10 @@ export async function POST(req: Request): Promise<NextResponse> {
   const img = await db().query(
     `INSERT INTO images (sha256, mime_type, width, height, size_bytes, storage_key, source, ground_truth_class)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-     ON CONFLICT (sha256) DO UPDATE SET sha256 = EXCLUDED.sha256 RETURNING id`,
+     ON CONFLICT (sha256) DO UPDATE SET
+       source = CASE WHEN images.ground_truth_class IS NULL THEN EXCLUDED.source ELSE images.source END,
+       ground_truth_class = COALESCE(images.ground_truth_class, EXCLUDED.ground_truth_class)
+     RETURNING id`, // a mesma imagem pode ter sido enviada antes como arquivo: a galeria completa a origem e o rótulo
     [hash, mime, largura, altura, original.length, chaveImagem, origem, rotulo]);
   const imageId: string = img.rows[0].id;
 

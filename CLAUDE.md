@@ -303,20 +303,22 @@ TCC/
 5. **Densidade de workstation**, não de landing page: informação próxima, sem rolagem para o essencial em 1366×768.
 
 ### 2.2 Tokens (CSS variables / Tailwind)
+> Revisados em 25/11/2026 (identidade "Platina", ADR 0006). Valores do tema claro e contrastes em `docs/projeto/04-ux-ui.md` §4.3.
+
 | Token | Valor | Uso |
 |---|---|---|
-| `--bg` | `#090D16` | fundo da aplicação |
-| `--surface-1` | `#0F1420` (≈ zinc-900) | painéis |
-| `--surface-2` | `#161C2B` | cards, popovers |
-| `--border` | `#232A3B` | divisórias 1px |
-| `--text` | `#E6E9EF` | texto principal (contraste ≥ 12:1) |
-| `--text-muted` | `#94A0B8` | secundário (≥ 4.5:1) |
-| `--accent` | `#14B8A6` (teal-500) | ação primária, foco, classe predita |
-| `--accent-2` | `#10B981` (emerald-500) | sucesso, conclusão |
-| `--warn` | `#F59E0B` | aviso ético, baixa confiança |
-| `--danger` | `#F97316` (laranja) | erro (não usar vermelho) |
-| Radius | `8px` cards / `6px` inputs | |
-| Fonte | Inter (UI), JetBrains Mono (números, hashes, latências) | `tabular-nums` em percentuais |
+| `--bg` | `#0D1517` | fundo da aplicação (estativa) |
+| `--s1` | `#142024` | painéis (platina) |
+| `--s2` | `#1B2A2F` | controles, cartões (lamínula) |
+| `--border` / `--border-strong` | `#26363C` / `#667E86` | divisória decorativa / borda de controles (≥ 3:1) |
+| `--text` | `#E3ECEA` | texto principal (≥ 12:1) |
+| `--muted` | `#9AAFAB` | secundário (≥ 6,4:1) |
+| `--accent` | `#2BC3AE` (verdete) | ação primária, foco, classe predita |
+| `--accent2` | `#43C98E` | acerto, conclusão |
+| `--warn` | `#E9B44C` | aviso ético, baixa confiança |
+| `--danger` | `#F08A3C` (laranja) | erro (não usar vermelho) |
+| Radius | `12px` painéis / `8px` controles / `4px` visualizador | |
+| Fonte | Instrument Sans (UI e números), Source Serif 4 (nome da classe, títulos) | `tabular-nums` em percentuais; ícones Lucide |
 
 Tema escuro padrão; tema claro opcional (projetor de sala de aula) com os mesmos tokens redefinidos.
 
