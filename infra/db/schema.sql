@@ -86,7 +86,8 @@ CREATE TABLE analyses (
     ood_method          text,
     ood_threshold       real,
     ood_reasons         text[]          NOT NULL DEFAULT '{}',    -- pouco_tecido | baixa_confianca | coloracao
-    color_adjusted      jsonb,                                    -- coloração fora do padrão: sugestão com a cor normalizada (informativa)
+    color_adjusted      jsonb,
+    gradcam_summary     jsonb,                                    -- medidas da região de maior influência do mapa                                    -- coloração fora do padrão: sugestão com a cor normalizada (informativa)
     worker_ms           integer CHECK (worker_ms >= 0),
     e2e_ms              integer CHECK (e2e_ms >= 0),
     error               text,
