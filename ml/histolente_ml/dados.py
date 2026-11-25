@@ -12,6 +12,7 @@ import csv
 import random
 from collections import defaultdict
 from pathlib import Path
+from typing import Callable
 
 import torch
 from PIL import Image
@@ -113,10 +114,12 @@ def transformacao_treino() -> T.Compose:
 
 
 class DatasetPatches(Dataset[tuple[torch.Tensor, int]]):
-    def __init__(self, raiz: Path, itens: list[tuple[str, str]], transformacao: T.Compose) -> None:
+    def __init__(self, raiz: Path, itens: list[tuple[str, str]], transformacao: T.Compose,
+                 pre: Callable[[Image.Image], Image.Image] | None = None) -> None:
         self.raiz = raiz
         self.itens = itens
         self.transformacao = transformacao
+        self.pre = pre  # ex.: normalização de cor, aplicada antes da transformação
         self.indice = {c: i for i, c in enumerate(CLASSES)}
 
     def __len__(self) -> int:
@@ -125,5 +128,6 @@ class DatasetPatches(Dataset[tuple[torch.Tensor, int]]):
     def __getitem__(self, i: int) -> tuple[torch.Tensor, int]:
         caminho, classe = self.itens[i]
         with Image.open(self.raiz / caminho) as img:
-            x = self.transformacao(img.convert("RGB"))
+            rgb = img.convert("RGB")
+            x = self.transformacao(self.pre(rgb) if self.pre else rgb)
         return x, self.indice[classe]

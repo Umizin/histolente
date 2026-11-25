@@ -6,12 +6,19 @@ import { pct } from "@/lib/formato";
 
 type Analise = {
   id: string; status: "QUEUED" | "PROCESSING" | "DONE" | "FAILED"; predictedClass: string | null;
-  probabilities: Record<string, number> | null; outOfDistribution: boolean; cacheHit: boolean;
+  probabilities: Record<string, number> | null; outOfDistribution: boolean; oodReasons: string[];
+  colorAdjusted: { predictedClass: string; probability: number } | null; cacheHit: boolean;
   workerMs: number | null; e2eMs: number | null; error: string | null; groundTruth: string | null;
   model: { name: string; version: string; sha256: string }; hasHeatmap: boolean;
   original: { width: number; height: number };
 };
 type Amostra = { id: string; url: string };
+
+const MOTIVOS: Record<string, string> = {
+  coloracao: "a coloração é diferente da usada no treino (outro laboratório, protocolo ou imagem de atlas); o modelo pode errar mesmo com confiança alta",
+  pouco_tecido: "há pouco tecido na área analisada",
+  baixa_confianca: "o modelo não se decidiu por nenhuma classe",
+};
 type Estado = { fase: "vazio" } | { fase: "enviando" } | { fase: "fila"; id: string; desde: number } | { fase: "pronto"; a: Analise } | { fase: "erro"; msg: string };
 
 
@@ -230,7 +237,18 @@ export function Workstation({ modeloPreliminar }: { modeloPreliminar: boolean })
         {a && top1 && (
           <>
             {ood ? (
-              <div className="alert" role="alert">Esta imagem difere do padrão usado no treino do modelo; o resultado pode não ser confiável. (Pouco tecido, outra coloração ou outra ampliação.) O mapa foi ocultado.</div>
+              <div className="alert" role="alert">
+                <div>
+                  <strong>Esta imagem difere do padrão usado no treino do modelo; o resultado pode não ser confiável.</strong>
+                  {a.oodReasons.length > 0 ? (
+                    <ul style={{ margin: "4px 0 0", paddingLeft: 18 }}>{a.oodReasons.map((m) => <li key={m}>{MOTIVOS[m] ?? m}.</li>)}</ul>
+                  ) : <> (Pouco tecido, outra coloração ou outra ampliação.)</>}
+                  {a.colorAdjusted && ehClasse(a.colorAdjusted.predictedClass) && (
+                    <p style={{ margin: "4px 0" }}>Com a cor ajustada ao padrão do treino (Macenko), a sugestão seria <strong>{a.colorAdjusted.predictedClass}</strong> ({INFO[a.colorAdjusted.predictedClass].nome}, {pct(a.colorAdjusted.probability)}). Se as duas sugestões diferem, nenhuma delas é confiável.</p>
+                  )}
+                  <small>O mapa foi ocultado.</small>
+                </div>
+              </div>
             ) : null}
             {(a.original.width !== 224 || a.original.height !== 224) && (
               <p className="hint" role="note" style={{ marginTop: 0 }}>Imagem de {a.original.width}×{a.original.height} px: foi analisado o recorte central de 224×224 px, sem reduzir a escala.</p>

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-const LINKS = [["/", "Analisar"], ["/historico", "Histórico"], ["/sobre", "Sobre"]] as const;
+const LINKS = [["/", "Analisar"], ["/quiz", "Quiz"], ["/historico", "Histórico"], ["/sobre", "Sobre"]] as const;
 
 export function Nav({ nome }: { nome: string | null }) {
   const caminho = usePathname();

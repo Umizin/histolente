@@ -1,7 +1,9 @@
 """Carregamento do modelo, classificação, Grad-CAM e detecção preliminar de imagem fora do padrão.
 
 O pré-processamento e o Grad-CAM vêm do pacote `histolente_ml` (o mesmo do treino), o que garante que o
-serviço trata a imagem exatamente como no treino.
+serviço trata a imagem exatamente como no treino. A coloração é comparada com a do treino: fora do padrão, a
+análise recebe o alerta e a sugestão para a imagem com a cor ajustada (Macenko) vai junto, só como informação;
+o resultado principal continua sendo o da imagem original (ADR 0005).
 """
 from __future__ import annotations
 
@@ -17,6 +19,7 @@ import torch
 from PIL import Image
 
 from histolente_ml import CLASSES
+from histolente_ml.cor import ReferenciaCor, coloracao_fora_do_padrao, preparar
 from histolente_ml.dados import TAMANHO, transformacao_avaliacao
 from histolente_ml.exportar import sha256_arquivo
 from histolente_ml.gradcam import GradCAM
@@ -43,6 +46,7 @@ class Classificador:
         self.info.camada = nome_camada
         self.cam = GradCAM(self.modelo, camada)
         self.tf = transformacao_avaliacao()
+        self.ref_cor = ReferenciaCor.carregar()
         self._aquecer()
 
     @staticmethod
@@ -80,22 +84,37 @@ class Classificador:
     def analisar(self, png_ou_jpeg: bytes, classe_alvo: str | None = None) -> dict[str, object]:
         t0 = time.perf_counter()
         img = self.recorte_central(Image.open(io.BytesIO(png_ou_jpeg)).convert("RGB"))
+        cor = preparar(np.asarray(img), self.ref_cor)
         x = self.tf(img).unsqueeze(0)
         t1 = time.perf_counter()
         alvo = CLASSES.index(classe_alvo) if classe_alvo else None
         mapa, probs = self.cam(x, alvo)  # uma passagem: classificação + Grad-CAM
+        ajustada: dict[str, object] | None = None
+        if cor.estimada:
+            x_norm = self.tf(Image.fromarray(cor.normalizada)).unsqueeze(0)
+            with torch.inference_mode():
+                p_norm = torch.softmax(self.modelo(x_norm), 1)[0]
+            k = int(p_norm.argmax())
+            if coloracao_fora_do_padrao(cor, CLASSES[int(probs.argmax())], CLASSES[k], self.ref_cor):
+                ajustada = {"predicted_class": CLASSES[k], "probability": round(float(p_norm[k]), 6)}
         t2 = time.perf_counter()
         p = probs.numpy().astype(float)
         p = p / p.sum()
         predita = CLASSES[int(p.argmax())]
-        ood = self.fracao_tecido(img) < LIMIAR_TECIDO or float(p.max()) < LIMIAR_MSP
+        motivos = [m for m, sim in (
+            ("pouco_tecido", self.fracao_tecido(img) < LIMIAR_TECIDO),
+            ("baixa_confianca", float(p.max()) < LIMIAR_MSP),
+            ("coloracao", ajustada is not None),
+        ) if sim]
         buf = io.BytesIO()
         Image.fromarray((mapa.numpy() * 255).astype(np.uint8), mode="L").save(buf, format="PNG")
         t3 = time.perf_counter()
         return {
             "predicted_class": predita,
             "probabilities": {c: round(float(v), 6) for c, v in zip(CLASSES, p)},
-            "out_of_distribution": bool(ood),
+            "out_of_distribution": bool(motivos),
+            "ood_reasons": motivos,
+            "color_adjusted": ajustada,
             "gradcam": {
                 "target_layer": self.info.camada,
                 "target_class": classe_alvo or predita,

@@ -68,7 +68,22 @@ def test_imagem_menor_que_224_e_recusada(clf: Classificador) -> None:
 def test_imagem_sem_tecido_marcada_fora_do_padrao(clf: Classificador) -> None:
     branca = io.BytesIO()
     Image.new("RGB", (224, 224), (250, 250, 250)).save(branca, format="PNG")
-    assert clf.analisar(branca.getvalue())["out_of_distribution"] is True
+    r = clf.analisar(branca.getvalue())
+    assert r["out_of_distribution"] is True
+    assert "pouco_tecido" in r["ood_reasons"]  # type: ignore[operator]
+    assert r["color_adjusted"] is None  # sem tecido não há coloração para estimar
+
+
+def test_sugestao_com_cor_ajustada_so_com_alerta_de_coloracao(clf: Classificador) -> None:
+    rng = np.random.default_rng(0)
+    arr = rng.integers(60, 230, (224, 224, 3), dtype=np.uint8)
+    arr[..., 1] = (arr[..., 1] * 0.6).astype(np.uint8)  # tons de rosa e roxo
+    buf = io.BytesIO()
+    Image.fromarray(arr).save(buf, format="PNG")
+    r = clf.analisar(buf.getvalue())
+    assert (r["color_adjusted"] is not None) is ("coloracao" in r["ood_reasons"])  # type: ignore[operator]
+    assert set(r["ood_reasons"]) <= {"pouco_tecido", "baixa_confianca", "coloracao"}  # type: ignore[arg-type]
+    assert r["out_of_distribution"] is bool(r["ood_reasons"])
 
 
 def test_rnf06_servico_nao_conhece_banco() -> None:

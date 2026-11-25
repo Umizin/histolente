@@ -5,6 +5,7 @@
   python -m histolente_ml avaliar   --modelo runs/r18/melhor.pt --backbone resnet18 --raiz DADOS/CRC-VAL-HE-7K --saida ml/reports/r18
   python -m histolente_ml exportar  --modelo runs/r18/melhor.pt --backbone resnet18 --versao 0.1.0 --treino runs/r18/treino.json --metricas ml/reports/r18/metricas.json
   python -m histolente_ml latencia  --modelo runs/r18/melhor.pt --backbone resnet18
+  python -m histolente_ml referencia-cor --raiz DADOS/NCT-CRC-HE-100K --csv ml/splits-preliminar/treino.csv
 """
 from __future__ import annotations
 
@@ -49,6 +50,7 @@ def main() -> None:
     a.add_argument("--saida", required=True)
     a.add_argument("--bootstrap", type=int, default=1000)
     a.add_argument("--workers", type=int, default=4)
+    a.add_argument("--normalizar-cor", action="store_true", help="aplica a regra de cor do serviço e mede o alerta de coloração")
 
     e = sub.add_parser("exportar")
     e.add_argument("--modelo", required=True)
@@ -65,6 +67,13 @@ def main() -> None:
     l.add_argument("--dispositivo", default="cpu")
     l.add_argument("--repeticoes", type=int, default=50)
     l.add_argument("--threads", type=int, default=None)
+
+    r = sub.add_parser("referencia-cor", help="calcula a coloração de referência e os limiares a partir do treino")
+    r.add_argument("--raiz", required=True)
+    r.add_argument("--csv", required=True, help="lista de treino (nunca a de teste)")
+    r.add_argument("--por-classe", type=int, default=300)
+    r.add_argument("--semente", type=int, default=42)
+    r.add_argument("--percentil", type=float, default=99.5)
 
     args = ap.parse_args()
     disp = "cuda" if torch.cuda.is_available() else "cpu"
@@ -87,7 +96,8 @@ def main() -> None:
         from .avaliacao import avaliar
         from .modelos import carregar
         m = carregar(args.modelo, args.backbone, disp)
-        res = avaliar(m, Path(args.raiz), listar_imagens(Path(args.raiz)), Path(args.saida), disp, args.bootstrap, args.workers)
+        res = avaliar(m, Path(args.raiz), listar_imagens(Path(args.raiz)), Path(args.saida), disp, args.bootstrap, args.workers,
+                      args.normalizar_cor)
         print(json.dumps({k: res[k] for k in ("n", "accuracy", "f1_macro", "roc_auc_ovr_macro", "ece", "ic95_bootstrap", "sensibilidade_TUM")}, indent=2))
 
     elif args.cmd == "exportar":
@@ -101,6 +111,28 @@ def main() -> None:
         from .modelos import carregar, criar
         m = carregar(args.modelo, args.backbone, args.dispositivo) if args.modelo else criar(args.backbone, pretreinado=False)
         print(json.dumps(medir(m, args.backbone, args.dispositivo, args.repeticoes, threads=args.threads), indent=2))
+
+    elif args.cmd == "referencia-cor":
+        import random
+
+        import numpy as np
+        from PIL import Image
+
+        from .cor import calcular_referencia
+        itens = ler_csv(Path(args.csv))
+        rng = random.Random(args.semente)
+        escolhidas: list[tuple[str, str]] = []
+        for classe in sorted({c for _, c in itens}):
+            grupo = sorted(i for i in itens if i[1] == classe)
+            escolhidas += rng.sample(grupo, min(args.por_classe, len(grupo)))
+        imagens = []
+        for caminho, classe in escolhidas:
+            with Image.open(Path(args.raiz) / caminho) as img:
+                imagens.append((np.asarray(img.convert("RGB")), classe))
+        ref = calcular_referencia(imagens, f"{Path(args.csv).as_posix()}: {len(escolhidas)} imagens, semente {args.semente}",
+                                  args.percentil)
+        ref.salvar()
+        print(json.dumps(ref.__dict__, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
