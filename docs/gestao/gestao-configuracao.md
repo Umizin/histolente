@@ -82,4 +82,11 @@ docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --pr
 docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml logs tunel-rapido | grep trycloudflare
 ```
 
+Num servidor com IP público (como a VPS da demonstração), o perfil `publicar-vps` sobe o Caddy nas portas 80 e 443, com HTTPS automático para o domínio em `DOMINIO`:
+
+```
+docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile app --profile publicar-vps up -d --wait
+docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml --profile atualizar up -d   # Watchtower
+```
+
 Fluxo completo: commit → PR → CI verde → merge na `main` → CD publica a imagem → Watchtower atualiza o servidor.

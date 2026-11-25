@@ -1,0 +1,21 @@
+# Proxy reverso do servidor da demonstração (perfil publicar-vps).
+# O Caddy obtém e renova o certificado HTTPS sozinho (Let's Encrypt) para o domínio em DOMINIO.
+{$DOMINIO} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+
+	reverse_proxy web:3000 {
+		# SSE: entrega cada evento na hora, sem buffer
+		flush_interval -1
+	}
+
+	request_body {
+		max_size 6MB
+	}
+}

@@ -6,7 +6,9 @@
 # - watchtower: verifica o GHCR a cada 5 min e atualiza web, consumidor e inferência (entrega contínua)
 # - tunel: Cloudflare Tunnel com TUNNEL_TOKEN (endereço fixo do domínio configurado no painel da Cloudflare)
 # - tunel-rapido (perfil publicar-rapido): túnel temporário *.trycloudflare.com, sem conta; o endereço muda a cada início
-# Nenhuma porta é aberta no roteador: o túnel sai da máquina para a Cloudflare.
+#   Nos dois perfis de túnel nenhuma porta é aberta no roteador: o túnel sai da máquina para a Cloudflare.
+# - proxy (perfil publicar-vps): servidor com IP público; Caddy nas portas 80/443 com HTTPS automático
+#   para o domínio em DOMINIO (sem domínio próprio, use <ip-com-hifens>.sslip.io)
 
 x-atualizavel: &atualizavel
   labels:
@@ -32,7 +34,7 @@ services:
     image: ghcr.io/umizin/histolente-inference:latest
 
   watchtower:
-    profiles: [publicar, publicar-rapido]
+    profiles: [publicar, publicar-rapido, atualizar]
     image: containrrr/watchtower:1.7.1
     restart: unless-stopped
     command: --label-enable --interval 300 --cleanup
@@ -60,3 +62,26 @@ services:
     depends_on:
       web: { condition: service_healthy }
     networks: [frontend_net]
+
+  proxy:
+    profiles: [publicar-vps]
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    environment:
+      DOMINIO: ${DOMINIO:-}   # obrigatório no perfil publicar-vps
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web: { condition: service_healthy }
+    networks: [frontend_net]
+    mem_limit: 128m
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -119,7 +119,18 @@ O ponto fraco é o estroma (STR): só 68,9 % são reconhecidos, e 23 % vão para
 
 Fluxo: commit → pull request → CI → merge na `main` → CD publica as imagens no GitHub Container Registry → Watchtower atualiza o servidor. Detalhes e comandos na Seção 6 de `gestao-configuracao.md`.
 
-Endereço de demonstração: `[[A DEFINIR]]`
+**Endereço de demonstração:** https://189-24-15-186.sslip.io
+
+| Item | Configuração |
+|---|---|
+| Servidor | VPS Hostinger KVM 2, data center no Brasil: 2 vCPU, 8 GB de RAM, Ubuntu 26.04 LTS, sem GPU |
+| Publicação | Caddy 2.8 nas portas 80 e 443, com certificado HTTPS automático (Let's Encrypt); HTTP redireciona para HTTPS |
+| Endereço | `sslip.io` resolve o nome para o IP do servidor, sem registro de domínio |
+| Segurança | firewall só com as portas 22, 80 e 443; SSH só por chave; banco, Redis e RabbitMQ sem porta exposta; senhas geradas no próprio servidor |
+| Aplicação | os mesmos seis contêineres do desenvolvimento, com as imagens do GHCR e o modelo 0.1.0 (SHA-256 conferido depois da cópia) |
+| Atualização | na primeira implantação as imagens foram copiadas da máquina de desenvolvimento (mesmo commit da `main`); a atualização automática pelo Watchtower entra quando o servidor tiver um token só de leitura do GHCR |
+
+Implantação em 25/11/2026. O teste de fumaça, rodado de fora contra o endereço público, passou, com 340 ms do envio ao evento SSE.
 
 ## 7. Limitações conhecidas
 
