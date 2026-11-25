@@ -28,7 +28,7 @@ Um pull request só é integrado com os sete jobs verdes. Até 25/11/2026, a CI 
 2. **Implantação:** entra no servidor por SSH com uma chave exclusiva de implantação, copia a composição (`infra/`, sem o `.env`, que só existe no servidor), baixa as imagens novas usando o token temporário do próprio GitHub Actions (expira quando o job termina), aplica as migrações do banco (`infra/db/migracoes/`, todas idempotentes) e reinicia só os serviços da aplicação. Banco, Redis e RabbitMQ não são reiniciados.
 3. **Conferência:** consulta `/api/healthz`, `/api/model` e a página de entrada no endereço público. Se alguma falhar, o *workflow* fica vermelho.
 
-O passo de implantação só roda quando o repositório tem os segredos `DEPLOY_SSH_KEY` e `DEPLOY_KNOWN_HOSTS` e a variável `DEPLOY_HOST`; sem eles, o job registra um aviso e não toca no servidor. Situação em 25/11/2026: o job está no *workflow*, mas os segredos ainda não foram cadastrados; até aqui, as atualizações do servidor seguiram os mesmos passos, executados manualmente depois de cada merge com a CI verde.
+O passo de implantação só roda quando o repositório tem os segredos `DEPLOY_SSH_KEY` e `DEPLOY_KNOWN_HOSTS` e a variável `DEPLOY_HOST`; sem eles, o job registra um aviso e não toca no servidor. Os segredos foram cadastrados em 25/11/2026, e a primeira implantação automática completa rodou no mesmo dia (https://github.com/Umizin/histolente/actions/runs/45659552926): imagens publicadas, migrações aplicadas, serviços saudáveis e site conferido. Antes disso, as atualizações do servidor seguiam os mesmos passos, executados manualmente depois de cada merge com a CI verde.
 
 **Como voltar uma versão:** no servidor, trocar a etiqueta `latest` pela do SHA anterior em `infra/docker-compose.prod.yml` (ou rodar o CD manualmente a partir do commit anterior).
 
@@ -46,7 +46,7 @@ O passo de implantação só roda quando o repositório tem os segredos `DEPLOY_
 | Segurança | firewall só com as portas 22, 80 e 443; SSH só por chave; banco, Redis e RabbitMQ sem porta exposta; senhas geradas no próprio servidor |
 | Aplicação | os mesmos seis contêineres do desenvolvimento (Seção 2 do MVP), com as imagens do GHCR e o modelo 0.1.0 (SHA-256 conferido depois da cópia) |
 
-Primeira implantação em 25/11/2026. Depois de cada atualização, o teste de fumaça foi rodado de fora contra o endereço público e passou (340 ms do envio ao evento SSE na primeira medição). A latência medida no servidor está na Seção 4 do documento de MVP.
+Primeira implantação em 25/11/2026 (manual); desde a execução citada na Seção 1.2, cada merge na `main` atualiza o servidor sozinho. Depois de cada atualização, o teste de fumaça foi rodado de fora contra o endereço público e passou (340 ms do envio ao evento SSE na primeira medição). A latência medida no servidor está na Seção 4 do documento de MVP.
 
 **Para acessar:** criar uma conta na tela de entrada (nome, e-mail e senha), aceitar o termo de uso e escolher uma amostra da galeria ou enviar um recorte H&E.
 
