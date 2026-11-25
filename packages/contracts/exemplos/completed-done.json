@@ -7,6 +7,8 @@
   "predicted_class": "TUM",
   "probabilities": { "ADI": 0.001, "BACK": 0.0, "DEB": 0.004, "LYM": 0.002, "MUC": 0.0, "MUS": 0.01, "NORM": 0.03, "STR": 0.05, "TUM": 0.903 },
   "out_of_distribution": false,
+  "ood_reasons": [],
+  "color_adjusted": null,
   "gradcam": { "target_layer": "layer4", "target_class": "TUM", "heatmap_png_b64": "iVBORw0KGgo=", "colormap": "turbo", "resolution": [224, 224] },
   "timings_ms": { "preprocess": 3, "inference": 41, "gradcam": 58, "total_worker": 104 },
   "error": null,

@@ -1,0 +1,272 @@
+[
+ {
+  "id": "06a98ae08d88",
+  "arquivo": "06a98ae08d88.png",
+  "classe": "LYM",
+  "origem": "CRC-VAL-HE-7K/LYM/LYM-TCGA-ILKTHMRE.tif"
+ },
+ {
+  "id": "088f14cc8d51",
+  "arquivo": "088f14cc8d51.png",
+  "classe": "LYM",
+  "origem": "CRC-VAL-HE-7K/LYM/LYM-TCGA-VGIIDPNC.tif"
+ },
+ {
+  "id": "0b62ee1f6a20",
+  "arquivo": "0b62ee1f6a20.png",
+  "classe": "DEB",
+  "origem": "CRC-VAL-HE-7K/DEB/DEB-TCGA-GDICFVAT.tif"
+ },
+ {
+  "id": "0e88a7bb2ffe",
+  "arquivo": "0e88a7bb2ffe.png",
+  "classe": "STR",
+  "origem": "CRC-VAL-HE-7K/STR/STR-TCGA-GWNYFGKN.tif"
+ },
+ {
+  "id": "1005d1b5c691",
+  "arquivo": "1005d1b5c691.png",
+  "classe": "BACK",
+  "origem": "CRC-VAL-HE-7K/BACK/BACK-TCGA-CYIWMSSL.tif"
+ },
+ {
+  "id": "16e21bccb137",
+  "arquivo": "16e21bccb137.png",
+  "classe": "MUC",
+  "origem": "CRC-VAL-HE-7K/MUC/MUC-TCGA-RMLLLCNS.tif"
+ },
+ {
+  "id": "1c5e64e5069f",
+  "arquivo": "1c5e64e5069f.png",
+  "classe": "LYM",
+  "origem": "CRC-VAL-HE-7K/LYM/LYM-TCGA-EAAVVTFF.tif"
+ },
+ {
+  "id": "212b0494bc8a",
+  "arquivo": "212b0494bc8a.png",
+  "classe": "STR",
+  "origem": "CRC-VAL-HE-7K/STR/STR-TCGA-QGELWFDW.tif"
+ },
+ {
+  "id": "2832aa4ae319",
+  "arquivo": "2832aa4ae319.png",
+  "classe": "DEB",
+  "origem": "CRC-VAL-HE-7K/DEB/DEB-TCGA-SNQGQTVC.tif"
+ },
+ {
+  "id": "3307881a6105",
+  "arquivo": "3307881a6105.png",
+  "classe": "MUC",
+  "origem": "CRC-VAL-HE-7K/MUC/MUC-TCGA-KPNWWRWT.tif"
+ },
+ {
+  "id": "361235518be3",
+  "arquivo": "361235518be3.png",
+  "classe": "DEB",
+  "origem": "CRC-VAL-HE-7K/DEB/DEB-TCGA-THPVTKFS.tif"
+ },
+ {
+  "id": "377876307024",
+  "arquivo": "377876307024.png",
+  "classe": "STR",
+  "origem": "CRC-VAL-HE-7K/STR/STR-TCGA-LWPAGRYE.tif"
+ },
+ {
+  "id": "3851b90ccd78",
+  "arquivo": "3851b90ccd78.png",
+  "classe": "MUS",
+  "origem": "CRC-VAL-HE-7K/MUS/MUS-TCGA-HRFPIILN.tif"
+ },
+ {
+  "id": "49a08b5013c0",
+  "arquivo": "49a08b5013c0.png",
+  "classe": "MUS",
+  "origem": "CRC-VAL-HE-7K/MUS/MUS-TCGA-YYESDVWI.tif"
+ },
+ {
+  "id": "4cce65408bf5",
+  "arquivo": "4cce65408bf5.png",
+  "classe": "TUM",
+  "origem": "CRC-VAL-HE-7K/TUM/TUM-TCGA-QWESFERN.tif"
+ },
+ {
+  "id": "4ebe93feddbb",
+  "arquivo": "4ebe93feddbb.png",
+  "classe": "ADI",
+  "origem": "CRC-VAL-HE-7K/ADI/ADI-TCGA-GICKLLMA.tif"
+ },
+ {
+  "id": "4f357504947f",
+  "arquivo": "4f357504947f.png",
+  "classe": "TUM",
+  "origem": "CRC-VAL-HE-7K/TUM/TUM-TCGA-RPCHDKCH.tif"
+ },
+ {
+  "id": "58793963c896",
+  "arquivo": "58793963c896.png",
+  "classe": "MUS",
+  "origem": "CRC-VAL-HE-7K/MUS/MUS-TCGA-PCFTSSTI.tif"
+ },
+ {
+  "id": "5c6126cf64cb",
+  "arquivo": "5c6126cf64cb.png",
+  "classe": "NORM",
+  "origem": "CRC-VAL-HE-7K/NORM/NORM-TCGA-SCVLDTNQ.tif"
+ },
+ {
+  "id": "5d5f9372146a",
+  "arquivo": "5d5f9372146a.png",
+  "classe": "MUC",
+  "origem": "CRC-VAL-HE-7K/MUC/MUC-TCGA-GPWEKDDI.tif"
+ },
+ {
+  "id": "60de9247faf0",
+  "arquivo": "60de9247faf0.png",
+  "classe": "MUS",
+  "origem": "CRC-VAL-HE-7K/MUS/MUS-TCGA-LGFPSCQW.tif"
+ },
+ {
+  "id": "61eaf4b08b6f",
+  "arquivo": "61eaf4b08b6f.png",
+  "classe": "NORM",
+  "origem": "CRC-VAL-HE-7K/NORM/NORM-TCGA-NCQYCCAF.tif"
+ },
+ {
+  "id": "652649845417",
+  "arquivo": "652649845417.png",
+  "classe": "MUS",
+  "origem": "CRC-VAL-HE-7K/MUS/MUS-TCGA-RLIDPLWE.tif"
+ },
+ {
+  "id": "6feb490034e5",
+  "arquivo": "6feb490034e5.png",
+  "classe": "STR",
+  "origem": "CRC-VAL-HE-7K/STR/STR-TCGA-DTYRTLQQ.tif"
+ },
+ {
+  "id": "70842ce84888",
+  "arquivo": "70842ce84888.png",
+  "classe": "TUM",
+  "origem": "CRC-VAL-HE-7K/TUM/TUM-TCGA-MRMERWRN.tif"
+ },
+ {
+  "id": "7902c86ca401",
+  "arquivo": "7902c86ca401.png",
+  "classe": "TUM",
+  "origem": "CRC-VAL-HE-7K/TUM/TUM-TCGA-HLSLLAVV.tif"
+ },
+ {
+  "id": "7f8ac2e4edda",
+  "arquivo": "7f8ac2e4edda.png",
+  "classe": "NORM",
+  "origem": "CRC-VAL-HE-7K/NORM/NORM-TCGA-FRTKLTES.tif"
+ },
+ {
+  "id": "85a5f865581b",
+  "arquivo": "85a5f865581b.png",
+  "classe": "BACK",
+  "origem": "CRC-VAL-HE-7K/BACK/BACK-TCGA-NVYVLHKP.tif"
+ },
+ {
+  "id": "9c1b54cb6641",
+  "arquivo": "9c1b54cb6641.png",
+  "classe": "ADI",
+  "origem": "CRC-VAL-HE-7K/ADI/ADI-TCGA-SFIFPSIY.tif"
+ },
+ {
+  "id": "a23c1e13b4df",
+  "arquivo": "a23c1e13b4df.png",
+  "classe": "NORM",
+  "origem": "CRC-VAL-HE-7K/NORM/NORM-TCGA-GKKQILGP.tif"
+ },
+ {
+  "id": "aaf968a2c9f0",
+  "arquivo": "aaf968a2c9f0.png",
+  "classe": "NORM",
+  "origem": "CRC-VAL-HE-7K/NORM/NORM-TCGA-TTENPDTV.tif"
+ },
+ {
+  "id": "b6a95eee8f2a",
+  "arquivo": "b6a95eee8f2a.png",
+  "classe": "ADI",
+  "origem": "CRC-VAL-HE-7K/ADI/ADI-TCGA-CQKYQFEC.tif"
+ },
+ {
+  "id": "bab7d406edf6",
+  "arquivo": "bab7d406edf6.png",
+  "classe": "BACK",
+  "origem": "CRC-VAL-HE-7K/BACK/BACK-TCGA-ESIQDQWF.tif"
+ },
+ {
+  "id": "bc667c4a640b",
+  "arquivo": "bc667c4a640b.png",
+  "classe": "STR",
+  "origem": "CRC-VAL-HE-7K/STR/STR-TCGA-MTWCSPKP.tif"
+ },
+ {
+  "id": "bcd132c62090",
+  "arquivo": "bcd132c62090.png",
+  "classe": "LYM",
+  "origem": "CRC-VAL-HE-7K/LYM/LYM-TCGA-IDFGPPWP.tif"
+ },
+ {
+  "id": "bff05a2408df",
+  "arquivo": "bff05a2408df.png",
+  "classe": "MUC",
+  "origem": "CRC-VAL-HE-7K/MUC/MUC-TCGA-PFNGSAHE.tif"
+ },
+ {
+  "id": "d1bece77e32e",
+  "arquivo": "d1bece77e32e.png",
+  "classe": "BACK",
+  "origem": "CRC-VAL-HE-7K/BACK/BACK-TCGA-RIHEQVCW.tif"
+ },
+ {
+  "id": "d39ab445a89d",
+  "arquivo": "d39ab445a89d.png",
+  "classe": "ADI",
+  "origem": "CRC-VAL-HE-7K/ADI/ADI-TCGA-GFKAANLS.tif"
+ },
+ {
+  "id": "de294dcf69af",
+  "arquivo": "de294dcf69af.png",
+  "classe": "DEB",
+  "origem": "CRC-VAL-HE-7K/DEB/DEB-TCGA-LMLTGCQQ.tif"
+ },
+ {
+  "id": "e9cf10fcd41d",
+  "arquivo": "e9cf10fcd41d.png",
+  "classe": "BACK",
+  "origem": "CRC-VAL-HE-7K/BACK/BACK-TCGA-RTQEFRPY.tif"
+ },
+ {
+  "id": "ed6eacc2bdc0",
+  "arquivo": "ed6eacc2bdc0.png",
+  "classe": "LYM",
+  "origem": "CRC-VAL-HE-7K/LYM/LYM-TCGA-CTYWQTRP.tif"
+ },
+ {
+  "id": "eefeed6e0ae5",
+  "arquivo": "eefeed6e0ae5.png",
+  "classe": "TUM",
+  "origem": "CRC-VAL-HE-7K/TUM/TUM-TCGA-KPRWIAWD.tif"
+ },
+ {
+  "id": "ef41aaa2c416",
+  "arquivo": "ef41aaa2c416.png",
+  "classe": "ADI",
+  "origem": "CRC-VAL-HE-7K/ADI/ADI-TCGA-TIYMHWHP.tif"
+ },
+ {
+  "id": "f13a1e19cc7f",
+  "arquivo": "f13a1e19cc7f.png",
+  "classe": "DEB",
+  "origem": "CRC-VAL-HE-7K/DEB/DEB-TCGA-CLTTFTFE.tif"
+ },
+ {
+  "id": "ffd46c9e7b84",
+  "arquivo": "ffd46c9e7b84.png",
+  "classe": "MUC",
+  "origem": "CRC-VAL-HE-7K/MUC/MUC-TCGA-GTQYIGYW.tif"
+ }
+]

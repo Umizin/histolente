@@ -112,11 +112,39 @@ def salvar_figura_matriz(cm: list[list[int]], destino: Path) -> None:
     plt.close(fig)
 
 
+def avaliar_com_cor(modelo: nn.Module, raiz: Path, itens: list[tuple[str, str]], dispositivo: str, workers: int
+                    ) -> tuple[np.ndarray, np.ndarray, dict[str, object]]:
+    """Reproduz a regra do serviço: o resultado é o da imagem original; a normalizada só decide o alerta de coloração.
+    Também mede, nas imagens marcadas, o acerto da original e o da versão com a cor ajustada."""
+    from PIL import Image
+
+    from .cor import NormalizacaoCor, ReferenciaCor, coloracao_fora_do_padrao, preparar
+    ref = ReferenciaCor.carregar()
+    y, p_orig = prever(modelo, DatasetPatches(raiz, itens, transformacao_avaliacao()), dispositivo, workers=workers)
+    _, p_norm = prever(modelo, DatasetPatches(raiz, itens, transformacao_avaliacao(), NormalizacaoCor(ref)), dispositivo,
+                       workers=workers)
+    usar = np.zeros(len(itens), dtype=bool)
+    for i, (caminho, _) in enumerate(itens):
+        with Image.open(raiz / caminho) as img:
+            r = preparar(np.asarray(img.convert("RGB")), ref)
+        usar[i] = coloracao_fora_do_padrao(r, CLASSES[int(p_orig[i].argmax())], CLASSES[int(p_norm[i].argmax())], ref)
+    acerto = lambda p: float((p[usar].argmax(1) == y[usar]).mean()) if usar.any() else None  # noqa: E731
+    por_classe = {c: {"marcadas": int(usar[y == k].sum()), "total": int((y == k).sum())} for k, c in enumerate(CLASSES)}
+    return y, p_orig, {"marcadas": int(usar.sum()), "total": len(itens), "taxa": float(usar.mean()), "por_classe": por_classe,
+                       "acerto_nas_marcadas": {"original": acerto(p_orig), "cor_ajustada": acerto(p_norm)}}
+
+
 def avaliar(modelo: nn.Module, raiz: Path, itens: list[tuple[str, str]], saida: Path, dispositivo: str,
-            n_bootstrap: int = 1000, workers: int = 4) -> dict[str, object]:
-    ds = DatasetPatches(raiz, itens, transformacao_avaliacao())
-    y, p = prever(modelo, ds, dispositivo, workers=workers)
+            n_bootstrap: int = 1000, workers: int = 4, normalizar_cor: bool = False) -> dict[str, object]:
+    alarmes = None
+    if normalizar_cor:
+        y, p, alarmes = avaliar_com_cor(modelo, raiz, itens, dispositivo, workers)
+    else:
+        y, p = prever(modelo, DatasetPatches(raiz, itens, transformacao_avaliacao()), dispositivo, workers=workers)
     res = metricas(y, p, n_bootstrap)
+    res["normalizacao_cor"] = "só alerta (resultado da imagem original)" if normalizar_cor else "nenhuma"
+    if alarmes is not None:
+        res["cor_fora_do_padrao"] = alarmes
     saida.mkdir(parents=True, exist_ok=True)
     (saida / "metricas.json").write_text(json.dumps(res, indent=2, ensure_ascii=False), encoding="utf-8")
     salvar_figura_matriz(res["matriz_confusao"], saida / "matriz_confusao.png")  # type: ignore[arg-type]

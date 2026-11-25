@@ -131,3 +131,25 @@ def test_ordem_canonica_das_classes() -> None:
     """A ordem do enum deve ser a do ImageFolder (alfabética) — mudar quebra o histórico."""
     enum = carregar("inference.completed.schema.json")["$defs"]["tissue_class"]["enum"]
     assert enum == CLASSES == sorted(CLASSES)
+
+
+# ----------------------------------------------------------------- campos opcionais de cor (25/11/2026)
+def test_campos_de_cor_sao_opcionais() -> None:
+    msg = carregar("exemplos/completed-done.json")
+    del msg["ood_reasons"], msg["color_adjusted"]
+    assert erros(DONE, msg) == []
+
+
+def test_motivo_desconhecido_e_rejeitado() -> None:
+    msg = carregar("exemplos/completed-done.json")
+    msg["ood_reasons"] = ["coloracao", "outro"]
+    assert erros(DONE, msg)
+
+
+def test_cor_ajustada_traz_classe_e_probabilidade() -> None:
+    msg = carregar("exemplos/completed-done.json")
+    msg["ood_reasons"] = ["coloracao"]
+    msg["color_adjusted"] = {"predicted_class": "TUM", "probability": 0.775}
+    assert erros(DONE, msg) == []
+    msg["color_adjusted"] = {"predicted_class": "XYZ", "probability": 0.775}
+    assert erros(DONE, msg)

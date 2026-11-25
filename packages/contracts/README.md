@@ -18,6 +18,9 @@ Fonte única dos formatos trocados entre o backend de orquestração e o serviç
 - Alteração incompatível: `2.0`, com período em que os dois lados aceitam as duas versões.
 - A ordem das classes (`ADI … TUM`) **não muda**: ela é o índice de saída do modelo.
 
+**Histórico:**
+- 25/11/2026: campos opcionais `ood_reasons` (`pouco_tecido`, `baixa_confianca`, `coloracao`) e `color_adjusted` (sugestão para a imagem com a cor normalizada, só informativa) no `inference.completed`. Mensagens sem eles continuam válidas, então `schema_version` segue `1.0`; o número 1.1 fica reservado para o pacote do ADR 0004.
+
 **Testes:**
 ```
 pip install -r packages/contracts/requirements-dev.txt

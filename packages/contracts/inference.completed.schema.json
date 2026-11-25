@@ -35,6 +35,22 @@
       "type": "boolean",
       "description": "true quando a imagem parece fora do padrão do dataset de treino (RF17)."
     },
+    "ood_reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["pouco_tecido", "baixa_confianca", "coloracao"] },
+      "description": "Critérios que marcaram a imagem como fora do padrão (vazio quando out_of_distribution é false). Opcional na v1.0."
+    },
+    "color_adjusted": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["predicted_class", "probability"],
+      "properties": {
+        "predicted_class": { "$ref": "#/$defs/tissue_class" },
+        "probability": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "description": "Com coloração fora do padrão: sugestão para a imagem com a cor normalizada (Macenko), só informativa; o resultado principal é o da imagem original. null nos demais casos. Opcional na v1.0."
+    },
     "gradcam": {
       "type": "object",
       "additionalProperties": false,

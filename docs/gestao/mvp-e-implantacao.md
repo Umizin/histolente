@@ -18,6 +18,8 @@ O MVP cobre o fluxo central da ferramenta: o estudante entra, aceita o termo de 
 | HU12 — Aviso ético permanente | RF07 | Pronto |
 | HU02, HU06, HU08, HU22 — galeria, baixa confiança, lado a lado, imagem fora do padrão | RF01, RF03, RF04, RF17 | Prontos (adiantados da Sprint 3 e 4) |
 | HU10 — Histórico | RF05, RF06 | Parcial: filtro por classe e paginação; faltam filtros por data e lote |
+| HU13 — Modo quiz | RF01, RF03 | Pronto (adiantado da Sprint 5) |
+| — Alerta de coloração fora do padrão | RF17, risco R01 | Pronto (ADR 0005; Seção 5.1) |
 
 ## 2. Arquitetura implementada
 
@@ -91,6 +93,12 @@ Fonte: elaborado pelo autor (2026).
 
 Fonte: elaborado pelo autor (2026).
 
+**Figura 5 — Modo quiz depois de uma resposta errada: rótulo de referência, "por que não é" e critérios da classe**
+
+![Modo quiz](figuras/05-quiz.png)
+
+Fonte: elaborado pelo autor (2026), com imagem de Kather et al. (2018).
+
 ## 5. Modelo preliminar (versão 0.1.0)
 
 Para o MVP funcionar com um modelo real antes do treino completo, foi treinada uma ResNet-18 pré-treinada na ImageNet, em CPU, com uma subamostra balanceada do NCT-CRC-HE-100K: 800 imagens por classe, divididas em 680 para treino e 120 para validação (semente 42; listas em `ml/splits-preliminar/`). Foram 4 épocas, em cerca de 45 minutos. A avaliação usou o CRC-VAL-HE-7K inteiro (7.180 imagens), que vem de pacientes diferentes dos do treino e não foi usado em nenhuma decisão de treino.
@@ -107,13 +115,35 @@ Para o MVP funcionar com um modelo real antes do treino completo, foi treinada u
 
 Intervalos de confiança por *bootstrap* com 1.000 reamostragens. Arquivos: `ml/reports/r18-preliminar/metricas.json` e o *model card* exportado com o modelo (SHA-256 `605cb482…`).
 
-**Figura 5 — Matriz de confusão normalizada por linha no conjunto de teste**
+**Figura 6 — Matriz de confusão normalizada por linha no conjunto de teste**
 
-![Matriz de confusão](figuras/05-matriz-confusao.png)
+![Matriz de confusão](figuras/06-matriz-confusao.png)
 
 Fonte: elaborado pelo autor (2026), com dados de Kather et al. (2018).
 
 O ponto fraco é o estroma (STR): só 68,9 % são reconhecidos, e 23 % vão para músculo liso (MUS). É a confusão que a interface já explica no texto de diferenças entre classes. Ela é o foco do treino completo, com o conjunto inteiro e mais épocas, no Google Colab. A acurácia de validação (98,6 %) fica acima da de teste porque treino e validação vêm das mesmas lâminas. Por isso os números que valem são os do conjunto de teste.
+
+### 5.1 Imagens com outra coloração
+
+No primeiro teste da demonstração, um recorte de mucosa colônica tirado de um atlas, mais pálido e lilás que as imagens do dataset, recebeu a sugestão BACK com 99,1 %, e o alerta de imagem fora do padrão não disparou, porque havia bastante tecido e a confiança era alta. O experimento com essa imagem mostrou que a causa é a coloração, não a escala. O NCT-CRC-HE-100K foi todo normalizado pelo método de Macenko, e o modelo nunca viu uma coloração assim.
+
+Três políticas foram comparadas no CRC-VAL-HE-7K (ADR 0005):
+
+| Política | Acurácia | Acurácia balanceada | Acerto DEB | Acerto MUS |
+|---|---|---|---|---|
+| Sem normalização | 96,6 % | 95,1 % | 100 % | 94,6 % |
+| Normalizar todas as imagens | 93,2 % | 89,6 % | 76,4 % | 70,9 % |
+| Normalizar só com coloração fora do padrão | 94,6 % | 91,4 % | 76,4 % | 86,3 % |
+
+Normalizar piorou o modelo nas imagens do próprio dataset. Por isso, a decisão foi **não trocar o resultado**: a sugestão continua sendo a da imagem original, e a coloração é verificada à parte. Quando os vetores de hematoxilina e eosina da imagem se afastam dos de treino mais do que o limite observado no treino para a classe sugerida, a análise recebe o alerta de coloração, e a tela mostra também a sugestão para a imagem com a cor ajustada (Figura 7). No caso do atlas, a sugestão original é BACK e a da cor ajustada é TUM; quando as duas diferem, a tela avisa que nenhuma é confiável.
+
+Com essa regra, as métricas da Seção 5 não mudam, porque o resultado é o da imagem original. No CRC-VAL-HE-7K, o alerta aparece em 4,6 % das imagens (331 de 7.180), 117 delas DEB, cuja coloração no conjunto de teste difere da do treino. Nas imagens marcadas, a sugestão original acerta 89,1 % (contra 96,6 % no conjunto todo) e a da cor ajustada só 46,5 %. O alerta aponta imagens mais difíceis; a sugestão com a cor ajustada serve para mostrar ao estudante que a cor influencia o modelo, não como resposta melhor.
+
+**Figura 7 — Recorte de atlas com coloração fora do padrão: alerta e sugestão com a cor ajustada**
+
+![Alerta de coloração](figuras/07-alerta-coloracao.png)
+
+Fonte: elaborado pelo autor (2026).
 
 ## 6. Implantação
 
@@ -138,3 +168,5 @@ Implantação em 25/11/2026. O teste de fumaça, rodado de fora contra o endere�
 - Envio em lote, modo quiz, reenvio de análise com falha e Grad-CAM de outra classe estão nas sprints seguintes.
 - Os textos morfológicos das classes ainda precisam da revisão de um docente de Patologia (HU05).
 - O modelo preliminar não substitui o treino completo previsto; os números da Seção 5 não são o resultado final do trabalho.
+- O modelo é sensível à coloração (Seção 5.1). O alerta reduz o risco, mas não o elimina: imagens de outros laboratórios e de atlas podem receber sugestões erradas com confiança alta. O treino completo vai incluir aumento de dados de cor.
+- Adenoma e displasia não são classes do dataset; podem aparecer como NORM ou TUM.

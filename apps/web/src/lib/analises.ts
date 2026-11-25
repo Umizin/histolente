@@ -3,14 +3,15 @@ import { db } from "./infra";
 
 export type Analise = {
   id: string; status: "QUEUED" | "PROCESSING" | "DONE" | "FAILED"; predictedClass: string | null;
-  probabilities: Record<string, number> | null; outOfDistribution: boolean; cacheHit: boolean;
+  probabilities: Record<string, number> | null; outOfDistribution: boolean; oodReasons: string[];
+  colorAdjusted: { predictedClass: string; probability: number } | null; cacheHit: boolean;
   workerMs: number | null; e2eMs: number | null; error: string | null; createdAt: string; completedAt: string | null;
   model: { name: string; version: string; sha256: string }; groundTruth: string | null; hasHeatmap: boolean;
   original: { width: number; height: number };
 };
 
 const SELECT = `
-  SELECT a.id, a.status, a.predicted_class, a.probabilities, a.out_of_distribution, a.cache_hit, a.worker_ms, a.e2e_ms,
+  SELECT a.id, a.status, a.predicted_class, a.probabilities, a.out_of_distribution, a.ood_reasons, a.color_adjusted, a.cache_hit, a.worker_ms, a.e2e_ms,
          a.error, a.created_at, a.completed_at, a.heatmap_storage_key IS NOT NULL AS has_heatmap,
          m.name AS m_name, m.version AS m_version, m.file_sha256 AS m_sha, i.ground_truth_class, i.width, i.height
     FROM analyses a JOIN model_versions m ON m.id = a.model_version_id JOIN images i ON i.id = a.image_id`;
@@ -18,7 +19,8 @@ const SELECT = `
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mapear = (r: any): Analise => ({
   id: r.id, status: r.status, predictedClass: r.predicted_class, probabilities: r.probabilities,
-  outOfDistribution: r.out_of_distribution, cacheHit: r.cache_hit, workerMs: r.worker_ms, e2eMs: r.e2e_ms,
+  outOfDistribution: r.out_of_distribution, oodReasons: r.ood_reasons ?? [], colorAdjusted: r.color_adjusted ? { predictedClass: r.color_adjusted.predicted_class, probability: r.color_adjusted.probability } : null,
+  cacheHit: r.cache_hit, workerMs: r.worker_ms, e2eMs: r.e2e_ms,
   // RN07: o rótulo da galeria só aparece depois que há resultado
   groundTruth: r.status === "DONE" ? r.ground_truth_class : null,
   error: r.error, createdAt: r.created_at.toISOString(), completedAt: r.completed_at?.toISOString() ?? null,

@@ -47,6 +47,17 @@ Com EN01, EN02 e EN03 adiantados, itens da Sprint 2 foram puxados para montar o 
 
 Bug encontrado no teste manual: mensagem fora do contrato travava o serviço de inferência (sem ack com prefetch=1). Corrigido no #48, com teste.
 
+## Acompanhamento — 25/11/2026
+
+Implantação da demonstração numa VPS com HTTPS (#52). No primeiro teste com uma imagem de fora do dataset (recorte de mucosa colônica de um atlas, com coloração mais pálida), o modelo sugeriu BACK com 99,1% e o alerta de imagem fora do padrão não disparou. O experimento mostrou que a causa era a coloração, não a escala: com a cor normalizada pelo método de Macenko, a sugestão de BACK desaparece. Esse é o risco R01 acontecendo na prática.
+
+Mudança de escopo, registrada também no quadro:
+
+| Issue | Item | Situação |
+|---|---|---|
+| — | Alerta de coloração fora do padrão, com limiar por classe, e sugestão com a cor ajustada só informativa (ADR 0005). Normalizar a cor de todas as imagens foi testado e descartado: a acurácia no CRC-VAL-HE-7K caiu de 96,6 % para 93,2 % | Em revisão |
+| HU13 | Praticar em modo quiz (antecipada da Sprint 5): banco de 45 imagens do CRC-VAL-HE-7K, correção no servidor e explicação "por que não é" | Em revisão |
+
 ---
 
 ## Sprint Review — `[[data]]`
