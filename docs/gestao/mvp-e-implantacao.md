@@ -65,7 +65,14 @@ Sem modelo em `ml/models/`, o serviço de inferência sobe com pesos aleatórios
 | Serviço de inferência (recorte, classificação e Grad-CAM) | 75 ms | 108 ms | p95 < 500 ms |
 | Ponta a ponta (envio até o resultado disponível) | 120 ms | 172 ms | p95 < 1,5 s |
 
-Ainda falta a medição com 30 usuários simultâneos (EN05, k6) e no hardware de referência da demonstração.
+**No servidor da demonstração** (VPS de 2 vCPU e 8 GB, sem GPU), em 25/11/2026, já com a verificação de coloração da Seção 5.1: 40 imagens do CRC-VAL-HE-7K fora da galeria e do quiz, enviadas uma a uma pela internet ao endereço público, sem cache:
+
+| Medida | p50 | p95 | Meta |
+|---|---|---|---|
+| Serviço de inferência | 122 ms | 154 ms | p95 < 500 ms |
+| Ponta a ponta, medido do cliente pela internet | 250 ms | 297 ms | p95 < 1,5 s |
+
+Ainda falta a medição com 30 usuários simultâneos (EN05, k6).
 
 ### Telas do MVP
 
