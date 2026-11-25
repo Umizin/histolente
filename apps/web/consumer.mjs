@@ -11,6 +11,7 @@ for (const [k, v] of Object.entries({ DATABASE_URL, REDIS_URL, AMQP_URL })) if (
 
 const CLASSES = ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"];
 const CACHE_TTL_S = 7 * 24 * 3600;
+const SINAL_DE_VIDA = "/tmp/consumidor-vivo";
 const PREPARO = "cor2"; // igual a PREPARO em src/lib/modelo.ts
 const MOTIVOS = ["pouco_tecido", "baixa_confianca", "coloracao"];
 const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 4 });
@@ -114,6 +115,11 @@ async function iniciar() {
     }
   }, { noAck: false });
   log("consumindo", { fila: "inference.completed" });
+  // Sinal de vida para o healthcheck do Compose: só é gravado enquanto o canal com o RabbitMQ está aberto
+  const vivo = () => writeFile(SINAL_DE_VIDA, String(Date.now())).catch(() => undefined);
+  await vivo();
+  setInterval(vivo, 10_000).unref();
+  ch.on("close", () => { log("canal_fechado", {}); process.exit(1); });
 }
 
 iniciar().catch((e) => { console.error(e); process.exit(1); });

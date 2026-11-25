@@ -50,18 +50,19 @@ TCC — HistoLente
 
 Sprints de duas semanas, começando em 10/11/2026. As datas a partir da Sprint 3 dependem do calendário acadêmico e do prazo de entrega final, ainda a confirmar.
 
+**Replanejamento de 25/11/2026.** A Sprint 1 antecipou o MVP e itens previstos para as Sprints 2 a 5 (ver a ata da Sprint 1). Somando os itens concluídos, são 63 pontos até 25/11. O restante do backlog foi redistribuído e o plano passou de seis para quatro sprints, mantendo os itens *Could* no fim, para sair primeiro se faltar capacidade.
+
 | Sprint | Período | Meta da sprint | Itens principais (EAP / backlog) | Pontos |
 |---|---|---|---|---|
 | S0 | 10/11 – 16/11/2026 (encerrada antes) | Base do projeto e design | 1.1–1.3; 4.1–4.5 (classes, sequência, dados, guia de estilo, protótipo); consolidação da elicitação | — (preparação) |
-| S1 | 16/11 – 29/11/2026 | Modelo treinado e ambiente rodando | EN01, EN02, EN03 | 21 |
-| S2 | 30/11 – 13/12/2026 | Fluxo central de ponta a ponta | EN04, HU14, HU17, HU01, HU19, HU04, HU12 | 32 |
+| S1 | 16/11 – 29/11/2026 | Modelo treinável e ambiente rodando; ampliada para o MVP | Planejados: EN01, EN02, EN03 (21). Puxados: EN04, HU14, HU17, HU01, HU19, HU04, HU12, HU07, HU02, HU22, HU08, HU06, HU13 | 21 planejados |
+| S2 | 30/11 – 13/12/2026 | Modelo final e fechamento do fluxo | EN01 (treino completo no Colab e comparação de dois *backbones*), EN04 (teste com GPU, tipos gerados dos contratos), HU10 (filtros por data e lote), HU05 (revisão por docente de Patologia), HU18, HU15, EN05 | 39 (EN01 e EN04 já parcialmente feitos) |
 | — | recesso de fim de ano | `[[confirmar com o calendário da UVS]]` | — | — |
-| S3 | `[[a definir]]` | Explicabilidade, galeria e imagem fora do padrão | HU07, HU02, HU05, HU22, HU10 | 24 |
-| S4 | `[[a definir]]` | Robustez e conformidade | HU08, HU06, HU18, HU15 | 15 |
-| S5 | `[[a definir]]` | Recursos pedagógicos e carga | HU13, HU03, EN05 | 18 |
-| S6 | `[[a definir]]` | Validação com usuários e itens opcionais | EN06, HU20, HU21, HU23, HU11, HU09, HU16 | 28 |
+| S3 | `[[a definir]]` | Recursos para aula e itens opcionais | HU03, HU11, HU09, HU16, HU20 | 23 |
+| S4 | `[[a definir]]` | Validação com usuários | EN06 (SUS e entrevistas), HU21, HU23; capítulo de Resultados | 13 |
 
 **Marcos:**
 - fim da S2: MVP com o fluxo central (enviar, classificar, ver resultado). *Antecipado: entregue em 24/11/2026, ainda na S1, com itens das S2 a S4 (ver `sprints/sprint-01.md`);*
-- fim da S4: versão completa para os testes de usabilidade;
-- fim da S6: validação concluída e capítulo de Resultados.
+- fim da S2: modelo final (treino completo) avaliado no CRC-VAL-HE-7K;
+- fim da S3: versão completa para os testes de usabilidade;
+- fim da S4: validação concluída e capítulo de Resultados.

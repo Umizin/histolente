@@ -323,17 +323,24 @@ def projeto() -> None:
 def gestao() -> None:
     pasta = ROOT / "docs/gestao"
     ordem = [("metodologia.md", "Metodologia de desenvolvimento"), ("eap-e-roadmap.md", "EAP, roadmap e estimativas"),
-             ("riscos.md", "Gestão de riscos"), ("gestao-configuracao.md", "Gestão de configuração, revisão e CI/CD"),
+             ("riscos.md", "Gestão de riscos"), ("gestao-configuracao.md", "Gestão de configuração e revisão de código"),
              ("sprints/sprint-00.md", "Ata da Sprint 0"), ("sprints/sprint-01.md", "Ata da Sprint 1"),
-             ("mvp-e-implantacao.md", "MVP e implantação"), ("historico-do-projeto.md", "Histórico do projeto")]
+             ("mvp-e-implantacao.md", "Desenvolvimento do MVP"), ("cicd-e-deploy.md", "Integração e entrega contínuas (CI/CD) e deploy"),
+             ("historico-do-projeto.md", "Histórico do projeto")]
     partes = [md_para_html((pasta / f).read_text(encoding="utf-8"), (pasta / f).parent, Path(f).stem) for f, _ in ordem]
     sumario = ("<h1 class='semquebra'>Sumário</h1><ol>" + "".join(f"<li>{t}</li>" for _, t in ordem) + "</ol>"
-               "<p>Repositório: https://github.com/Umizin/histolente (privado; acesso mediante convite). "
+               "<p>Aplicação: https://189-24-15-186.sslip.io. "
+               "Repositório: https://github.com/Umizin/histolente (privado; acesso mediante convite). "
                "Quadro: https://github.com/users/Umizin/projects/1.</p>")
+    mapa = md_para_html((pasta / "mapa-da-entrega.md").read_text(encoding="utf-8"), pasta, "mapa-da-entrega")
     sub = ("Projeto: Reconhecimento Automatizado de Padrões Histológicos em Câncer Colorretal com Inteligência "
            "Artificial: Uma Ferramenta de Apoio à Patologia Digital — ferramenta HistoLente")
-    imprimir(_html("Gestão e Desenvolvimento", CSS_PROJETO, capa("GESTÃO E DESENVOLVIMENTO", sub) + sumario + "\n".join(partes)),
+    imprimir(_html("Gestão e Desenvolvimento", CSS_PROJETO, capa("GESTÃO E DESENVOLVIMENTO", sub) + sumario + mapa + "\n".join(partes)),
              pasta / "gestao-e-desenvolvimento.pdf")
+    # pasta da entrega: o PDF e o índice, prontos para enviar
+    entrega = ROOT / "entregas/gestao-e-desenvolvimento"
+    entrega.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(pasta / "gestao-e-desenvolvimento.pdf", entrega / "HistoLente-Gestao-e-Desenvolvimento.pdf")
 
 
 if __name__ == "__main__":
