@@ -41,3 +41,9 @@ Thumbs.db
 
 # Saídas de treino (checkpoints ficam no Drive / ml/models)
 ml/runs/
+
+# Material entregue pelo AVA (gerado por tools/md2pdf.py; não vai para o repositório)
+entregas/
+
+# Scripts de geração dos formulários da pesquisa (ficam só com o autor)
+docs/pesquisa/*.gs

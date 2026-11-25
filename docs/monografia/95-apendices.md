@@ -18,7 +18,7 @@
 
 # Apêndice D — Instrumento de elicitação (formulário online)
 
-O instrumento foi aplicado via Google Forms, gerado a partir do script `docs/pesquisa/criar-formulario-elicitacao.gs`, que contém também o texto integral do TCLE apresentado aos participantes.
+O instrumento foi aplicado via Google Forms, gerado por um script do Google Apps Script mantido pelo autor, que contém também o texto integral do TCLE apresentado aos participantes.
 
 @@incluir ../pesquisa/roteiro-entrevista-elicitacao.md | Seção 1 — Apresentação e consentimento@@
 
